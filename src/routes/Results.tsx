@@ -1,6 +1,3 @@
-import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
-import "../App.css";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getSubmissionsByRoom, Submission } from "../lib/submissionsApi";
@@ -41,13 +38,9 @@ function Results() {
   }
 
   return (
-    <>
-      <div>
-        <img src={viteLogo} className="logo" alt="Vite logo" />
-        <img src={reactLogo} className="logo react" alt="React logo" />
-      </div>
+    <div className="card">
       <h1>Results</h1>
-      <div className="card">
+      <div>
         <div style={{ padding: "1rem" }}>
           <h2>Results for Room: {roomId}</h2>
 
@@ -80,7 +73,7 @@ function Results() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
