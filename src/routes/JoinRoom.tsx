@@ -1,6 +1,3 @@
-import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
-import "../App.css";
 import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import DrawingCanvas, {
@@ -59,13 +56,9 @@ function JoinRoom() {
     return <p>Missing room id.</p>;
   }
   return (
-    <>
-      <div>
-        <img src={viteLogo} className="logo" alt="Vite logo" />
-        <img src={reactLogo} className="logo react" alt="React logo" />
-      </div>
+    <div className="card">
       <h1>Join Room</h1>
-      <div className="card">
+      <div>
         <section style={{ marginBottom: "1rem" }}>
           <h3>{`Hello ${name}`}</h3>
         </section>
@@ -112,7 +105,7 @@ function JoinRoom() {
         )}
         {error && <div>{error}</div>}
       </div>
-    </>
+    </div>
   );
 }
 

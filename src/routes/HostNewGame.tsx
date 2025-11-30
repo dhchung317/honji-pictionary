@@ -1,6 +1,3 @@
-import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
-import "../App.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { createRoom } from "../lib/roomApi";
@@ -10,7 +7,7 @@ function HostNewGame() {
   const [prompt, setPrompt] = useState("Draw a dragon eating ramen");
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const handleCreate = async () => {
     if (!prompt.trim()) {
       setError("Prompt cannot be empty.");
@@ -29,13 +26,9 @@ function HostNewGame() {
   };
 
   return (
-    <>
-      <div>
-        <img src={viteLogo} className="logo" alt="Vite logo" />
-        <img src={reactLogo} className="logo react" alt="React logo" />
-      </div>
+    <div className="card">
       <h1>Host New Game</h1>
-      <div className="card">
+      <div>
         <label>
           Prompt
           <br />
@@ -53,7 +46,7 @@ function HostNewGame() {
           {isCreating ? "Creating..." : "Create Game"}
         </button>
       </div>
-    </>
+    </div>
   );
 }
 

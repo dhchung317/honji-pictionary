@@ -1,9 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { getRoom, updateRoomStatus, type Room } from "../lib/roomApi";
-
-import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
-import "../App.css";
 import { useEffect, useState } from "react";
 
 function HostRoom() {
@@ -65,11 +61,7 @@ function HostRoom() {
   const joinUrl = `${baseUrl}/join/${room.id}`;
 
   return (
-    <>
-      <div>
-        <img src={viteLogo} className="logo" alt="Vite logo" />
-        <img src={reactLogo} className="logo react" alt="React logo" />
-      </div>
+    <div className="card">
       <h2>Host Room: {room.id}</h2>
 
       {/* LOBBY PHASE */}
@@ -150,7 +142,7 @@ function HostRoom() {
           <button onClick={handleViewResults}>View results</button>
         </section>
       )}
-    </>
+    </div>
   );
 }
 

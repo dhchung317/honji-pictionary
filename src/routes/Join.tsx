@@ -1,16 +1,10 @@
-import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
-import "../App.css";
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function Join() {
   const navigate = useNavigate();
-  const { roomId } = useParams();
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const [nameError, setNameError] = useState<string | null>(null);
 
@@ -30,14 +24,16 @@ function Join() {
   };
 
   return (
-    <>
-      <div>
-        <img src={viteLogo} className="logo" alt="Vite logo" />
-        <img src={reactLogo} className="logo react" alt="React logo" />
-      </div>
+    <div className="card">
       <h1>Join Room</h1>
-      <div className="card">
-        <section style={{ marginBottom: "1rem", display: 'flex', flexDirection: 'column' }}>
+      <div>
+        <section
+          style={{
+            marginBottom: "1rem",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <h3>Name</h3>
           <input
             value={name}
@@ -53,12 +49,15 @@ function Join() {
             onChange={(e) => setCode(e.target.value)}
             placeholder="Enter your room code"
           />
-          <button style={{display: 'block', marginTop: '18px'}} onClick={handleJoin}>
+          <button
+            style={{ display: "block", marginTop: "18px" }}
+            onClick={handleJoin}
+          >
             Join
           </button>
         </section>
       </div>
-    </>
+    </div>
   );
 }
 
