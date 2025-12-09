@@ -37,41 +37,87 @@ function Results() {
     );
   }
 
+  const sorted = [...submissions].sort((a, b) => {
+    if (typeof a.rank === "number" && typeof b.rank === "number") {
+      return a.rank - b.rank; // rank 1 is best
+    }
+    if (typeof a.score === "number" && typeof b.score === "number") {
+      return b.score - a.score; // higher score first
+    }
+    return (a.createdAt ?? "").localeCompare(b.createdAt ?? "");
+  });
+
+  const winner = sorted[0];
+
   return (
     <div className="card">
       <h1>Results</h1>
-      <div>
-        <div style={{ padding: "1rem" }}>
-          <h2>Results for Room: {roomId}</h2>
 
+      <div style={{ padding: "1rem" }}>
+        <h2>Results for Room: {roomId}</h2>
+
+        <section style={{ marginBottom: "1rem" }}>
+          <h3>Winner</h3>
+          <p>
+            🏆 <strong>{winner.playerName}</strong>
+            {typeof winner.score === "number" && (
+              <> — score: {winner.score.toFixed(2)}</>
+            )}
+          </p>
+          <div
+            style={{
+              maxWidth: 400,
+              marginTop: "0.5rem",
+              border: "1px solid #ccc",
+              borderRadius: 4,
+            }}
+          >
+            <img
+              src={winner.imageDataUrl}
+              alt={`Winning submission from ${winner.playerName}`}
+              style={{ width: "100%", height: "auto", display: "block" }}
+            />
+          </div>
+        </section>
+
+        <section>
+          <h3>All submissions</h3>
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
               gap: "1rem",
             }}
           >
-            {submissions.map((sub) => (
+            {sorted.map((s) => (
               <div
-                key={sub.id}
+                key={s.id}
                 style={{
                   border: "1px solid #ccc",
+                  borderRadius: 4,
                   padding: "0.5rem",
-                  borderRadius: "4px",
                 }}
               >
-                <strong>{sub.playerName}</strong>
-                <div style={{ marginTop: "0.5rem" }}>
-                  <img
-                    src={sub.imageDataUrl}
-                    alt={`Submission from ${sub.playerName}`}
-                    style={{ width: "100%", height: "auto" }}
-                  />
+                <div style={{ marginBottom: "0.25rem" }}>
+                  <strong>{s.playerName}</strong>
                 </div>
+                {typeof s.rank === "number" && (
+                  <div style={{ fontSize: "0.9rem", marginBottom: "0.25rem" }}>
+                    Rank: {s.rank}
+                    {typeof s.score === "number" && (
+                      <> — {s.score.toFixed(2)}</>
+                    )}
+                  </div>
+                )}
+                <img
+                  src={s.imageDataUrl}
+                  alt={`Submission from ${s.playerName}`}
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                />
               </div>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

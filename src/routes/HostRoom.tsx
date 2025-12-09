@@ -7,7 +7,7 @@ import {
   startRound,
   // updateRoomStatus,
   type Room,
-} from "../lib/roomApi";
+} from "../lib/roomsApi";
 import { useEffect, useState } from "react";
 import { getPlayersByRoom } from "../lib/playersApi";
 import { useCountdown } from "../hooks/useCountdown";
@@ -102,9 +102,9 @@ function HostRoom() {
   // const joinUrl = `${baseUrl}/join/${room.id}`;
 
   const isLobby = room.status === "LOBBY";
-  // const isDrawing = room.status === "DRAWING";
-  // const isScoring = room.status === "SCORING";
-  // const isDone = room.status === "DONE";
+  const isDrawing = room.status === "DRAWING";
+  const isScoring = room.status === "SCORING";
+  const isDone = room.status === "DONE";
 
   return (
     <div className="card">
@@ -128,38 +128,40 @@ function HostRoom() {
           </button>
         </section>
       ) : null}
+
+        {/* DRAWING view */}
+  {isDrawing && (
+    <section style={{ marginTop: "1rem" }}>
+      <h3>Drawing in progress</h3>
+      <p>Prompt:</p>
+      <p>
+        <strong>{room.prompt}</strong>
+      </p>
+      {/* later: show countdown using room.roundEndAt */}
+      <p>(Timer UI coming from roundEndAt.)</p>
+    </section>
+  )}
+
+  {/* SCORING view */}
+  {isScoring && (
+    <section style={{ marginTop: "1rem" }}>
+      <h3>Scoring…</h3>
+      <p>The drawing phase has ended. The backend/AI would score now.</p>
+      {/* <button onClick={handleViewResults}>View provisional results</button> */}
+    </section>
+  )}
+
+  {/* DONE view */}
+  {isDone && (
+    <section style={{ marginTop: "1rem" }}>
+      <h3>Round finished</h3>
+      {/* <button onClick={handleViewResults}>View results</button> */}
+    </section>
+  )}
     </div>
   );
 }
 
-//   {/* DRAWING view */}
-//   {isDrawing && (
-//     <section style={{ marginTop: "1rem" }}>
-//       <h3>Drawing in progress</h3>
-//       <p>Prompt:</p>
-//       <p>
-//         <strong>{room.prompt}</strong>
-//       </p>
-//       {/* later: show countdown using room.roundEndAt */}
-//       <p>(Timer UI coming from roundEndAt.)</p>
-//     </section>
-//   )}
 
-//   {/* SCORING view */}
-//   {isScoring && (
-//     <section style={{ marginTop: "1rem" }}>
-//       <h3>Scoring…</h3>
-//       <p>The drawing phase has ended. The backend/AI would score now.</p>
-//       <button onClick={handleViewResults}>View provisional results</button>
-//     </section>
-//   )}
-
-//   {/* DONE view */}
-//   {isDone && (
-//     <section style={{ marginTop: "1rem" }}>
-//       <h3>Round finished</h3>
-//       <button onClick={handleViewResults}>View results</button>
-//     </section>
-//   )}
 
 export default HostRoom;
