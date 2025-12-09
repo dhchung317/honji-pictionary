@@ -8,6 +8,7 @@ export interface Room {
   status: RoomStatus;
   createdAt: string;
   roundEndAt: string | null;
+  drawingDurationMs: number;
 }
 
 const STORAGE_KEY = "drawBattle.rooms";
@@ -37,14 +38,18 @@ export async function createRoom(prompt: string): Promise<Room> {
   await new Promise((r) => setTimeout(r, 200));
 
   const rooms = loadAllRooms();
-  const now = new Date().toISOString();
+  const now = new Date();
+  const createdAt = now.toISOString();
+
+  const drawingDurationMs = 10_000;
 
   const room: Room = {
     id: generateRoomId(),
     prompt,
     status: "LOBBY", // starts in lobby
-    createdAt: now,
+    createdAt,
     roundEndAt: null,
+    drawingDurationMs,
   };
 
   rooms.push(room);
@@ -59,11 +64,25 @@ export async function getRoom(roomId: string): Promise<Room | null> {
 
   const rooms = loadAllRooms();
   const normalized = roomId.trim().toLowerCase();
-  const room =
-    rooms.find((r) => r.id.trim().toLowerCase() === normalized) ?? null;
+  const idx = rooms.findIndex((r) => r.id.trim().toLowerCase() === normalized);
+  if (idx === -1) {
+    console.log("[roomsApi] getRoom", roomId, "-> not found");
+    return null;
+  }
 
-  console.log("[roomsApi] getRoom", roomId, "->", room);
-  return room;
+  const stored = rooms[idx];
+  const updated = applyAutomaticPhase(stored);
+
+  if (
+    updated.status !== stored.status ||
+    updated.roundEndAt !== stored.roundEndAt
+  ) {
+    rooms[idx] = updated;
+    saveAllRooms(rooms);
+  }
+
+  console.log("[roomsApi] getRoom", roomId, "->", updated);
+  return updated;
 }
 
 export async function updateRoomStatus(
@@ -89,5 +108,53 @@ export async function updateRoomStatus(
   saveAllRooms(rooms);
 
   console.log("[roomsApi] updateRoomStatus", roomId, "->", updated);
+  return updated;
+}
+
+export async function startRound(roomId: string): Promise<Room | null> {
+  await new Promise((r) => setTimeout(r, 150));
+
+  const rooms = loadAllRooms();
+  const normalized = roomId.trim().toLowerCase();
+  const idx = rooms.findIndex(
+    (r) => r.id.trim().toLowerCase() === normalized
+  );
+  if (idx === -1) return null;
+
+  const existing = rooms[idx];
+  const now = Date.now();
+
+  // Only start if we're in LOBBY
+  if (existing.status !== "LOBBY") return existing;
+
+  const endTime = new Date(now + existing.drawingDurationMs).toISOString();
+
+  const updated: Room = {
+    ...existing,
+    status: "DRAWING",
+    roundEndAt: endTime,
+  };
+
+  rooms[idx] = updated;
+  saveAllRooms(rooms);
+
+  console.log("[roomsApi] startRound", roomId, "->", updated);
+  return updated;
+}
+
+function applyAutomaticPhase(room: Room): Room {
+  const now = Date.now();
+  const updated = { ...room };
+
+  if (updated.status === "DRAWING" && updated.roundEndAt) {
+    const end = Date.parse(updated.roundEndAt);
+    if (now >= end) {
+      updated.status = "SCORING"; // or DONE directly, depending on flow
+    }
+  }
+
+  // For now, we don't auto-progress SCORING → DONE,
+  // but you could add that later.
+
   return updated;
 }

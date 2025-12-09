@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { registerPlayer } from "../lib/playersApi";
+
+const PLAYER_ID_KEY = "drawBattle.playerId";
 
 function Join() {
   const navigate = useNavigate();
@@ -15,10 +18,18 @@ function Join() {
     }
   }, []);
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     const trimmed = name.trim();
-    if (!trimmed) setNameError("Enter a name!");
+    if (!trimmed) return setNameError("Enter a name!");
+    // TODO: handling for invalid/non existent codes
+    if (!code) return;
+
     window.localStorage.setItem("playerName", trimmed);
+    const existingId = window.localStorage.getItem(PLAYER_ID_KEY);
+    const player = await registerPlayer(code, trimmed);
+    if (!existingId) {
+      window.localStorage.setItem(PLAYER_ID_KEY, player.id);
+    }
     setName(trimmed);
     navigate(code);
   };
