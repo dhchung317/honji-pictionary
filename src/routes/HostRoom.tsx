@@ -1,49 +1,90 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { getRoom, updateRoomStatus, type Room } from "../lib/roomApi";
+import {
+  // useNavigate,
+  useParams,
+} from "react-router-dom";
+import {
+  getRoom,
+  startRound,
+  // updateRoomStatus,
+  type Room,
+} from "../lib/roomApi";
 import { useEffect, useState } from "react";
+import { getPlayersByRoom } from "../lib/playersApi";
+import { useCountdown } from "../hooks/useCountdown";
 
 function HostRoom() {
   const { roomId } = useParams<{ roomId: string }>();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [playersCount, setPlayersCount] = useState(0);
+  const { isExpired } = useCountdown(room?.roundEndAt ?? null);
 
+  // Poll room for phase changes
   useEffect(() => {
     if (!roomId) return;
 
-    const load = async () => {
-      setLoading(true);
+    let cancelled = false;
+
+    const loadRoom = async () => {
       const r = await getRoom(roomId);
+      if (cancelled) return;
       if (!r) {
         setError("Room not found.");
+        setRoom(null);
       } else {
-        setRoom(r);
         setError(null);
+        setRoom(r);
       }
       setLoading(false);
     };
 
+    loadRoom();
+    const interval = setInterval(loadRoom, 3000);
+    if (isExpired) clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [roomId, isExpired]);
+
+  useEffect(() => {
+    if (!roomId) return;
+    let cancelled = false;
+
+    const load = async () => {
+      const players = await getPlayersByRoom(roomId);
+      console.log("players", players, roomId);
+      if (!cancelled) setPlayersCount(players.length);
+    };
+
     load();
-  }, [roomId]);
+    const interval = setInterval(load, 3000); // poll every 3s
+    if (isExpired) clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [roomId, isExpired]);
 
   const handleStartRound = async () => {
     if (!roomId) return;
     setIsUpdating(true);
     try {
       // later we can compute a real end time here
-      const updated = await updateRoomStatus(roomId, "DRAWING");
+      const updated = await startRound(roomId);
       if (updated) setRoom(updated);
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const handleViewResults = () => {
-    if (!roomId) return;
-    navigate(`/room/${roomId}/results`);
-  };
+  // const handleViewResults = () => {
+  //   if (!roomId) return;
+  //   navigate(`/room/${roomId}/results`);
+  // };
 
   if (!roomId) {
     return <p>Missing room id.</p>;
@@ -57,93 +98,68 @@ function HostRoom() {
     return <p>{error ?? "Room not found."}</p>;
   }
 
-  const baseUrl = window.location.origin;
-  const joinUrl = `${baseUrl}/join/${room.id}`;
+  // const baseUrl = window.location.origin;
+  // const joinUrl = `${baseUrl}/join/${room.id}`;
+
+  const isLobby = room.status === "LOBBY";
+  // const isDrawing = room.status === "DRAWING";
+  // const isScoring = room.status === "SCORING";
+  // const isDone = room.status === "DONE";
 
   return (
     <div className="card">
-      <h2>Host Room: {room.id}</h2>
+      <h2>Host Room</h2>
+      <h2>Room Code: {room.id}</h2>
 
-      {/* LOBBY PHASE */}
-      {room.status === "LOBBY" && (
-        <>
-          <section style={{ marginBottom: "1rem" }}>
-            <h3>Lobby</h3>
-            <p>
-              Share this link with players. Once everyone has joined, start the
-              round.
-            </p>
-            <code>{joinUrl}</code>
-          </section>
+      <section style={{ marginBottom: "1rem" }}>
+        <h3>Players joined</h3>
+        <p>{playersCount} player(s) in this room.</p>
+      </section>
 
-          <section style={{ marginBottom: "1rem" }}>
-            <h3>Prompt</h3>
-            <p>
-              The prompt is <strong>hidden from players</strong> until you start
-              the round.
-            </p>
-            {/* You can show it to yourself here or keep it hidden; 
-                I'm showing it to host only: */}
-            <details>
-              <summary>Show prompt (host only)</summary>
-              <p>{room.prompt}</p>
-            </details>
-          </section>
-
+      {isLobby ? (
+        <section>
+          <p>Once everyone has joined, start the round.</p>
+          <details>
+            <summary>Show prompt (dev)</summary>
+            <p>{room.prompt}</p>
+          </details>
           <button onClick={handleStartRound} disabled={isUpdating}>
             {isUpdating ? "Starting…" : "Start round"}
           </button>
-        </>
-      )}
-
-      {/* DRAWING PHASE */}
-      {room.status === "DRAWING" && (
-        <>
-          <section style={{ marginBottom: "1rem" }}>
-            <h3>Drawing in progress</h3>
-            <p>Players are drawing based on this prompt:</p>
-            <p>
-              <strong>{room.prompt}</strong>
-            </p>
-          </section>
-
-          <section style={{ marginBottom: "1rem" }}>
-            <h3>Have players join</h3>
-            <p>
-              New players can still join and submit until you end the round.
-            </p>
-            <code>{joinUrl}</code>
-          </section>
-
-          <section style={{ marginBottom: "1rem" }}>
-            <h3>Next actions (coming soon)</h3>
-            <ul>
-              <li>End round & lock submissions</li>
-              <li>Score round with AI</li>
-              <li>View final results</li>
-            </ul>
-          </section>
-
-          <button onClick={handleViewResults}>View results (dev)</button>
-        </>
-      )}
-
-      {/* other phases reserved for later */}
-      {room.status === "SCORING" && (
-        <section>
-          <h3>Scoring round…</h3>
-          <p>AI is evaluating drawings. (Mock coming soon.)</p>
         </section>
-      )}
-
-      {room.status === "DONE" && (
-        <section>
-          <h3>Round finished</h3>
-          <button onClick={handleViewResults}>View results</button>
-        </section>
-      )}
+      ) : null}
     </div>
   );
 }
+
+//   {/* DRAWING view */}
+//   {isDrawing && (
+//     <section style={{ marginTop: "1rem" }}>
+//       <h3>Drawing in progress</h3>
+//       <p>Prompt:</p>
+//       <p>
+//         <strong>{room.prompt}</strong>
+//       </p>
+//       {/* later: show countdown using room.roundEndAt */}
+//       <p>(Timer UI coming from roundEndAt.)</p>
+//     </section>
+//   )}
+
+//   {/* SCORING view */}
+//   {isScoring && (
+//     <section style={{ marginTop: "1rem" }}>
+//       <h3>Scoring…</h3>
+//       <p>The drawing phase has ended. The backend/AI would score now.</p>
+//       <button onClick={handleViewResults}>View provisional results</button>
+//     </section>
+//   )}
+
+//   {/* DONE view */}
+//   {isDone && (
+//     <section style={{ marginTop: "1rem" }}>
+//       <h3>Round finished</h3>
+//       <button onClick={handleViewResults}>View results</button>
+//     </section>
+//   )}
 
 export default HostRoom;
