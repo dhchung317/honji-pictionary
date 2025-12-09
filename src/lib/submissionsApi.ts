@@ -6,6 +6,9 @@ export interface Submission {
   playerName: string;
   imageDataUrl: string; // for now, we store the data URL directly
   createdAt: string;
+    // scoring info (optional until scored)
+  score?: number;
+  rank?: number;
 }
 
 const STORAGE_KEY = "drawBattle.submissions";
@@ -67,4 +70,48 @@ export async function getSubmissionsByRoom(
     `[getSubmissionsByRoom] roomId=${roomId}, count=${filtered.length}`
   );
   return filtered;
+}
+
+export function scoreSubmissionsForRoom(roomId: string): Submission[] {
+  const all = loadAllSubmissions();
+  const normalized = roomId.trim().toLowerCase();
+
+  const roomSubs = all.filter(
+    (s) => s.roomId.trim().toLowerCase() === normalized
+  );
+
+  if (roomSubs.length === 0) {
+    console.log("[scoreSubmissionsForRoom] no submissions for room", roomId);
+    return [];
+  }
+
+  // if already scored (all have scores), don't rescore
+  const alreadyScored = roomSubs.every((s) => typeof s.score === "number");
+  if (alreadyScored) {
+    console.log("[scoreSubmissionsForRoom] already scored", roomId);
+    return roomSubs;
+  }
+
+  // Fake "AI" scoring: random scores for now
+  const scored = roomSubs
+    .map((s) => ({
+      ...s,
+      score: Math.random() * 10, // 0–10
+    }))
+    .sort((a, b) => (b.score! - a.score!)) // highest score first
+    .map((s, idx) => ({
+      ...s,
+      rank: idx + 1,
+    }));
+
+  // merge back into all submissions
+  const updatedAll = all.map((s) => {
+    const match = scored.find((x) => x.id === s.id);
+    return match ? match : s;
+  });
+
+  saveAllSubmissions(updatedAll);
+
+  console.log("[scoreSubmissionsForRoom] scored room", roomId, scored);
+  return scored;
 }

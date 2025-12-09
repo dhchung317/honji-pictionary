@@ -4,7 +4,7 @@ import DrawingCanvas, {
   DrawingCanvasHandle,
 } from "../components/DrawingCanvas";
 import { createSubmission } from "../lib/submissionsApi";
-import { getRoom, Room, RoomStatus } from "../lib/roomApi";
+import { getRoom, Room, RoomStatus } from "../lib/roomsApi";
 import { useCountdown } from "../hooks/useCountdown";
 
 const formatSeconds = (secs: number) => {
@@ -31,6 +31,8 @@ function JoinRoom() {
     roomError,
     setRoomError,
   ] = useState<string | null>(null);
+
+  roomLoading && roomError
 
   const prompt = "Draw a dragon eating ramen"; // later: fetch from room
   const isLobby = status === "LOBBY";

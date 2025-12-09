@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { createRoom } from "../lib/roomApi";
+import { createRoom } from "../lib/roomsApi";
 
 function HostNewGame() {
   const navigate = useNavigate();
@@ -18,8 +18,9 @@ function HostNewGame() {
     try {
       const room = await createRoom(prompt.trim());
       navigate(`/host/${room.id}`);
-    } catch (e) {
-      setError("Failed to create room. Try again.");
+    } catch (e:unknown) {
+
+      setError((e as Error).message);
     } finally {
       setIsCreating(false);
     }
