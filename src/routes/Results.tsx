@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getSubmissionsByRoom, Submission } from "../lib/submissionsApi";
+import { getSubmissionsByRoom } from "../lib/submissionsApi";
+import { getRoom } from "../lib/roomsApi";
+import { Submission } from "../../shared/submission";
 
 function Results() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -12,9 +14,18 @@ function Results() {
 
     const fetchSubmissions = async () => {
       setLoading(true);
+      const room = await getRoom(roomId);
       const subs = await getSubmissionsByRoom(roomId);
-      setSubmissions(subs);
-      setLoading(false);
+      const ranked = room.rankedPlayerIds;
+
+      if (ranked !== null) {
+        const rankedSubs = ranked
+          .map((r) => subs.find((s) => s.playerId === r))
+          .filter((rs): rs is Submission => rs !== undefined);
+
+        setSubmissions(rankedSubs);
+        setLoading(false);
+      }
     };
 
     fetchSubmissions();
@@ -37,17 +48,7 @@ function Results() {
     );
   }
 
-  const sorted = [...submissions].sort((a, b) => {
-    if (typeof a.rank === "number" && typeof b.rank === "number") {
-      return a.rank - b.rank; // rank 1 is best
-    }
-    if (typeof a.score === "number" && typeof b.score === "number") {
-      return b.score - a.score; // higher score first
-    }
-    return (a.createdAt ?? "").localeCompare(b.createdAt ?? "");
-  });
-
-  const winner = sorted[0];
+  const winner = submissions[0];
 
   return (
     <div className="card">
@@ -89,7 +90,7 @@ function Results() {
               gap: "1rem",
             }}
           >
-            {sorted.map((s) => (
+            {submissions.map((s) => (
               <div
                 key={s.id}
                 style={{
