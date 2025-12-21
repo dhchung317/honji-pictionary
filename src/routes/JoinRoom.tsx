@@ -49,7 +49,7 @@ function JoinRoom() {
   }, [room, isDrawing, isExpired, hasSubmitted, isSubmitting]);
 
   useEffect(() => {
-    const savedName = window.localStorage.getItem("playerName");
+    const savedName = window.localStorage.getItem(`playerName:${roomId}`);
     if (savedName) {
       setName(savedName);
     }
