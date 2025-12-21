@@ -1,21 +1,19 @@
-# React + TypeScript + Vite
+# Honji Pictionary
+### Made with React + TypeScript + Vite
+---
+POC pictionary game - live at https://honji-pictionary.vercel.app/
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Compete to see who draws the best!
 
-While this project uses React, Vite supports many popular JS frameworks. [See all the supported frameworks](https://vitejs.dev/guide/#scaffolding-your-first-vite-project).
+### How to play
+---
 
-## Deploy Your Own
+Host a new game at https://honji-pictionary.vercel.app/
 
-Deploy your own Vite project with Vercel.
+Players enter their name and room code at https://honji-pictionary.vercel.app/join
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/examples/tree/main/framework-boilerplates/vite-react&template=vite-react)
+Hosts can start when everyone has joined 
 
-_Live Example: https://vite-react-example.vercel.app_
+Players have a time limit to draw the prompt
 
-### Deploying From Your Terminal
-
-You can deploy your new Vite project with a single command from your terminal using [Vercel CLI](https://vercel.com/download):
-
-```shell
-$ vercel
-```
+Once game is over you can see the results
