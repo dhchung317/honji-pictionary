@@ -1,19 +1,7 @@
-// src/lib/roomsApi.ts
-
 import { API_BASE_URL } from "./config";
+import {Room} from '../../shared/room'
+
 // import { scoreSubmissionsForRoom } from "./submissionsApi";
-
-export type RoomStatus = "LOBBY" | "DRAWING" | "SCORING" | "DONE";
-
-export interface Room {
-  id: string;
-  prompt: string;
-  status: RoomStatus;
-  createdAt: string;
-  roundEndAt: string | null;
-  drawingDurationMs: number;
-  scoredAt: string | null;
-}
 
 // const STORAGE_KEY = "drawBattle.rooms";
 
@@ -74,26 +62,24 @@ export async function createRoom(prompt: string) {
   return res.json();
 }
 
-export async function getRoom(roomId:string) {
-    const res = await fetch(`${API_BASE_URL}/api/get-room`, {
+export async function getRoom(roomId: string): Promise<Room> {
+  const res = await fetch(`${API_BASE_URL}/api/get-room`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ roomId }),
   });
   if (!res.ok) throw new Error("Room id not found");
   return res.json();
-  
 }
 
-export async function startRound(roomId:string) {
-    const res = await fetch(`${API_BASE_URL}/api/start-round`, {
+export async function startRound(roomId: string) {
+  const res = await fetch(`${API_BASE_URL}/api/start-round`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ roomId }),
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json();
-  
 }
 
 // export async function getRoom(roomId: string): Promise<Room | null> {
