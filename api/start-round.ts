@@ -1,5 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { getRoomById, Room, saveRoom } from "./_roomStore.js";
+import { getRoomById, saveRoom } from "./_roomStore.js";
+import { listPlayers } from "./_playerStore.js";
+import { Room } from "../shared/room.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -25,11 +27,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
+    const players = await listPlayers(roomId);
+    const frozen = players.map((p) => p.id);
+
     const now = Date.now();
     const updated: Room = {
       ...room,
       status: "DRAWING",
       roundEndAt: new Date(now + room.drawingDurationMs).toISOString(),
+      frozenPlayerIds: frozen,
     };
 
     await saveRoom(updated);
