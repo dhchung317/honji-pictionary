@@ -1,5 +1,4 @@
-import { API_BASE_URL } from "./config";
-import {Room} from '../../shared/room'
+import { Room } from "../../shared/room";
 
 // import { scoreSubmissionsForRoom } from "./submissionsApi";
 
@@ -53,7 +52,7 @@ import {Room} from '../../shared/room'
 // }
 
 export async function createRoom(prompt: string) {
-  const res = await fetch(`${API_BASE_URL}/api/create-room`, {
+  const res = await fetch(`/api/create-room`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt }),
@@ -63,7 +62,7 @@ export async function createRoom(prompt: string) {
 }
 
 export async function getRoom(roomId: string): Promise<Room> {
-  const res = await fetch(`${API_BASE_URL}/api/get-room`, {
+  const res = await fetch(`/api/get-room`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ roomId }),
@@ -73,7 +72,7 @@ export async function getRoom(roomId: string): Promise<Room> {
 }
 
 export async function startRound(roomId: string) {
-  const res = await fetch(`${API_BASE_URL}/api/start-round`, {
+  const res = await fetch(`/api/start-round`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ roomId }),
