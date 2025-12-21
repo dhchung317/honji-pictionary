@@ -4,8 +4,9 @@ import DrawingCanvas, {
   DrawingCanvasHandle,
 } from "../components/DrawingCanvas";
 import { createSubmission } from "../lib/submissionsApi";
-import { getRoom, Room, RoomStatus } from "../lib/roomsApi";
+import { getRoom } from "../lib/roomsApi";
 import { useCountdown } from "../hooks/useCountdown";
+import { Room, RoomStatus } from "../../shared/room";
 
 const formatSeconds = (secs: number) => {
   const m = Math.floor(secs / 60);
@@ -23,16 +24,10 @@ function JoinRoom() {
   const [room, setRoom] = useState<Room | null>(null);
   const [status, setStatus] = useState<RoomStatus>("LOBBY");
   const { secondsLeft, isExpired } = useCountdown(room?.roundEndAt ?? null);
-  const [
-    roomLoading,
-    setRoomLoading,
-  ] = useState(true);
-  const [
-    roomError,
-    setRoomError,
-  ] = useState<string | null>(null);
+  const [roomLoading, setRoomLoading] = useState(true);
+  const [roomError, setRoomError] = useState<string | null>(null);
 
-  roomLoading && roomError
+  roomLoading && roomError;
 
   const prompt = "Draw a dragon eating ramen"; // later: fetch from room
   const isLobby = status === "LOBBY";
@@ -115,12 +110,18 @@ function JoinRoom() {
       setError("Could not capture drawing.");
       return;
     }
+    const playerId = window.localStorage.getItem(`playerId:${roomId}`);
+    if (!playerId) {
+      setError("player id not found");
+      return;
+    }
 
     setError(null);
     setIsSubmitting(true);
     try {
       await createSubmission({
         roomId,
+        playerId,
         playerName: trimmedName,
         imageDataUrl: dataUrl,
       });
