@@ -10,7 +10,7 @@ function Join() {
   const [nameError, setNameError] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedName = window.localStorage.getItem("playerName");
+    const savedName = window.localStorage.getItem(`playerName:${code}`);
     if (savedName) {
       setName(savedName);
     }
@@ -23,8 +23,9 @@ function Join() {
     // TODO: handling for invalid/non existent codes
     if (!code) return;
 
-    const player = await registerPlayer(code, name);
+    const player = await registerPlayer(code, trimmed);
     window.localStorage.setItem(`playerId:${code}`, player.id);
+    window.localStorage.setItem(`playerName:${code}`, player.name);
 
     navigate(code);
   };
