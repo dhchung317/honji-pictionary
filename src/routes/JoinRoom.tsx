@@ -162,7 +162,7 @@ function JoinRoom() {
           <h3>{`Hello ${name}`}</h3>
         </section>
 
-        {secondsLeft !== null && (
+        {secondsLeft !== null && room?.status === "DRAWING" && (
           <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
             Time remaining: {formatSeconds(secondsLeft)}
           </p>
