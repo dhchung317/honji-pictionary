@@ -127,7 +127,7 @@ function HostRoom() {
         <h3>Players joined</h3>
         <p>{playersCount} player(s) in this room.</p>
         {players.map((p) => {
-          return <div>{p.name}</div>;
+          return <div key={p.id}>{p.name}</div>;
         })}
       </section>
 
