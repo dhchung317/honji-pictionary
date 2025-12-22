@@ -9,12 +9,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const roomId = String(req.body?.roomId || "").trim();
   const playerId = String(req.body?.playerId || "").trim();
   const playerName = String(req.body?.playerName || "").trim();
-  const imageDataUrl = String(req.body?.imageDataUrl || "");
+  const imageUrl = String(req.body?.imageUrl || "");
 
-  if (!roomId || !playerId || !playerName || !imageDataUrl) {
+  if (!roomId || !playerId || !playerName || !imageUrl) {
     return res
       .status(400)
-      .json({ error: "roomId, playerId, playerName, imageDataUrl required" });
+      .json({ error: "roomId, playerId, playerName, imageUrl required" });
   }
 
   const room = await getRoomById(roomId);
@@ -33,15 +33,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!endAt) return res.status(400).json({ error: "" });
   const end = new Date(endAt).getTime();
   if (now > end)
-    return res
-      .status(400)
-      .json({ error: "Cannot accept submission from late players" });
+    return res.status(400).json({ error: "submission after end of round" });
 
-  const submission = await createOrReplaceSubmission({
+  const round = room.roundId;
+
+  const submission = await createOrReplaceSubmission(round, {
     roomId,
     playerId,
     playerName,
-    imageDataUrl,
+    imageUrl,
   });
 
   res.status(200).json(submission);

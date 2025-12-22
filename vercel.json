@@ -1,3 +1,12 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "routes": [
+    { "src": "^/api/(.*)$", "dest": "/api/$1" },
+
+    {
+      "src": "^/(@vite/.*|@react-refresh$|src/.*|@fs/.*|@id/.*|node_modules/.*)$",
+      "continue": true
+    },
+
+    { "src": ".*", "dest": "/index.html" }
+  ]
 }
