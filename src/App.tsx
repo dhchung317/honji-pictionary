@@ -6,6 +6,7 @@ import JoinRoom from "./routes/JoinRoom";
 import Results from "./routes/Results";
 import Join from "./routes/Join";
 import { Layout } from "./Layout";
+import PlayerResults from "./routes/PlayerResults";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/join" element={<Join />} />
         <Route path="/join/:roomId" element={<JoinRoom />} />
         <Route path="/room/:roomId/results" element={<Results />} />
+        <Route path="/room/:roomId/playerresults" element={<PlayerResults />} />
       </Route>
     </Routes>
   );

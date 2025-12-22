@@ -3,7 +3,7 @@ export interface Submission {
   roomId: string;
   playerId: string;
   playerName: string;
-  imageDataUrl: string; // for now (later: imageUrl)
+  imageUrl: string; // for now (later: imageUrl)
   createdAt: string;
   rank?: number;
   score?: number;

@@ -1,4 +1,5 @@
-import { useParams } from "react-router-dom";
+import { upload } from "@vercel/blob/client";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import DrawingCanvas, {
   DrawingCanvasHandle,
@@ -15,6 +16,7 @@ const formatSeconds = (secs: number) => {
 };
 
 function JoinRoom() {
+  const navigate = useNavigate();
   const { roomId } = useParams();
   const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,7 +35,7 @@ function JoinRoom() {
   const isLobby = status === "LOBBY";
   const isDrawing = status === "DRAWING";
   // const isScoring = status === "SCORING";
-  // const isDone = status === "DONE";
+  const isDone = status === "DONE";
 
   useEffect(() => {
     if (!room) return;
@@ -47,6 +49,12 @@ function JoinRoom() {
     // we intentionally DO NOT await submitDrawing here;
     // it's fine to fire-and-forget in this effect.
   }, [room, isDrawing, isExpired, hasSubmitted, isSubmitting]);
+
+  useEffect(() => {
+    if (isDone) {
+      navigate(`/room/${roomId}/playerresults`);
+    }
+  });
 
   useEffect(() => {
     const savedName = window.localStorage.getItem(`playerName:${roomId}`);
@@ -105,11 +113,11 @@ function JoinRoom() {
       return;
     }
 
-    const dataUrl = canvasRef.current.getImageDataUrl();
-    if (!dataUrl) {
-      setError("Could not capture drawing.");
-      return;
-    }
+    // const dataUrl = canvasRef.current.getImageDataUrl();
+    // if (!dataUrl) {
+    //   setError("Could not capture drawing.");
+    //   return;
+    // }
     const playerId = window.localStorage.getItem(`playerId:${roomId}`);
     if (!playerId) {
       setError("player id not found");
@@ -119,11 +127,35 @@ function JoinRoom() {
     setError(null);
     setIsSubmitting(true);
     try {
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvasRef.current
+          ?.getCanvas()
+          ?.toBlob(
+            (b) => (b ? resolve(b) : reject(new Error("toBlob failed"))),
+            "image/png"
+          );
+      });
+
+      const round = room.roundId;
+
+      const { url } = await upload(
+        `rooms/${roomId}/rounds/${round}/players/${playerId}.png`,
+        blob,
+        {
+          access: "public",
+          handleUploadUrl: "/api/blob-upload",
+          clientPayload: JSON.stringify({
+            roomId,
+            round,
+            playerId,
+          }),
+        }
+      );
       await createSubmission({
         roomId,
         playerId,
         playerName: trimmedName,
-        imageDataUrl: dataUrl,
+        imageUrl: url,
       });
       setHasSubmitted(true);
     } catch (e) {
@@ -203,6 +235,7 @@ function JoinRoom() {
             <p>Waiting for the host to score the round…</p>
           </section>
         )}
+
         {error && <div>{error}</div>}
       </div>
     </div>

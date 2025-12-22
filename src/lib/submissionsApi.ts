@@ -4,7 +4,7 @@ export async function createSubmission(input: {
   roomId: string;
   playerId: string;
   playerName: string;
-  imageDataUrl: string;
+  imageUrl: string;
 }): Promise<Submission> {
   const res = await fetch("/api/submit-drawing", {
     method: "POST",

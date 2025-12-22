@@ -7,7 +7,8 @@ import React, {
 } from "react";
 
 export interface DrawingCanvasHandle {
-  getImageDataUrl: () => string | null;
+  getCanvas: () => HTMLCanvasElement | null;
+  // getImageDataUrl: () => string | null;
   clear: () => void;
 }
 
@@ -64,11 +65,12 @@ const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
     useImperativeHandle(
       ref,
       () => ({
-        getImageDataUrl: () => {
-          const canvas = canvasRef.current;
-          if (!canvas) return null;
-          return canvas.toDataURL("image/png");
-        },
+        getCanvas: () => canvasRef.current,
+        // getImageDataUrl: () => {
+        //   const canvas = canvasRef.current;
+        //   if (!canvas) return null;
+        //   return canvas.toDataURL("image/png");
+        // },
         clear: () => {
           const ctx = ctxRef.current;
           if (!ctx) return;

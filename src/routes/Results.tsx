@@ -1,10 +1,11 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getSubmissionsByRoom } from "../lib/submissionsApi";
-import { getRoom } from "../lib/roomsApi";
+import { getRoom, nextRound, quit } from "../lib/roomsApi";
 import { Submission } from "../../shared/submission";
 
 function Results() {
+  const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,16 @@ function Results() {
       <div style={{ padding: "1rem" }}>
         <h2>Results for Room: {roomId}</h2>
 
+        <button onClick={() => nextRound(roomId)}>Next Round</button>
+        <button
+          onClick={() => {
+            quit(roomId);
+            navigate("/host/new");
+          }}
+        >
+          Quit (expedite TTL)
+        </button>
+
         <section style={{ marginBottom: "1rem" }}>
           <h3>Winner</h3>
           <p>
@@ -74,7 +85,7 @@ function Results() {
             }}
           >
             <img
-              src={winner.imageDataUrl}
+              src={winner.imageUrl}
               alt={`Winning submission from ${winner.playerName}`}
               style={{ width: "100%", height: "auto", display: "block" }}
             />
@@ -111,7 +122,7 @@ function Results() {
                   </div>
                 )}
                 <img
-                  src={s.imageDataUrl}
+                  src={s.imageUrl}
                   alt={`Submission from ${s.playerName}`}
                   style={{ width: "100%", height: "auto", display: "block" }}
                 />

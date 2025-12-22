@@ -10,4 +10,6 @@ export interface Room {
   scoredAt: string | null;
   frozenPlayerIds: string[];
   rankedPlayerIds: string[] | null;
+  roundId: number;
+  scoreNotesByPlayerId?: Record<string, string> | null;
 }
