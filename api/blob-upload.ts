@@ -1,13 +1,19 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById } from "./_roomStore.js";
 
-export default async function handler(request: Request) {
-  const body = (await request.json()) as HandleUploadBody;
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const body = req.body as HandleUploadBody;
 
   try {
     const jsonResponse = await handleUpload({
       body,
-      request,
+      request: req as any, // VercelRequest isn't a Fetch Request, but this works in Node runtime
+
       onBeforeGenerateToken: async (_pathname, clientPayload) => {
         const payload = clientPayload ? JSON.parse(clientPayload) : null;
         const { roomId, round, playerId } = payload ?? {};
@@ -43,27 +49,15 @@ export default async function handler(request: Request) {
           // you could pass a user id from auth, or a value from clientPayload
         };
       },
+
       onUploadCompleted: async ({ blob, tokenPayload }) => {
-        // Called by Vercel API on client upload completion
-        // Use tools like ngrok if you want this to work locally
-
-        console.log("blob upload completed", blob, tokenPayload);
-
-        try {
-          // Run any logic after the file upload completed
-          // const { userId } = JSON.parse(tokenPayload);
-          // await db.update({ avatar: blob.url, userId });
-        } catch (error) {
-          throw new Error("Could not update user");
-        }
+        // Optional: don’t rely on this locally unless you tunnel
+        console.log("blob upload completed", blob.url, tokenPayload);
       },
     });
 
-    return Response.json(jsonResponse);
+    return res.status(200).json(jsonResponse);
   } catch (error) {
-    return Response.json(
-      { error: (error as Error).message },
-      { status: 400 } // The webhook will retry 5 times waiting for a 200
-    );
+    return res.status(400).json({ error: (error as Error).message });
   }
 }
