@@ -1,15 +1,7 @@
-import {
-  useNavigate,
-  // useNavigate,
-  useParams,
-} from "react-router-dom";
-import {
-  getRoom,
-  startRound,
-  // updateRoomStatus,
-} from "../lib/roomsApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { getRoom, startRound } from "../lib/roomsApi";
 import { useEffect, useState } from "react";
-import { getPlayersByRoom} from "../lib/playersApi";
+import { getPlayersByRoom } from "../lib/playersApi";
 import { useCountdown } from "../hooks/useCountdown";
 import { Room } from "../../shared/room";
 import { Player } from "../../shared/player";
@@ -17,7 +9,7 @@ import { Player } from "../../shared/player";
 function HostRoom() {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const [room, setRoom] = useState<Room| null>(null);
+  const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -70,7 +62,6 @@ function HostRoom() {
 
     const load = async () => {
       const players = await getPlayersByRoom(roomId);
-      console.log("players", players, roomId);
       if (!cancelled) {
         setPlayersCount(players.length);
         setPlayers(players);
@@ -134,10 +125,10 @@ function HostRoom() {
       {isLobby ? (
         <section>
           <p>Once everyone has joined, start the round.</p>
-          <details>
+          {/* <details>
             <summary>Show prompt (dev)</summary>
-            <p>{room.prompt}</p>
-          </details>
+            <p>{room.currentPrompt}</p>
+          </details> */}
           <button onClick={handleStartRound} disabled={isUpdating}>
             {isUpdating ? "Starting…" : "Start round"}
           </button>
@@ -150,7 +141,7 @@ function HostRoom() {
           <h3>Drawing in progress</h3>
           <p>Prompt:</p>
           <p>
-            <strong>{room.prompt}</strong>
+            <strong>{room.currentPrompt}</strong>
           </p>
           {/* later: show countdown using room.roundEndAt */}
           <p>(Timer UI coming from roundEndAt.)</p>

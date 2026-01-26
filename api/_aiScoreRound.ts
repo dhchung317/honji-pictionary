@@ -1,9 +1,7 @@
 // api/_aiScoreRound.ts
-import OpenAI from "openai";
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+import { openai } from "./openai.js";
 
 export type ScoringInput = {
   playerId: string;
@@ -12,8 +10,14 @@ export type ScoringInput = {
 };
 
 const ScoreResultSchema = z.object({
-  rankedPlayerIds: z.array(z.string()).min(1),
-  notesByPlayerId: z.record(z.string(), z.string()).optional(),
+  rankedPlayerIds: z.array(z.string()),
+  notes: z.array(
+    z.object({
+      playerId: z.string(),
+      score: z.number().int().min(0).max(100),
+      note: z.string(),
+    }),
+  ),
 });
 
 export async function scoreRoundWithAI(params: {
@@ -33,11 +37,15 @@ export async function scoreRoundWithAI(params: {
         `You are judging a drawing round.\n` +
         `Prompt: "${prompt}".\n\n` +
         `Rank the drawings from best to worst based on: (1) matches prompt, (2) clarity/readability, (3) creativity.\n` +
+        `Give every player a score from 0–100. Higher is better. Include exactly one results entry per playerId.` +
+        `Note that these drawings are done under tight time constraints, with no tools that allow for polish or detail` +
+        `That being said, feel free to roast the artist for exceptionally bad drawings` +
+        `Instead of stating the obvious, use descriptive, exaggerated and dramatic language` +
         `Return ONLY the JSON schema.\n\n` +
         `Drawings:\n` +
         submissions
           .map(
-            (s, i) => `#${i + 1}: playerId=${s.playerId} name=${s.playerName}`
+            (s, i) => `#${i + 1}: playerId=${s.playerId} name=${s.playerName}`,
           )
           .join("\n"),
     },
@@ -61,5 +69,11 @@ export async function scoreRoundWithAI(params: {
     },
   });
 
-  return resp.output_parsed; // { rankedPlayerIds, notesByPlayerId? }
+  const parsed = resp.output_parsed;
+
+  if (!parsed) {
+    throw new Error("AI returned no parsed output");
+  }
+
+  return parsed;
 }

@@ -3,11 +3,10 @@ import { generateRoomId, redis as kv, TTL_SECONDS } from "./redis.js";
 
 const roomKey = (id: string) => `room:${id}`;
 
-export async function createRoom(prompt: string): Promise<Room> {
+export async function createRoom(): Promise<Room> {
   const now = new Date();
   const room: Room = {
     id: generateRoomId(),
-    prompt,
     status: "LOBBY",
     createdAt: now.toISOString(),
     roundEndAt: null,
@@ -16,6 +15,11 @@ export async function createRoom(prompt: string): Promise<Room> {
     frozenPlayerIds: [],
     rankedPlayerIds: null,
     roundId: 0,
+    scoreNotesByPlayerId: null,
+    scoreByPlayerId: null,
+    currentPrompt: null,
+    promptHistory: [],
+    theme: null,
   };
 
   // Upstash will JSON-serialize this object

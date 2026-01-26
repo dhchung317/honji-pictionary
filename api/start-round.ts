@@ -2,6 +2,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById, saveRoom } from "./_roomStore.js";
 import { listPlayers } from "./_playerStore.js";
 import { Room } from "../shared/room.js";
+import { genPrompt } from "./_aiGeneratePrompt.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -27,6 +28,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
+    const promptRes = await genPrompt({ history: room.promptHistory });
+
     const players = await listPlayers(roomId);
     const frozen = players.map((p) => p.id);
 
@@ -36,6 +39,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       status: "DRAWING",
       roundEndAt: new Date(now + room.drawingDurationMs).toISOString(),
       frozenPlayerIds: frozen,
+      currentPrompt: promptRes.prompt,
+      promptHistory: [...room.promptHistory, promptRes.prompt],
     };
 
     await saveRoom(updated);

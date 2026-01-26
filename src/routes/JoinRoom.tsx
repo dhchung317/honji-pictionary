@@ -18,43 +18,43 @@ const formatSeconds = (secs: number) => {
 function JoinRoom() {
   const navigate = useNavigate();
   const { roomId } = useParams();
+  const autoSubmittedRef = useRef(false);
   const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<DrawingCanvasHandle | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
-  const [status, setStatus] = useState<RoomStatus>("LOBBY");
+
   const { secondsLeft, isExpired } = useCountdown(room?.roundEndAt ?? null);
   const [roomLoading, setRoomLoading] = useState(true);
   const [roomError, setRoomError] = useState<string | null>(null);
 
   roomLoading && roomError;
 
-  const prompt = "Draw a dragon eating ramen"; // later: fetch from room
+  const prompt = room?.currentPrompt;
+
+  const status: RoomStatus = room?.status ?? "LOBBY";
   const isLobby = status === "LOBBY";
   const isDrawing = status === "DRAWING";
-  // const isScoring = status === "SCORING";
   const isDone = status === "DONE";
 
   useEffect(() => {
     if (!room) return;
-    if (!isDrawing) return; // you already have const isDrawing = room.status === "DRAWING";
+    if (!isDrawing) return;
     if (!isExpired) return;
-    if (hasSubmitted) return;
-    if (isSubmitting) return;
+    if (hasSubmitted || isSubmitting) return;
+    if (autoSubmittedRef.current) return;
 
-    // Auto-submit once when time is up
+    autoSubmittedRef.current = true;
     submitDrawing();
-    // we intentionally DO NOT await submitDrawing here;
-    // it's fine to fire-and-forget in this effect.
-  }, [room, isDrawing, isExpired, hasSubmitted, isSubmitting]);
+  }, [room, isExpired, hasSubmitted, isSubmitting]);
 
   useEffect(() => {
     if (isDone) {
       navigate(`/room/${roomId}/playerresults`);
     }
-  });
+  }, [isDone, navigate, roomId]);
 
   useEffect(() => {
     const savedName = window.localStorage.getItem(`playerName:${roomId}`);
@@ -69,29 +69,35 @@ function JoinRoom() {
     let cancelled = false;
 
     const loadRoom = async () => {
-      const r = await getRoom(roomId);
-      if (cancelled) return;
-      if (!r) {
-        setRoomError("Room not found.");
-        setRoom(null);
-      } else {
-        setRoomError(null);
-        setRoom(r);
-        setStatus(r.status);
+      try {
+        const r = await getRoom(roomId);
+        if (cancelled) return;
+
+        if (!r) {
+          setRoomError("Room not found.");
+          setRoom(null);
+        } else {
+          setRoomError(null);
+          setRoom(r);
+        }
+      } finally {
+        if (!cancelled) setRoomLoading(false);
       }
-      setRoomLoading(false);
     };
 
     loadRoom();
     const interval = setInterval(loadRoom, 3000);
 
-    if (isExpired) clearInterval(interval);
-
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [roomId, isExpired]);
+  }, [roomId]);
+
+  useEffect(() => {
+    autoSubmittedRef.current = false;
+    setHasSubmitted(false);
+  }, [room?.roundId]);
 
   const submitDrawing = async () => {
     if (!roomId) {
@@ -103,7 +109,7 @@ function JoinRoom() {
       return;
     }
 
-    const trimmedName = name.trim();
+    const trimmedName = name.trim() || "Player";
     if (!trimmedName) {
       setError("Please save your name before submitting.");
       return;
@@ -132,7 +138,7 @@ function JoinRoom() {
           ?.getCanvas()
           ?.toBlob(
             (b) => (b ? resolve(b) : reject(new Error("toBlob failed"))),
-            "image/png"
+            "image/png",
           );
       });
 
@@ -149,7 +155,7 @@ function JoinRoom() {
             round,
             playerId,
           }),
-        }
+        },
       );
       await createSubmission({
         roomId,
@@ -158,9 +164,9 @@ function JoinRoom() {
         imageUrl: url,
       });
       setHasSubmitted(true);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      setError("Failed to submit drawing. Try again.");
+      setError(e?.message ?? "Failed to submit drawing");
     } finally {
       setIsSubmitting(false);
     }
@@ -178,13 +184,11 @@ function JoinRoom() {
     await submitDrawing();
   };
 
-  if (!roomId) {
-    return <p>Missing room id.</p>;
-  }
-
-  if (isLobby) {
-    return <div> Waiting for host to start...</div>;
-  }
+  if (!roomId) return <p>Missing room id.</p>;
+  if (roomLoading) return <div>Loading room…</div>;
+  if (roomError) return <div>{roomError}</div>;
+  if (!room) return <div>Room not found.</div>;
+  if (isLobby) return <div>Waiting for host to start...</div>;
 
   return (
     <div className="card">
@@ -193,12 +197,13 @@ function JoinRoom() {
         <section style={{ marginBottom: "1rem" }}>
           <h3>{`Hello ${name}`}</h3>
         </section>
-
-        {secondsLeft !== null && room?.status === "DRAWING" && (
-          <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
-            Time remaining: {formatSeconds(secondsLeft)}
-          </p>
-        )}
+        {secondsLeft !== null &&
+          room?.status === "DRAWING" &&
+          !hasSubmitted && (
+            <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
+              Time remaining: {formatSeconds(secondsLeft)}
+            </p>
+          )}
 
         {/* Drawing section */}
         {name.trim() && !hasSubmitted && (

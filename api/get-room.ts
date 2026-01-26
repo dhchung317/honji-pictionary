@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { redis as kv } from "./redis.js";
+import { generateId, redis as kv } from "./redis.js";
 import { getRoomById, saveRoom } from "./_roomStore.js";
 import { listSubmissions, submissionUniqKey } from "./_submissionStore.js";
 import { Room } from "../shared/room.js";
@@ -7,12 +7,13 @@ import { scoreRoundWithAI } from "./_aiScoreRound.js";
 
 async function allFrozenSubmitted(room: Room): Promise<boolean> {
   const frozen = room.frozenPlayerIds ?? [];
+
   if (frozen.length === 0) return true; // or false if you want to require at least 1
 
   const subIds = await Promise.all(
     frozen.map((pid) =>
-      kv.get<string>(submissionUniqKey(room.id, room.roundId, pid))
-    )
+      kv.get<string>(submissionUniqKey(room.id, room.roundId, pid)),
+    ),
   );
 
   return subIds.every((x) => typeof x === "string" && x.length > 0);
@@ -23,12 +24,6 @@ function isRoundTimedOut(room: Room, nowMs: number): boolean {
   return nowMs >= Date.parse(room.roundEndAt);
 }
 
-function makeFakeRanking(playerIds: string[]): string[] {
-  // If you want deterministic (same every time) without storing: sort.
-  // If you want "random" but stable for the round: you MUST store the result.
-  return [...playerIds].sort();
-}
-
 async function advanceRoomIfNeeded(room: Room): Promise<Room> {
   const nowMs = Date.now();
   if (room.status === "DRAWING") {
@@ -37,16 +32,10 @@ async function advanceRoomIfNeeded(room: Room): Promise<Room> {
 
     if (!timedOut && !everyoneSubmitted) return room;
 
-    // Enter SCORING: compute a stable ranking ONCE
-    const ranked =
-      room.rankedPlayerIds && room.rankedPlayerIds.length > 0
-        ? room.rankedPlayerIds
-        : makeFakeRanking(room.frozenPlayerIds); // deterministic or random
-
     const updated: Room = {
       ...room,
       status: "SCORING",
-      rankedPlayerIds: ranked,
+      rankedPlayerIds: null,
       scoredAt: null,
     };
 
@@ -58,7 +47,7 @@ async function advanceRoomIfNeeded(room: Room): Promise<Room> {
     try {
       const subs = await listSubmissions(room.id, room.roundId); // uses your new namespacing
       const result = await scoreRoundWithAI({
-        prompt: room.prompt,
+        prompt: room.currentPrompt ?? "",
         submissions: subs.map((s) => ({
           playerId: s.playerId,
           playerName: s.playerName,
@@ -67,7 +56,12 @@ async function advanceRoomIfNeeded(room: Room): Promise<Room> {
       });
 
       room.rankedPlayerIds = result?.rankedPlayerIds ?? [];
-      room.scoreNotesByPlayerId = result?.notesByPlayerId ?? null;
+      room.scoreNotesByPlayerId = Object.fromEntries(
+        result.notes.map((n) => [n.playerId, n.note]),
+      );
+      room.scoreByPlayerId = Object.fromEntries(
+        result.notes.map((r) => [r.playerId, r.score]),
+      );
       room.scoredAt = new Date().toISOString();
       room.status = "DONE";
       await saveRoom(room);
