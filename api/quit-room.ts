@@ -1,6 +1,6 @@
 // api/quit-room.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getRoomById, saveRoom, expireRoom } from "./_roomStore";
+import { getRoomById, saveRoom, expireRoom } from "./_roomStore.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST")

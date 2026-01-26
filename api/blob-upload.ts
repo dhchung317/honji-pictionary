@@ -1,5 +1,5 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
-import { getRoomById } from "./_roomStore";
+import { getRoomById } from "./_roomStore.js";
 
 export default async function handler(request: Request) {
   const body = (await request.json()) as HandleUploadBody;
