@@ -2,7 +2,6 @@ export type RoomStatus = "LOBBY" | "DRAWING" | "SCORING" | "DONE";
 
 export interface Room {
   id: string;
-  prompt: string;
   status: RoomStatus;
   createdAt: string;
   roundEndAt: string | null;
@@ -12,4 +11,8 @@ export interface Room {
   rankedPlayerIds: string[] | null;
   roundId: number;
   scoreNotesByPlayerId?: Record<string, string> | null;
+  scoreByPlayerId: Record<string, number> | null;
+  currentPrompt: string | null;
+  promptHistory: string[]; // optional but recommended
+  theme: string | null; // optional: "animals", "food", etc.
 }

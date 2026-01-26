@@ -1,10 +1,10 @@
 import { Room } from "../../shared/room";
 
-export async function createRoom(prompt: string) {
+export async function createRoom() {
   const res = await fetch(`/api/create-room`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({}),
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json();

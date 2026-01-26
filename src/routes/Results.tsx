@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { getSubmissionsByRoom } from "../lib/submissionsApi";
 import { getRoom, nextRound, quit } from "../lib/roomsApi";
 import { Submission } from "../../shared/submission";
+import { Room } from "../../shared/room";
 
 function Results() {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [room, setRoom] = useState<Room | null>();
 
   useEffect(() => {
     if (!roomId) return;
@@ -16,6 +18,7 @@ function Results() {
     const fetchSubmissions = async () => {
       setLoading(true);
       const room = await getRoom(roomId);
+      setRoom(room);
       const subs = await getSubmissionsByRoom(roomId);
       const ranked = room.rankedPlayerIds;
 
@@ -126,6 +129,8 @@ function Results() {
                   alt={`Submission from ${s.playerName}`}
                   style={{ width: "100%", height: "auto", display: "block" }}
                 />
+                <div>{room?.scoreByPlayerId?.[s.playerId]}</div>
+                <div>{room?.scoreNotesByPlayerId?.[s.playerId]}</div>
               </div>
             ))}
           </div>
