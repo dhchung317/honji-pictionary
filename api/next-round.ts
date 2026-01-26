@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getRoomById, saveRoom } from "./_roomStore";
-import { Room } from "../shared/room";
+import { getRoomById, saveRoom } from "./_roomStore.js";
+import { Room } from "../shared/room.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
