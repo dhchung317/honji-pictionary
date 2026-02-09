@@ -33,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!endAt) return res.status(400).json({ error: "" });
   const end = new Date(endAt).getTime();
 
-  const GRACE_MS = 30000; // 3 seconds
+  const GRACE_MS = 30000;
 
   if (now > end + GRACE_MS) {
     return res.status(400).json({ error: "submission after end of round" });

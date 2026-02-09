@@ -43,7 +43,11 @@ async function advanceRoomIfNeeded(room: Room): Promise<Room> {
     return updated;
   }
 
-  if (room.status === "SCORING" && !room.scoredAt) {
+  if (
+    room.status === "SCORING" &&
+    !room.scoredAt &&
+    (await allFrozenSubmitted(room))
+  ) {
     try {
       const subs = await listSubmissions(room.id, room.roundId); // uses your new namespacing
       const result = await scoreRoundWithAI({
