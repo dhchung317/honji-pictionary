@@ -25,8 +25,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const room = await getRoomById(roomId);
         if (!room) throw new Error("Room not found");
 
+        const end = new Date(room.roundEndAt!).getTime();
+        const GRACE_MS = 20000;
+
+        const now = Date.now();
+        const withinGrace = now <= end + GRACE_MS;
         // Same rules as submit-drawing:
-        if (room.status !== "DRAWING")
+        if (!withinGrace)
           throw new Error("Round not accepting uploads");
         if (room.roundId !== round) throw new Error("Wrong round");
         if (!room.frozenPlayerIds.includes(playerId))
