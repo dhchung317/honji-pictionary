@@ -11,30 +11,41 @@ export async function upsertPlayer(
   name: string,
 ): Promise<Player> {
   const trimmed = name.trim();
-  const lower = trimmed.toLowerCase();
 
-  const existingId = await kv.get<string>(playerNameKey(roomId, lower));
-  if (existingId) {
-    const existing = await kv.get<Player>(playerKey(existingId));
-    if (existing) return existing;
+  let displayName = trimmed;
+  let suffix = 2;
+
+  while (
+    await kv.get<string>(playerNameKey(roomId, displayName.toLowerCase()))
+  ) {
+    displayName = `${trimmed} ${suffix}`;
+    suffix++;
   }
+
   const player: Player = {
     id: generateId(),
     roomId,
-    name: trimmed,
+    name: displayName,
     joinedAt: new Date().toISOString(),
   };
 
   const pk = playerKey(player.id);
   const rpk = roomPlayersKey(roomId);
-  const pnk = playerNameKey(roomId, lower);
+  const pnk = playerNameKey(roomId, displayName.toLowerCase());
 
-  await kv.set(pk, player, { ex: TTL_SECONDS });
-  await kv.set(pnk, player.id, { ex: TTL_SECONDS });
+  await kv.set(pk, player, {
+    ex: TTL_SECONDS,
+  });
+
+  await kv.set(pnk, player.id, {
+    ex: TTL_SECONDS,
+  });
+
   await kv.sadd(rpk, player.id);
   await kv.expire(rpk, TTL_SECONDS);
 
   await touchKeys([pk, rpk, pnk]);
+
   return player;
 }
 
@@ -46,5 +57,9 @@ export async function listPlayers(roomId: string): Promise<Player[]> {
   const players = await Promise.all(
     ids.map((id) => kv.get<Player>(playerKey(id))),
   );
-  return players.filter((p): p is Player => p !== null);
+  return players
+    .filter((p): p is Player => p !== null)
+    .sort(
+      (a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime(),
+    );
 }

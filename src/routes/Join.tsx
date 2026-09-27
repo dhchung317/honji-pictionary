@@ -1,70 +1,104 @@
+import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+
 import { registerPlayer } from "../lib/playersApi";
+
+import styles from "./Join.module.css";
 
 function Join() {
   const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
 
   const [nameError, setNameError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const savedName = window.localStorage.getItem(`playerName:${code}`);
-    if (savedName) {
-      setName(savedName);
+  const handleJoin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedName = name.trim();
+    const roomCode = code.trim().toUpperCase();
+
+    if (!trimmedName) {
+      setNameError("Enter a name!");
+      return;
     }
-  }, []);
 
-  const handleJoin = async () => {
-    const trimmed = name.trim();
-    if (!trimmed) return setNameError("Enter a name!");
-    setName(trimmed);
-    // TODO: handling for invalid/non existent codes
-    if (!code) return;
+    setNameError(null);
+    setName(trimmedName);
+    setCode(roomCode);
 
-    const player = await registerPlayer(code, trimmed);
-    window.localStorage.setItem(`playerId:${code}`, player.id);
-    window.localStorage.setItem(`playerName:${code}`, player.name);
+    // TODO: handling for invalid/non-existent codes
+    if (!roomCode) {
+      return;
+    }
 
-    navigate(code);
+    const player = await registerPlayer(roomCode, trimmedName);
+
+    window.localStorage.setItem(`playerId:${roomCode}`, player.id);
+
+    window.localStorage.setItem(`playerName:${roomCode}`, player.name);
+
+    navigate(roomCode);
   };
 
   return (
-    <div className="card">
-      <h1>Join Room</h1>
-      <div>
-        <section
-          style={{
-            marginBottom: "1rem",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <h3>Name</h3>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your name"
-          />
-          {nameError && !name ? (
-            <p style={{ color: "red" }}>{nameError}</p>
-          ) : null}
-          <h3>Room</h3>
-          <input
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Enter your room code"
-          />
-          <button
-            style={{ display: "block", marginTop: "18px" }}
-            onClick={handleJoin}
-          >
+    <main className={styles.page}>
+      <section className={styles.card}>
+        <header className={styles.header}>
+          <h1 className={styles.title}>Join Room</h1>
+
+          <p className={styles.description}>
+            Enter your name and room code to join the game.
+          </p>
+        </header>
+
+        <form className={styles.form} onSubmit={handleJoin}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="player-name">
+              Name
+            </label>
+
+            <input
+              id="player-name"
+              className={styles.input}
+              value={name}
+              onChange={(event) => {
+                setName(event.target.value);
+
+                if (nameError) {
+                  setNameError(null);
+                }
+              }}
+              placeholder="Enter your name"
+              autoComplete="name"
+            />
+
+            {nameError && <p className={styles.error}>{nameError}</p>}
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="room-code">
+              Room
+            </label>
+
+            <input
+              id="room-code"
+              className={`${styles.input} ${styles.roomInput}`}
+              value={code}
+              onChange={(event) => setCode(event.target.value.toUpperCase())}
+              placeholder="ABCD"
+              autoCapitalize="characters"
+              autoComplete="off"
+            />
+          </div>
+
+          <button className={styles.joinButton} type="submit">
             Join
           </button>
-        </section>
-      </div>
-    </div>
+        </form>
+      </section>
+    </main>
   );
 }
 
