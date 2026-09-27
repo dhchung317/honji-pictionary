@@ -1,0 +1,182 @@
+.page {
+  min-height: 100vh;
+  width: 100%;
+
+  padding: var(--space-xl);
+}
+
+.results {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+
+  margin-bottom: var(--space-xl);
+}
+
+.heading {
+  min-width: 0;
+}
+
+.title {
+  margin-bottom: var(--space-xs);
+}
+
+.roomId {
+  margin: 0;
+
+  color: var(--color-primary);
+
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.nextButton {
+  border-color: var(--color-primary);
+}
+
+.quitButton {
+  opacity: 0.75;
+}
+
+.winnerSection {
+  margin-bottom: var(--space-xl);
+  text-align: center;
+}
+
+.sectionTitle {
+  margin-bottom: var(--space-md);
+}
+
+.winnerName {
+  margin-bottom: var(--space-md);
+
+  font-size: 1.5rem;
+}
+
+.winnerCard {
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto;
+
+  overflow: hidden;
+
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+
+  background: var(--color-surface-dark);
+}
+
+.winnerImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.submissionsSection {
+  width: 100%;
+}
+
+.submissionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+
+  gap: var(--space-lg);
+}
+
+.submissionCard {
+  overflow: hidden;
+
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+
+  background: var(--color-surface-dark);
+}
+
+.submissionHeader {
+  padding: var(--space-sm) var(--space-md);
+
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.submissionImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.submissionDetails {
+  padding: var(--space-md);
+}
+
+.score {
+  margin-bottom: var(--space-xs);
+
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.note {
+  margin: 0;
+
+  color: var(--color-text-dark);
+  opacity: 0.75;
+}
+
+.emptyState {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: var(--space-xl);
+
+  text-align: center;
+}
+
+@media (prefers-color-scheme: light) {
+  .winnerCard,
+  .submissionCard {
+    background: var(--color-surface-light);
+  }
+
+  .note {
+    color: var(--color-text-light);
+  }
+}
+
+@media (max-width: 48rem) {
+  .page {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .heading {
+    text-align: center;
+  }
+
+  .actions {
+    justify-content: center;
+  }
+
+  .submissionsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(11.25rem, 1fr));
+
+    gap: var(--space-md);
+  }
+}

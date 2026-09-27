@@ -5,12 +5,12 @@ import { Player } from "../../shared/player";
  */
 export async function registerPlayer(
   roomId: string,
-  name: string
+  name: string,
 ): Promise<Player> {
   const res = await fetch("/api/join-room", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ roomId, name }),
+    body: JSON.stringify({ roomId, name}),
   });
   if (!res.ok) throw new Error("Failed to join room");
   return res.json();
@@ -18,7 +18,7 @@ export async function registerPlayer(
 
 export async function getPlayersByRoom(roomId: string): Promise<Player[]> {
   const res = await fetch(
-    `/api/get-players?roomId=${encodeURIComponent(roomId)}`
+    `/api/get-players?roomId=${encodeURIComponent(roomId)}`,
   );
   if (!res.ok) throw new Error("Failed to get players");
   return res.json();

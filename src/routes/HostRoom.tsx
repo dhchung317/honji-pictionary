@@ -1,22 +1,42 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { getRoom, startRound } from "../lib/roomsApi";
 import { useEffect, useState } from "react";
-import { getPlayersByRoom } from "../lib/playersApi";
-// import { useCountdown } from "../hooks/useCountdown";
+import { useNavigate, useParams } from "react-router-dom";
+
 import { Player } from "../../shared/player";
-import { RoomState } from "../../shared/roomstate";
+
+import { GameErrorPage } from "../components/GameError";
+
+import { useAsync } from "../hooks/useAsync";
+import { useAsyncAction } from "../hooks/useAsyncAction";
+
+import { getPlayersByRoom } from "../lib/playersApi";
+import { getRoom, startRound } from "../lib/roomsApi";
 import { getViewerRole } from "../lib/viewer";
+
+import styles from "./HostRoom.module.css";
 
 function HostRoom() {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const [roomState, setRoomState] = useState<RoomState | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [playersCount, setPlayersCount] = useState(0);
+
   const [players, setPlayers] = useState<Player[]>([]);
-  // const { isExpired } = useCountdown(room?.roundEndAt ?? null);
+
+  /* ---------- Room state ---------- */
+
+  const {
+    data: roomState,
+    loading: roomLoading,
+    error: roomError,
+  } = useAsync(
+    async () => {
+      if (!roomId) {
+        throw new Error("Missing room id");
+      }
+
+      return getRoom(roomId);
+    },
+    [roomId],
+    { intervalMs: 3000 },
+  );
 
   const room = roomState?.room ?? null;
   const round = roomState?.round ?? null;
@@ -26,168 +46,170 @@ function HostRoom() {
   const isScoring = round?.status === "SCORING";
   const isDone = round?.status === "DONE";
 
-  useEffect(() => {
-    if (isDone) {
-      navigate(`/room/${roomId}/results`);
-    }
-  }, [isDone, roomId, navigate]);
+  /* ---------- Players ---------- */
 
-  // Poll room for phase changes
   useEffect(() => {
     if (!roomId) return;
 
     let cancelled = false;
 
-    const loadRoom = async () => {
-      const state = await getRoom(roomId);
-
-      if (cancelled) return;
-      if (!state) {
-        setError("Room not found.");
-        setRoomState(null);
-      } else {
-        setError(null);
-        setRoomState(state);
-      }
-      setLoading(false);
-    };
-
-    loadRoom();
-    const interval = setInterval(loadRoom, 3000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [roomId]);
-
-  useEffect(() => {
-    if (!roomId) return;
-    let cancelled = false;
-
-    const load = async () => {
+    const loadPlayers = async () => {
       const players = await getPlayersByRoom(roomId);
+
       if (!cancelled) {
-        setPlayersCount(players.length);
         setPlayers(players);
       }
     };
 
-    load();
-    const interval = setInterval(load, 3000); // poll every 3s
+    loadPlayers();
+
+    const interval = setInterval(loadPlayers, 3000);
+
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
   }, [roomId]);
 
+  /* ---------- Start round ---------- */
+
+  const {
+    run: handleStartRound,
+    loading: isStarting,
+    error: startError,
+  } = useAsyncAction(async () => {
+    if (!roomId) {
+      throw new Error("Missing room id");
+    }
+
+    await startRound(roomId);
+  });
+
+  /* ---------- Results navigation ---------- */
+
   useEffect(() => {
-  if (!roomId || !room || !round) return;
+    if (!roomId || !room || !isDone) return;
 
-  const role = getViewerRole(room);
+    const role = getViewerRole(room);
 
-  if (round.status === "DONE") {
     if (role === "PLAYER") {
-      navigate(`/room/${roomId}/playerresults`, {
-        replace: true,
-      });
+      navigate(`/room/${roomId}/playerresults`, { replace: true });
     } else {
-      navigate(`/room/${roomId}/results`, {
-        replace: true,
-      });
+      navigate(`/room/${roomId}/results`, { replace: true });
     }
-  }
-}, [roomId, room, round?.status, navigate]);
+  }, [roomId, room, isDone, navigate]);
 
-  const handleStartRound = async () => {
-    if (!roomId) return;
-
-    setIsUpdating(true);
-
-    try {
-      await startRound(roomId);
-
-      const updatedState = await getRoom(roomId);
-      setRoomState(updatedState);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  // const handleViewResults = () => {
-  //   if (!roomId) return;
-  //   navigate(`/room/${roomId}/results`);
-  // };
+  /* ---------- Page states ---------- */
 
   if (!roomId) {
     return <p>Missing room id.</p>;
   }
 
-  if (loading) {
+  if (roomLoading) {
     return <p>Loading room…</p>;
   }
 
-  if (error || !room) {
-    return <p>{error ?? "Room not found."}</p>;
+  if (roomError) {
+    return <GameErrorPage type={roomError.message} />;
   }
 
-
+  if (!room) {
+    return <GameErrorPage type="ROOM_NOT_FOUND" />;
+  }
 
   return (
-    <div className="card">
-      <h2>Host Room</h2>
-      <h2>Room Code: {room.id}</h2>
+    <main className={styles.page}>
+      <div className={styles.room}>
+        <header className={styles.header}>
+          <div>
+            <h1 className={styles.title}>Honji Pictionary</h1>
 
-      <section style={{ marginBottom: "1rem" }}>
-        <h3>Players joined</h3>
-        <p>{playersCount} player(s) in this room.</p>
-        {players.map((p) => {
-          return <div key={p.id}>{p.name}</div>;
-        })}
-      </section>
+            <p className={styles.roomCode}>{room.id}</p>
+          </div>
+        </header>
 
-      {isLobby ? (
-        <section>
-          <p>Once everyone has joined, start the round.</p>
-          {/* <details>
-            <summary>Show prompt (dev)</summary>
-            <p>{room.currentPrompt}</p>
-          </details> */}
-          <button onClick={handleStartRound} disabled={isUpdating}>
-            {isUpdating ? "Starting…" : "Start round"}
-          </button>
-        </section>
-      ) : null}
+        <div className={styles.gameArea}>
+          <section className={styles.stage}>
+            {isLobby && (
+              <>
+                <h2 className={styles.stageTitle}>Waiting for players</h2>
 
-      {/* DRAWING view */}
-      {isDrawing && (
-        <section style={{ marginTop: "1rem" }}>
-          <h3>Drawing in progress</h3>
-          <p>Prompt:</p>
-          <p>
-            <strong>{round.prompt}</strong>
-          </p>
-          {/* later: show countdown using room.roundEndAt */}
-          <p>(Timer UI coming from roundEndAt.)</p>
-        </section>
-      )}
+                <p className={styles.stageMessage}>
+                  Share the room code. Once everyone has joined, start the
+                  round.
+                </p>
 
-      {/* SCORING view */}
-      {isScoring && (
-        <section style={{ marginTop: "1rem" }}>
-          <h3>Scoring…</h3>
-          <p>The drawing phase has ended. The backend/AI would score now.</p>
-          {/* <button onClick={handleViewResults}>View provisional results</button> */}
-        </section>
-      )}
+                <button
+                  className={styles.startButton}
+                  onClick={handleStartRound}
+                  disabled={isStarting || players.length === 0}
+                >
+                  {isStarting ? "Starting…" : "Start Round"}
+                </button>
 
-      {/* DONE view */}
-      {isDone && (
-        <section style={{ marginTop: "1rem" }}>
-          <h3>Round finished</h3>
-          {/* <button onClick={handleViewResults}>View results</button> */}
-        </section>
-      )}
-    </div>
+                {startError && <p>{startError.message}</p>}
+              </>
+            )}
+
+            {isDrawing && (
+              <>
+                <p className={styles.promptLabel}>Draw</p>
+
+                <p className={styles.prompt}>{round.prompt}</p>
+              </>
+            )}
+
+            {isScoring && (
+              <>
+                <h2 className={styles.stageTitle}>Scoring…</h2>
+
+                <p className={styles.stageMessage}>
+                  Everyone's drawings are in. Calculating the results.
+                </p>
+              </>
+            )}
+
+            {isDone && (
+              <>
+                <h2 className={styles.stageTitle}>Round finished</h2>
+
+                <p className={styles.stageMessage}>Loading results…</p>
+              </>
+            )}
+          </section>
+
+          <aside className={styles.playersPanel}>
+            <header className={styles.playersHeader}>
+              <h2 className={styles.playersTitle}>Players</h2>
+
+              <p className={styles.playerCount}>{players.length} joined</p>
+            </header>
+
+            <div className={styles.playerList}>
+              {players.length === 0 ? (
+                <p className={styles.emptyPlayers}>
+                  Waiting for someone to join…
+                </p>
+              ) : (
+                players.map((player) => (
+                  <div key={player.id} className={styles.player}>
+                    <div className={styles.avatar}>
+                      {player.name.charAt(0).toUpperCase()}
+                    </div>
+
+                    <span className={styles.playerName}>{player.name}</span>
+
+                    {isDrawing && (
+                      <span className={styles.playerStatus}>Drawing</span>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
   );
 }
 

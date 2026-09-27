@@ -1,16 +1,21 @@
 import { upload } from "@vercel/blob/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+
 import DrawingCanvas, {
   DrawingCanvasHandle,
 } from "../components/DrawingCanvas";
 import { GameErrorPage } from "../components/GameError";
+
 import { createSubmission } from "../lib/submissionsApi";
 import { getRoom } from "../lib/roomsApi";
 import { getViewerRole } from "../lib/viewer";
+
 import { useCountdown } from "../hooks/useCountdown";
 import { useAsync } from "../hooks/useAsync";
 import { useAsyncAction } from "../hooks/useAsyncAction";
+
+import styles from "./JoinRoom.module.css";
 
 const formatSeconds = (secs: number) => {
   const m = Math.floor(secs / 60);
@@ -184,61 +189,64 @@ function JoinRoom() {
   }
 
   return (
-    <div className="card">
-      <h1>Join Room</h1>
+    <main className={styles.page}>
+      <div className={styles.game}>
+        <h1>Join Room</h1>
 
-      <section style={{ marginBottom: "1rem" }}>
-        <h3>Hello {name}</h3>
-      </section>
+        <header className={styles.header}>
+          <h3 className={styles.greeting}>Hello {name}</h3>
 
-      {secondsLeft !== null && isDrawing && !hasSubmitted && (
-        <p
-          style={{
-            fontWeight: "bold",
-            marginBottom: "0.5rem",
-          }}
-        >
-          Time remaining: {formatSeconds(secondsLeft)}
-        </p>
-      )}
+          {secondsLeft !== null && isDrawing && !hasSubmitted && (
+            <span className={styles.timer}>{formatSeconds(secondsLeft)}</span>
+          )}
+        </header>
 
-      {name.trim() && !hasSubmitted && (
-        <section>
-          <p>{round?.prompt}</p>
+        {name.trim() && !hasSubmitted && (
+          <section>
+            <p className={styles.prompt}>{round?.prompt}</p>
 
-          <DrawingCanvas
-            ref={canvasRef}
-            width={300}
-            height={300}
-            strokeColor="#000000"
-            strokeWidth={4}
-          />
+            <div className={styles.canvasContainer}>
+              <DrawingCanvas
+                ref={canvasRef}
+                width={300}
+                height={300}
+                strokeColor="#000000"
+                strokeWidth={4}
+              />
+            </div>
 
-          <div style={{ marginTop: "0.5rem" }}>
-            <button onClick={submitDrawing} disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit drawing"}
-            </button>
+            <div className={styles.actions}>
+              <button
+                className={styles.submitButton}
+                onClick={submitDrawing}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit drawing"}
+              </button>
 
-            <button
-              type="button"
-              style={{ marginLeft: "0.5rem" }}
-              onClick={() => canvasRef.current?.clear()}
-            >
-              Clear
-            </button>
-          </div>
-        </section>
-      )}
+              <button
+                className={styles.clearButton}
+                type="button"
+                onClick={() => canvasRef.current?.clear()}
+              >
+                Clear
+              </button>
+            </div>
+          </section>
+        )}
 
-      {hasSubmitted && (
-        <section style={{ marginTop: "1rem" }}>
-          <h3>Submitted!</h3>
-          <p>Waiting for the host to score the round…</p>
-        </section>
-      )}
+        {hasSubmitted && (
+          <section className={styles.submitted}>
+            <h3>Submitted!</h3>
+            <p>Waiting for the host to score the round…</p>
+          </section>
+        )}
 
-      {submissionError && <div>{submissionError.message}</div>}
-    </div>
+        {submissionError && (
+          <div className={styles.error}>{submissionError.message}</div>
+        )}
+      </div>
+    </main>
   );
 }
 

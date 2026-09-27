@@ -1,11 +1,16 @@
 import { useParams } from "react-router-dom";
-import { getSubmissionsByRoom } from "../lib/submissionsApi";
-import { getRoom } from "../lib/roomsApi";
-import { Submission } from "../../shared/submission";
-// import { Room } from "../../shared/room";
-import { getRoundScore } from "../lib/roundScoreApi";
+
 import { GameErrorPage } from "../components/GameError";
+
+import { getRoom } from "../lib/roomsApi";
+import { getRoundScore } from "../lib/roundScoreApi";
+import { getSubmissionsByRoom } from "../lib/submissionsApi";
+
 import { useAsync } from "../hooks/useAsync";
+
+import { Submission } from "../../shared/submission";
+
+import styles from "./PlayerResults.module.css";
 
 function PlayerResults() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -21,19 +26,28 @@ function PlayerResults() {
       throw new Error("NO_CURRENT_ROUND");
     }
 
-    const subs = await getSubmissionsByRoom(roomId);
-    const roundScore = await getRoundScore(roomId, roomState.round.id);
+    const submissions = await getSubmissionsByRoom(roomId);
+    const roundScore = await getRoundScore(
+      roomId,
+      roomState.round.id,
+    );
 
-    const submissions = [...roundScore.results]
+    const rankedSubmissions = [...roundScore.results]
       .sort((a, b) => a.rank - b.rank)
-      .map((result) => subs.find((s) => s.playerId === result.playerId))
+      .map((result) =>
+        submissions.find(
+          (submission) =>
+            submission.playerId === result.playerId,
+        ),
+      )
       .filter(
-        (submission): submission is Submission => submission !== undefined,
+        (submission): submission is Submission =>
+          submission !== undefined,
       );
 
     return {
       roundScore,
-      submissions,
+      submissions: rankedSubmissions,
     };
   }, [roomId]);
 
@@ -53,89 +67,96 @@ function PlayerResults() {
 
   if (submissions.length === 0) {
     return (
-      <div style={{ padding: "1rem" }}>
-        <h2>Results for Room: {roomId}</h2>
-        <p>No submissions yet.</p>
-      </div>
+      <main className={styles.page}>
+        <section className={styles.emptyState}>
+          <h1>Results</h1>
+          <h2>Room {roomId}</h2>
+          <p>No submissions yet.</p>
+        </section>
+      </main>
     );
   }
 
   const winner = submissions[0];
 
   return (
-    <div className="card">
-      <h1>Results</h1>
+    <main className={styles.page}>
+      <div className={styles.results}>
+        <header className={styles.header}>
+          <h1 className={styles.title}>Results</h1>
 
-      <div style={{ padding: "1rem" }}>
-        <h2>Results for Room: {roomId}</h2>
+          <p className={styles.roomId}>
+            Room {roomId}
+          </p>
+        </header>
 
-        <section style={{ marginBottom: "1rem" }}>
-          <h3>Winner</h3>
-          <p>
+        <section className={styles.winnerSection}>
+          <h2 className={styles.sectionTitle}>
+            Winner
+          </h2>
+
+          <p className={styles.winnerName}>
             🏆 <strong>{winner.playerName}</strong>
           </p>
-          <div
-            style={{
-              maxWidth: 400,
-              marginTop: "0.5rem",
-              border: "1px solid #ccc",
-              borderRadius: 4,
-            }}
-          >
+
+          <div className={styles.winnerCard}>
             <img
+              className={styles.winnerImage}
               src={winner.imageUrl}
               alt={`Winning submission from ${winner.playerName}`}
-              style={{ width: "100%", height: "auto", display: "block" }}
             />
           </div>
         </section>
 
-        <section>
-          <h3>All submissions</h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-              gap: "1rem",
-            }}
-          >
-            {submissions.map((s) => (
-              <div
-                key={s.id}
-                style={{
-                  border: "1px solid #ccc",
-                  borderRadius: 4,
-                  padding: "0.5rem",
-                }}
-              >
-                <div style={{ marginBottom: "0.25rem" }}>
-                  <strong>{s.playerName}</strong>
-                </div>
+        <section className={styles.submissionsSection}>
+          <h2 className={styles.sectionTitle}>
+            All submissions
+          </h2>
 
-                <img
-                  src={s.imageUrl}
-                  alt={`Submission from ${s.playerName}`}
-                  style={{ width: "100%", height: "auto", display: "block" }}
-                />
+          <div className={styles.submissionsGrid}>
+            {submissions.map((submission) => {
+              const result = roundScore.results.find(
+                (result) =>
+                  result.playerId === submission.playerId,
+              );
 
-                {(() => {
-                  const result = roundScore?.results.find(
-                    (r) => r.playerId === s.playerId,
-                  );
+              return (
+                <article
+                  key={submission.id}
+                  className={styles.submissionCard}
+                >
+                  <div className={styles.submissionHeader}>
+                    {submission.playerName}
+                  </div>
 
-                  return (
-                    <>
-                      <div>{result?.score}</div>
-                      <div>{result?.note}</div>
-                    </>
-                  );
-                })()}
-              </div>
-            ))}
+                  <img
+                    className={styles.submissionImage}
+                    src={submission.imageUrl}
+                    alt={`Submission from ${submission.playerName}`}
+                  />
+
+                  <div className={styles.submissionDetails}>
+                    {result && (
+                      <>
+                        <div className={styles.score}>
+                          Score: {result.score}
+                        </div>
+
+                        {result.note && (
+                          <p className={styles.note}>
+                            {result.note}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
       </div>
-    </div>
+    </main>
   );
 }
 
