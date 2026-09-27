@@ -1,5 +1,5 @@
 import { Round } from "../shared/round";
-import { redis, TTL_SECONDS } from "./redis";
+import { redis, TTL_SECONDS } from "./redis.js";
 
 const roundKey = (roomId: string, roundId: string) =>
   `room:${roomId}:round:${roundId}`;
