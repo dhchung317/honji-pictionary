@@ -10,7 +10,9 @@ export async function createRoom() {
   const res = await fetch(`/api/create-room`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({}),
+    body: JSON.stringify({
+      hostId,
+    }),
   });
   if (!res.ok) throw new Error(res.statusText);
   return res.json();
@@ -19,8 +21,12 @@ export async function createRoom() {
 export async function getRoom(roomId: string): Promise<RoomState> {
   const res = await fetch(`/api/get-room?roomId=${encodeURIComponent(roomId)}`);
 
+  if (res.status === 404) {
+    throw new Error("ROOM_NOT_FOUND");
+  }
+
   if (!res.ok) {
-    throw new Error("Failed to get room");
+    throw new Error("ROOM_LOAD_FAILED");
   }
 
   return res.json();
