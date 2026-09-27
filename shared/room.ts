@@ -2,6 +2,7 @@ export type RoomStatus = "LOBBY" | "DRAWING" | "SCORING" | "DONE";
 
 export interface Room {
   id: string;
+  hostId: string;
   status: RoomStatus;
   createdAt: string;
   currentRoundId: string | null;

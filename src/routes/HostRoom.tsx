@@ -5,6 +5,7 @@ import { getPlayersByRoom } from "../lib/playersApi";
 // import { useCountdown } from "../hooks/useCountdown";
 import { Player } from "../../shared/player";
 import { RoomState } from "../../shared/roomstate";
+import { getViewerRole } from "../lib/viewer";
 
 function HostRoom() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -79,6 +80,24 @@ function HostRoom() {
     };
   }, [roomId]);
 
+  useEffect(() => {
+  if (!roomId || !room || !round) return;
+
+  const role = getViewerRole(room);
+
+  if (round.status === "DONE") {
+    if (role === "PLAYER") {
+      navigate(`/room/${roomId}/playerresults`, {
+        replace: true,
+      });
+    } else {
+      navigate(`/room/${roomId}/results`, {
+        replace: true,
+      });
+    }
+  }
+}, [roomId, room, round?.status, navigate]);
+
   const handleStartRound = async () => {
     if (!roomId) return;
 
@@ -111,8 +130,7 @@ function HostRoom() {
     return <p>{error ?? "Room not found."}</p>;
   }
 
-  // const baseUrl = window.location.origin;
-  // const joinUrl = `${baseUrl}/join/${room.id}`;
+
 
   return (
     <div className="card">

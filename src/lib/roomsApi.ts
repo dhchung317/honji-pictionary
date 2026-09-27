@@ -1,6 +1,12 @@
 import { RoomState } from "../../shared/roomstate";
 
 export async function createRoom() {
+  let hostId = localStorage.getItem("hostId");
+
+  if (!hostId) {
+    hostId = crypto.randomUUID();
+    localStorage.setItem("hostId", hostId);
+  }
   const res = await fetch(`/api/create-room`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
