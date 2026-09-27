@@ -3,10 +3,11 @@ import { generateRoomId, redis as kv, TTL_SECONDS } from "./redis.js";
 
 const roomKey = (id: string) => `room:${id}`;
 
-export async function createRoom(): Promise<Room> {
+export async function createRoom(hostId: string): Promise<Room> {
   const now = new Date();
   const room: Room = {
     id: generateRoomId(),
+    hostId,
     status: "LOBBY",
     createdAt: now.toISOString(),
     currentRoundId: null,
