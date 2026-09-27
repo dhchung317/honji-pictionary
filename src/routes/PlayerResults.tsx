@@ -3,29 +3,39 @@ import { useEffect, useState } from "react";
 import { getSubmissionsByRoom } from "../lib/submissionsApi";
 import { getRoom } from "../lib/roomsApi";
 import { Submission } from "../../shared/submission";
+// import { Room } from "../../shared/room";
+import { RoundScore } from "../../shared/roundscore";
+import { getRoundScore } from "../lib/roundScoreApi";
 
 function PlayerResults() {
   const { roomId } = useParams<{ roomId: string }>();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [roundScore, setRoundScore] = useState<RoundScore | null>(null);
 
   useEffect(() => {
     if (!roomId) return;
 
     const fetchSubmissions = async () => {
       setLoading(true);
-      const room = await getRoom(roomId);
-      const subs = await getSubmissionsByRoom(roomId);
-      const ranked = room.rankedPlayerIds;
-
-      if (ranked !== null) {
-        const rankedSubs = ranked
-          .map((r) => subs.find((s) => s.playerId === r))
-          .filter((rs): rs is Submission => rs !== undefined);
-
-        setSubmissions(rankedSubs);
-        setLoading(false);
+      const roomState = await getRoom(roomId);
+      if (!roomState.round) {
+        throw new Error("No current round");
       }
+      const subs = await getSubmissionsByRoom(roomId);
+      const score = await getRoundScore(roomId, roomState.round.id);
+
+      setRoundScore(score);
+
+      const rankedSubs = [...score.results]
+        .sort((a, b) => a.rank - b.rank)
+        .map((result) => subs.find((s) => s.playerId === result.playerId))
+        .filter(
+          (submission): submission is Submission => submission !== undefined,
+        );
+
+      setSubmissions(rankedSubs);
+      setLoading(false);
     };
 
     fetchSubmissions();
@@ -61,9 +71,6 @@ function PlayerResults() {
           <h3>Winner</h3>
           <p>
             🏆 <strong>{winner.playerName}</strong>
-            {typeof winner.score === "number" && (
-              <> — score: {winner.score.toFixed(2)}</>
-            )}
           </p>
           <div
             style={{
@@ -102,19 +109,25 @@ function PlayerResults() {
                 <div style={{ marginBottom: "0.25rem" }}>
                   <strong>{s.playerName}</strong>
                 </div>
-                {typeof s.rank === "number" && (
-                  <div style={{ fontSize: "0.9rem", marginBottom: "0.25rem" }}>
-                    Rank: {s.rank}
-                    {typeof s.score === "number" && (
-                      <> — {s.score.toFixed(2)}</>
-                    )}
-                  </div>
-                )}
+
                 <img
                   src={s.imageUrl}
                   alt={`Submission from ${s.playerName}`}
                   style={{ width: "100%", height: "auto", display: "block" }}
                 />
+
+                {(() => {
+                  const result = roundScore?.results.find(
+                    (r) => r.playerId === s.playerId,
+                  );
+
+                  return (
+                    <>
+                      <div>{result?.score}</div>
+                      <div>{result?.note}</div>
+                    </>
+                  );
+                })()}
               </div>
             ))}
           </div>

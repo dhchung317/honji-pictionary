@@ -1,4 +1,4 @@
-import { Room } from "../../shared/room";
+import { RoomState } from "../../shared/roomstate";
 
 export async function createRoom() {
   const res = await fetch(`/api/create-room`, {
@@ -10,13 +10,13 @@ export async function createRoom() {
   return res.json();
 }
 
-export async function getRoom(roomId: string): Promise<Room> {
-  const res = await fetch(`/api/get-room`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ roomId }),
-  });
-  if (!res.ok) throw new Error("Room id not found");
+export async function getRoom(roomId: string): Promise<RoomState> {
+  const res = await fetch(`/api/get-room?roomId=${encodeURIComponent(roomId)}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to get room");
+  }
+
   return res.json();
 }
 

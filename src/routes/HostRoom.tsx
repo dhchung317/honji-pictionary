@@ -2,31 +2,34 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getRoom, startRound } from "../lib/roomsApi";
 import { useEffect, useState } from "react";
 import { getPlayersByRoom } from "../lib/playersApi";
-import { useCountdown } from "../hooks/useCountdown";
-import { Room } from "../../shared/room";
+// import { useCountdown } from "../hooks/useCountdown";
 import { Player } from "../../shared/player";
+import { RoomState } from "../../shared/roomstate";
 
 function HostRoom() {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const [room, setRoom] = useState<Room | null>(null);
+  const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [playersCount, setPlayersCount] = useState(0);
   const [players, setPlayers] = useState<Player[]>([]);
-  const { isExpired } = useCountdown(room?.roundEndAt ?? null);
+  // const { isExpired } = useCountdown(room?.roundEndAt ?? null);
+
+  const room = roomState?.room ?? null;
+  const round = roomState?.round ?? null;
 
   const isLobby = room?.status === "LOBBY";
-  const isDrawing = room?.status === "DRAWING";
-  const isScoring = room?.status === "SCORING";
-  const isDone = room?.status === "DONE";
+  const isDrawing = round?.status === "DRAWING";
+  const isScoring = round?.status === "SCORING";
+  const isDone = round?.status === "DONE";
 
   useEffect(() => {
     if (isDone) {
       navigate(`/room/${roomId}/results`);
     }
-  }, [isDone]);
+  }, [isDone, roomId, navigate]);
 
   // Poll room for phase changes
   useEffect(() => {
@@ -35,26 +38,26 @@ function HostRoom() {
     let cancelled = false;
 
     const loadRoom = async () => {
-      const r = await getRoom(roomId);
+      const state = await getRoom(roomId);
+
       if (cancelled) return;
-      if (!r) {
+      if (!state) {
         setError("Room not found.");
-        setRoom(null);
+        setRoomState(null);
       } else {
         setError(null);
-        setRoom(r);
+        setRoomState(state);
       }
       setLoading(false);
     };
 
     loadRoom();
     const interval = setInterval(loadRoom, 3000);
-    if (isExpired) clearInterval(interval);
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [roomId, isExpired]);
+  }, [roomId]);
 
   useEffect(() => {
     if (!roomId) return;
@@ -70,20 +73,22 @@ function HostRoom() {
 
     load();
     const interval = setInterval(load, 3000); // poll every 3s
-    if (isExpired) clearInterval(interval);
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [roomId, isExpired]);
+  }, [roomId]);
 
   const handleStartRound = async () => {
     if (!roomId) return;
+
     setIsUpdating(true);
+
     try {
-      // later we can compute a real end time here
-      const updated = await startRound(roomId);
-      if (updated) setRoom(updated);
+      await startRound(roomId);
+
+      const updatedState = await getRoom(roomId);
+      setRoomState(updatedState);
     } finally {
       setIsUpdating(false);
     }
@@ -141,7 +146,7 @@ function HostRoom() {
           <h3>Drawing in progress</h3>
           <p>Prompt:</p>
           <p>
-            <strong>{room.currentPrompt}</strong>
+            <strong>{round.prompt}</strong>
           </p>
           {/* later: show countdown using room.roundEndAt */}
           <p>(Timer UI coming from roundEndAt.)</p>

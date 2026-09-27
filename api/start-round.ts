@@ -3,6 +3,8 @@ import { getRoomById, saveRoom } from "./_roomStore.js";
 import { listPlayers } from "./_playerStore.js";
 import { Room } from "../shared/room.js";
 import { genPrompt } from "./_aiGeneratePrompt.js";
+import { saveRound } from "./_roundStore.js";
+import type { Round } from "../shared/round.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -11,36 +13,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const roomId = String(req.body?.roomId || "").trim();
+
   if (!roomId) {
-    res.status(400).json({ error: "Room id is required" });
-    return;
+    return res.status(400).json({ error: "Room id is required" });
   }
 
   try {
     const room = await getRoomById(roomId);
+
     if (!room) {
-      res.status(404).json({ error: "Room not found" });
-      return;
+      return res.status(404).json({ error: "Room not found" });
     }
 
     if (room.status !== "LOBBY") {
-      res.status(400).json({ error: "Round already started" });
-      return;
+      return res.status(400).json({ error: "Round already started" });
     }
 
-    const promptRes = await genPrompt({ history: room.promptHistory });
+    const { prompt } = await genPrompt({ history: room.promptHistory });
 
     const players = await listPlayers(roomId);
-    const frozen = players.map((p) => p.id);
+    const frozenPlayerIds = players.map((p) => p.id);
 
-    const now = Date.now();
+    const roundId = crypto.randomUUID();
+    const startedAt = new Date();
+    const roundEndAt = new Date(startedAt.getTime() + room.drawingDurationMs);
+
+    const round: Round = {
+      id: roundId,
+      roomId,
+      status: "DRAWING",
+      prompt,
+      frozenPlayerIds,
+      startedAt: startedAt.toISOString(),
+      roundEndAt: roundEndAt.toISOString(),
+      drawingDurationMs: room.drawingDurationMs,
+      scoredAt: null,
+    };
+
+    await saveRound(round);
     const updated: Room = {
       ...room,
+      currentRoundId: round.id,
       status: "DRAWING",
-      roundEndAt: new Date(now + room.drawingDurationMs).toISOString(),
-      frozenPlayerIds: frozen,
-      currentPrompt: promptRes.prompt,
-      promptHistory: [...room.promptHistory, promptRes.prompt],
+      promptHistory: [...room.promptHistory, prompt],
     };
 
     await saveRoom(updated);

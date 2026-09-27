@@ -20,11 +20,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const updated: Room = {
     ...room,
     status: "LOBBY",
-    roundEndAt: null,
-    frozenPlayerIds: [],
-    scoredAt: null,
-    rankedPlayerIds: null,
-    roundId: room.roundId + 1,
   };
 
   await saveRoom(updated);

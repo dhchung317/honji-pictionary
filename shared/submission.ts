@@ -5,6 +5,4 @@ export interface Submission {
   playerName: string;
   imageUrl: string; // for now (later: imageUrl)
   createdAt: string;
-  rank?: number;
-  score?: number;
 }

@@ -3,7 +3,14 @@ import { zodTextFormat } from "openai/helpers/zod";
 import { openai } from "./openai.js";
 
 const PromptResultSchema = z.object({
-  prompt: z.string(),
+  prompt: z
+    .string()
+    .min(3)
+    .max(100)
+    .refine(
+      (value) => !value.includes("\n"),
+      "Prompt must be a single line",
+    ),
 });
 
 export async function genPrompt(params: { history: string[] }) {
@@ -13,7 +20,8 @@ export async function genPrompt(params: { history: string[] }) {
     {
       type: "input_text",
       text:
-        `Generate fun prompts for pictionary.\n` +
+        `Generate exactly one fun prompt for Pictionary.\n` +
+        `Return one short drawing idea, not a list of ideas.\n` +
         `just make sure its fun, clear and safe.\n` +
         `Example: wizard riding a skateboard` +
         `Do not repeat prompts in history.\n\n` +
