@@ -1,53 +1,55 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { getSubmissionsByRoom } from "../lib/submissionsApi";
 import { getRoom } from "../lib/roomsApi";
 import { Submission } from "../../shared/submission";
 // import { Room } from "../../shared/room";
-import { RoundScore } from "../../shared/roundscore";
 import { getRoundScore } from "../lib/roundScoreApi";
+import { GameErrorPage } from "../components/GameError";
+import { useAsync } from "../hooks/useAsync";
 
 function PlayerResults() {
   const { roomId } = useParams<{ roomId: string }>();
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [roundScore, setRoundScore] = useState<RoundScore | null>(null);
 
-  useEffect(() => {
-    if (!roomId) return;
+  const { data, loading, error } = useAsync(async () => {
+    if (!roomId) {
+      throw new Error("Missing room id");
+    }
 
-    const fetchSubmissions = async () => {
-      setLoading(true);
-      const roomState = await getRoom(roomId);
-      if (!roomState.round) {
-        throw new Error("No current round");
-      }
-      const subs = await getSubmissionsByRoom(roomId);
-      const score = await getRoundScore(roomId, roomState.round.id);
+    const roomState = await getRoom(roomId);
 
-      setRoundScore(score);
+    if (!roomState.round) {
+      throw new Error("NO_CURRENT_ROUND");
+    }
 
-      const rankedSubs = [...score.results]
-        .sort((a, b) => a.rank - b.rank)
-        .map((result) => subs.find((s) => s.playerId === result.playerId))
-        .filter(
-          (submission): submission is Submission => submission !== undefined,
-        );
+    const subs = await getSubmissionsByRoom(roomId);
+    const roundScore = await getRoundScore(roomId, roomState.round.id);
 
-      setSubmissions(rankedSubs);
-      setLoading(false);
+    const submissions = [...roundScore.results]
+      .sort((a, b) => a.rank - b.rank)
+      .map((result) => subs.find((s) => s.playerId === result.playerId))
+      .filter(
+        (submission): submission is Submission => submission !== undefined,
+      );
+
+    return {
+      roundScore,
+      submissions,
     };
-
-    fetchSubmissions();
   }, [roomId]);
-
-  if (!roomId) {
-    return <p>Missing room id.</p>;
-  }
 
   if (loading) {
     return <p>Loading submissions…</p>;
   }
+
+  if (error) {
+    return <GameErrorPage type={error.message} />;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const { roundScore, submissions } = data;
 
   if (submissions.length === 0) {
     return (
