@@ -7,7 +7,7 @@ import DrawingCanvas, {
 import { createSubmission } from "../lib/submissionsApi";
 import { getRoom } from "../lib/roomsApi";
 import { useCountdown } from "../hooks/useCountdown";
-import { Room, RoomStatus } from "../../shared/room";
+import { RoomState } from "../../shared/roomstate";
 
 const formatSeconds = (secs: number) => {
   const m = Math.floor(secs / 60);
@@ -24,20 +24,21 @@ function JoinRoom() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<DrawingCanvasHandle | null>(null);
-  const [room, setRoom] = useState<Room | null>(null);
-
-  const { secondsLeft, isExpired } = useCountdown(room?.roundEndAt ?? null);
+  const [roomState, setRoomState] = useState<RoomState | null>(null);
   const [roomLoading, setRoomLoading] = useState(true);
   const [roomError, setRoomError] = useState<string | null>(null);
 
-  roomLoading && roomError;
+  const room = roomState?.room ?? null;
+  const round = roomState?.round ?? null;
 
-  const prompt = room?.currentPrompt;
+  const { secondsLeft, isExpired } = useCountdown(round?.roundEndAt ?? null);
 
-  const status: RoomStatus = room?.status ?? "LOBBY";
-  const isLobby = status === "LOBBY";
-  const isDrawing = status === "DRAWING";
-  const isDone = status === "DONE";
+  const prompt = round?.prompt;
+
+  const isLobby = room?.status === "LOBBY";
+  const isDrawing = round?.status === "DRAWING";
+  // const isScoring = round?.status === "SCORING";
+  const isDone = round?.status === "DONE";
 
   useEffect(() => {
     if (!room) return;
@@ -61,7 +62,7 @@ function JoinRoom() {
     if (savedName) {
       setName(savedName);
     }
-  }, []);
+  }, [roomId]);
 
   useEffect(() => {
     if (!roomId) return;
@@ -70,15 +71,15 @@ function JoinRoom() {
 
     const loadRoom = async () => {
       try {
-        const r = await getRoom(roomId);
+        const state = await getRoom(roomId);
         if (cancelled) return;
 
-        if (!r) {
+        if (!state) {
           setRoomError("Room not found.");
-          setRoom(null);
+          setRoomState(null);
         } else {
           setRoomError(null);
-          setRoom(r);
+          setRoomState(state);
         }
       } finally {
         if (!cancelled) setRoomLoading(false);
@@ -97,7 +98,7 @@ function JoinRoom() {
   useEffect(() => {
     autoSubmittedRef.current = false;
     setHasSubmitted(false);
-  }, [room?.roundId]);
+  }, [round?.id]);
 
   const submitDrawing = async () => {
     if (!roomId) {
@@ -106,6 +107,10 @@ function JoinRoom() {
     }
     if (!room) {
       setError("Room not loaded yet.");
+      return;
+    }
+    if (!round) {
+      setError("Round not loaded yet.");
       return;
     }
 
@@ -142,17 +147,17 @@ function JoinRoom() {
           );
       });
 
-      const round = room.roundId;
+      const roundId = round.id;
 
       const { url } = await upload(
-        `rooms/${roomId}/rounds/${round}/players/${playerId}.png`,
+        `room/${roomId}/round/${roundId}/players/${playerId}.png`,
         blob,
         {
           access: "public",
           handleUploadUrl: "/api/blob-upload",
           clientPayload: JSON.stringify({
             roomId,
-            round,
+            roundId,
             playerId,
           }),
         },
@@ -173,14 +178,16 @@ function JoinRoom() {
   };
 
   const handleSubmitDrawing = async () => {
-    if (!room) {
-      setError("Room not loaded yet.");
+    if (!round) {
+      setError("Round not loaded yet.");
       return;
     }
-    if (room.status !== "DRAWING") {
+
+    if (round.status !== "DRAWING") {
       setError("You can only submit while the round is in progress.");
       return;
     }
+
     await submitDrawing();
   };
 
@@ -197,13 +204,11 @@ function JoinRoom() {
         <section style={{ marginBottom: "1rem" }}>
           <h3>{`Hello ${name}`}</h3>
         </section>
-        {secondsLeft !== null &&
-          room?.status === "DRAWING" &&
-          !hasSubmitted && (
-            <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
-              Time remaining: {formatSeconds(secondsLeft)}
-            </p>
-          )}
+        {secondsLeft !== null && isDrawing && !hasSubmitted && (
+          <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
+            Time remaining: {formatSeconds(secondsLeft)}
+          </p>
+        )}
 
         {/* Drawing section */}
         {name.trim() && !hasSubmitted && (

@@ -1,22 +1,22 @@
 import { Submission } from "../shared/submission.js";
 import { generateId, redis as kv, touchKeys, TTL_SECONDS } from "./redis.js";
 
-const roomSubsKey = (roomId: string, round: number) =>
-  `room:${roomId}:round:${round}:submissions`;
+const roomSubsKey = (roomId: string, roundId: string) =>
+  `room:${roomId}:round:${roundId}:submissions`;
 
 const submissionKey = (id: string) => `submission:${id}`;
 
 export const submissionUniqKey = (
   roomId: string,
-  round: number,
+  roundId: string,
   playerId: string
-) => `room:${roomId}:round:${round}:submissionByPlayer:${playerId}`;
+) => `room:${roomId}:round:${roundId}:submissionByPlayer:${playerId}`;
 
 export async function createOrReplaceSubmission(
-  round: number,
+  roundId: string,
   input: Omit<Submission, "id" | "createdAt">
 ) {
-  const uniqKey = submissionUniqKey(input.roomId, round, input.playerId);
+  const uniqKey = submissionUniqKey(input.roomId, roundId, input.playerId);
 
   // ensure 1 submission per player (replace)
   const existingId = await kv.get<string>(uniqKey);
@@ -29,7 +29,7 @@ export async function createOrReplaceSubmission(
   };
 
   const sk = submissionKey(id);
-  const rsk = roomSubsKey(input.roomId, round);
+  const rsk = roomSubsKey(input.roomId, roundId);
 
   await kv.set(sk, sub, { ex: TTL_SECONDS });
   await kv.set(uniqKey, id, { ex: TTL_SECONDS });
@@ -46,9 +46,9 @@ export async function createOrReplaceSubmission(
 
 export async function listSubmissions(
   roomId: string,
-  round: number
+  roundId: string
 ): Promise<Submission[]> {
-  const ids = (await kv.lrange(roomSubsKey(roomId, round), 0, -1)) ?? [];
+  const ids = (await kv.lrange(roomSubsKey(roomId, roundId), 0, -1)) ?? [];
   if (ids.length === 0) return [];
 
   const subs = await Promise.all(

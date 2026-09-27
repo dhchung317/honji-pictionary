@@ -1,6 +1,8 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById } from "./_roomStore.js";
+import { GRACE_MS } from "./shared.js";
+import { getRound } from "./_roundStore.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -16,28 +18,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       onBeforeGenerateToken: async (_pathname, clientPayload) => {
         const payload = clientPayload ? JSON.parse(clientPayload) : null;
-        const { roomId, round, playerId } = payload ?? {};
+        const { roomId, roundId, playerId } = payload ?? {};
 
-        if (!roomId || round === undefined || !playerId) {
+        if (!roomId || roundId === undefined || !playerId) {
           throw new Error("Missing clientPayload");
         }
 
         const room = await getRoomById(roomId);
         if (!room) throw new Error("Room not found");
 
-        const end = new Date(room.roundEndAt!).getTime();
-        const GRACE_MS = 20000;
+        if (!room.currentRoundId) throw new Error("Round id not found");
+        const round = await getRound(roomId, room.currentRoundId);
+        if (!round) throw new Error("Round not found");
+
+        const end = new Date(round.roundEndAt!).getTime();
 
         const now = Date.now();
         const withinGrace = now <= end + GRACE_MS;
         // Same rules as submit-drawing:
-        if (!withinGrace)
-          throw new Error("Round not accepting uploads");
-        if (room.roundId !== round) throw new Error("Wrong round");
-        if (!room.frozenPlayerIds.includes(playerId))
+        if (!withinGrace) throw new Error("Round not accepting uploads");
+        if (!round.frozenPlayerIds.includes(playerId))
           throw new Error("Not in this round");
 
-        const safePath = `rooms/${roomId}/rounds/${round}/players/${playerId}.png`;
+        const safePath = `room/${roomId}/round/${roundId}/players/${playerId}.png`;
 
         return {
           allowedContentTypes: ["image/jpeg", "image/png", "image/webp"],
@@ -46,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           // optional, `callbackUrl` is automatically computed when hosted on Vercel
           tokenPayload: JSON.stringify({
             roomId,
-            round,
+            roundId,
             playerId,
             safePath,
           }),

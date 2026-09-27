@@ -7,8 +7,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!roomId) return res.status(400).json({ error: "roomId required" });
 
   const room = await getRoomById(roomId);
-  const round = req.query.round ? Number(req.query.round) : room?.roundId;
+  if (!room?.currentRoundId)
+    return res.status(400).json({ error: "roundId required" });
 
-  const subs = await listSubmissions(roomId, round!);
+  const roundId = req.query.round
+    ? String(req.query.round)
+    : room?.currentRoundId;
+
+  const subs = await listSubmissions(roomId, roundId ?? "");
   res.status(200).json(subs);
 }

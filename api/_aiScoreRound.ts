@@ -39,8 +39,8 @@ export async function scoreRoundWithAI(params: {
         `Rank the drawings from best to worst based on: (1) matches prompt, (2) clarity/readability, (3) creativity.\n` +
         `Give every player a score from 0–100. Higher is better. Include exactly one results entry per playerId.` +
         `Note that these drawings are done under tight time constraints, with no tools that allow for polish or detail` +
-        `That being said, feel free to roast the artist for exceptionally bad drawings` +
-        `Instead of stating the obvious, use descriptive, exaggerated and dramatic language` +
+        `That being said, feel free to roast the artist for bad drawings` +
+        `Instead of stating the obvious, use comedic and witty language, up to the edge of profanity, but be blunt and concise, 35 words soft limit` +
         `Return ONLY the JSON schema.\n\n` +
         `Drawings:\n` +
         submissions
