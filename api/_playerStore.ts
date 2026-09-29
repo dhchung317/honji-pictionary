@@ -63,3 +63,29 @@ export async function listPlayers(roomId: string): Promise<Player[]> {
       (a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime(),
     );
 }
+
+export async function updatePlayerAvatar(
+  playerId: string,
+  avatarUrl: string,
+): Promise<Player | null> {
+  const pk = playerKey(playerId);
+
+  const player = await kv.get<Player>(pk);
+
+  if (!player) {
+    return null;
+  }
+
+  const updatedPlayer: Player = {
+    ...player,
+    avatarUrl,
+  };
+
+  await kv.set(pk, updatedPlayer, {
+    ex: TTL_SECONDS,
+  });
+
+  await touchKeys([pk]);
+
+  return updatedPlayer;
+}

@@ -3,4 +3,5 @@ export interface Player {
   roomId: string;
   name: string;
   joinedAt: string;
+  avatarUrl?: string;
 }
