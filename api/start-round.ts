@@ -1,4 +1,5 @@
 import { authorize } from "./_session.js";
+import { allowRequest } from "./_limits.js";
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById, saveRoom } from "./_roomStore.js";
 import { listPlayers } from "./_playerStore.js";
@@ -31,6 +32,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (room.status !== "LOBBY") {
       return res.status(400).json({ error: "Round already started" });
     }
+
+    if (!await allowRequest(req, res, "start", 6, 3600, roomId)) return;
+    if (!await allowRequest(req, res, "start-global", 100, 3600, "global")) return;
 
     const { prompt } = await genPrompt({ history: room.promptHistory });
 

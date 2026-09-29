@@ -1,4 +1,5 @@
 import { authorize } from "./_session.js";
+import { allowRequest } from "./_limits.js";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
@@ -21,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body,
       request: req as any,
 
-      onBeforeGenerateToken: async (_pathname, clientPayload) => {
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
         const payload = clientPayload ? JSON.parse(clientPayload) : null;
 
         const { roomId, roundId, playerId, type } = payload ?? {};
@@ -29,6 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (!roomId || !playerId) {
           throw new Error("Missing clientPayload");
         }
+
 
         const room = await getRoomById(roomId);
 
@@ -39,6 +41,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (!await authorize(req, res, { role: "PLAYER", roomId, id: playerId })) {
           throw new Error("Invalid player session");
         }
+
+        if (!await allowRequest(req, res, "upload", 6, 60, `${roomId}:${playerId}`)) throw new Error("Upload limit reached");
+        if (!await allowRequest(req, res, "upload-room", 60, 60, roomId)) throw new Error("Room upload limit reached");
 
         /* ---------- Avatar upload ---------- */
 
@@ -59,8 +64,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
           const safePath = `room/${roomId}/players/${playerId}/avatar.png`;
 
+          if (pathname !== safePath) throw new Error("Invalid upload path");
           return {
-            allowedContentTypes: ["image/jpeg", "image/png", "image/webp"],
+            maximumSizeInBytes: 2 * 1024 * 1024,
+          validUntil: Date.now() + 60_000,
+          allowedContentTypes: ["image/jpeg", "image/png", "image/webp"],
 
             addRandomSuffix: true,
 
@@ -109,7 +117,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const safePath = `room/${roomId}/round/${roundId}/players/${playerId}.png`;
 
+        if (pathname !== safePath) throw new Error("Invalid upload path");
         return {
+          maximumSizeInBytes: 2 * 1024 * 1024,
+          validUntil: Date.now() + 60_000,
           allowedContentTypes: ["image/jpeg", "image/png", "image/webp"],
 
           addRandomSuffix: true,
