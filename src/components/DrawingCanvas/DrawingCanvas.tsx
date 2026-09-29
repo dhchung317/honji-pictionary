@@ -33,7 +33,6 @@ const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
     const {
       clear,
       undo,
-      canUndo,
       handlePointerDown,
       handlePointerMove,
       handlePointerEnd,
@@ -69,10 +68,6 @@ const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
           onPointerCancel={handlePointerEnd}
           onPointerLeave={handlePointerEnd}
         />
-
-        <button type="button" onClick={undo} disabled={!canUndo}>
-          Undo
-        </button>
       </div>
     );
   },

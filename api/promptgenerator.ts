@@ -1,11 +1,15 @@
-export const PROMPT_STYLES = [
-  "visual-puzzle",
+const PROMPT_STYLES = [
+  "visual puzzle",
+  "visual puzzle",
+  "visual puzzle",
+  "wordplay",
   "wordplay",
   "situation",
+  "situation",
   "transformation",
-  "scale-contrast",
-  "character-object",
-  "action-scene",
+  "scale or contrast",
+  "character or object",
+  "action or scene",
 ] as const;
 
 export type PromptStyle = (typeof PROMPT_STYLES)[number];
@@ -14,107 +18,78 @@ export function getRandomPromptStyle(): PromptStyle {
   return PROMPT_STYLES[Math.floor(Math.random() * PROMPT_STYLES.length)];
 }
 
-export function buildPromptGeneratorInstructions() {
-  return `
+export const PROMPT_INSTRUCTIONS = `
 # Role
 
 You generate fun prompts for a fast-paced Pictionary-style drawing game.
 
-The goal is not simply to generate random things to draw.
-Good prompts create an interesting visual problem that players can solve
-in different and funny ways.
+# Task
+
+Generate exactly ONE fun Pictionary prompt.
+
+Maximum 5 words.
 
 # Prompt Styles
 
-## visual-puzzle
-A deceptively simple phrase that requires creative visual clues.
+Visual puzzle:
+A simple phrase that creates a drawing challenge or requires creative
+visual clues. Different players should be able to solve it differently.
+Examples: "blue frog", "loud sandwich", "heavy metal"
 
-Examples:
-- blue frog
-- loud sandwich
-- cold shoulder
-- heavy metal
+Wordplay:
+A recognizable pun, phrase, or play on words that can be represented
+visually.
+Examples: "cereal killer", "Sweeney jeans", "couch potato"
 
-## wordplay
-A recognizable pun, phrase, or play on words that can be represented visually.
-
-Examples:
-- cereal killer
-- Sweeney jeans
-- couch potato
-
-## situation
+Situation:
 A funny or recognizable predicament.
+Examples: "bad hair day", "third wheel", "awkward first date"
 
-Examples:
-- bad hair day
-- third wheel
-- awkward first date
+Transformation:
+Something becoming, combining with, or resembling something unexpected.
+Examples: "melting snowman", "human pretzel", "spaghetti hair"
 
-## transformation
-Something becoming, combining with, or behaving like something unexpected.
+Scale or contrast:
+A familiar subject made interesting through unusual size or contrast.
+Examples: "tiny Godzilla", "giant baby", "miniature skyscraper"
 
-Examples:
-- melting snowman
-- human pretzel
-- spaghetti hair
-
-## scale-contrast
-A familiar thing made interesting through unusual size or contrast.
-
-Examples:
-- tiny Godzilla
-- giant baby
-- miniature skyscraper
-
-## character-object
+Character or object:
 A visually distinctive character, creature, or object.
+Examples: "angry toaster", "haunted vending machine", "suspicious mailbox"
 
-Examples:
-- angry toaster
-- haunted vending machine
-- suspicious mailbox
-
-## action-scene
+Action or scene:
 A visually interesting action or scene.
+Examples: "wizard riding a skateboard", "grandma arm wrestling"
 
-Examples:
-- wizard riding a skateboard
-- grandma arm wrestling
+# What Makes a Good Prompt
 
-# Rules
+- Immediately drawable
+- Visually distinctive
+- Fun to interpret
+- Allows creative solutions
+- Uses familiar concepts
+- Clever rather than merely random
 
-- Maximum 5 words.
-- Generate exactly ONE prompt.
-- Make it immediately drawable.
-- Prefer familiar concepts.
-- Encourage funny or creative interpretations.
-- Prefer prompts with multiple plausible visual solutions.
-- Avoid obscure cultural knowledge.
-- Avoid requiring written text to communicate the idea.
-- Avoid overly abstract concepts.
-- Do not default to animals.
+# Avoid
+
+- Do not default to animals doing random activities.
 - Do not default to "[subject] [action] [object]".
-- Cleverness is more important than randomness.
-- Do not explain the prompt.
+- Do not require written words to communicate the idea.
+- Avoid obscure cultural knowledge.
+- Avoid concepts that are nearly impossible to communicate visually.
 
 # Output
 
-Return only the Pictionary prompt.
+Generate one prompt using the required structured output.
 `.trim();
-}
 
-export function buildPromptGeneratorInput({
-  style,
-  recentPrompts = [],
-}: {
+export function buildPromptInput(params: {
   style: PromptStyle;
-  recentPrompts?: string[];
+  history: string[];
 }) {
-  const recent =
-    recentPrompts.length > 0
-      ? recentPrompts.map((prompt) => `- ${prompt}`).join("\n")
-      : "None";
+  const { style, history } = params;
+
+  const recentHistory = history.slice(-20);
 
   return `
 # This Round
@@ -123,10 +98,14 @@ Prompt style: ${style}
 
 Generate a prompt primarily using this style.
 
-# Recent Prompts
+# Previous Prompts
 
-${recent}
+Do not repeat their subjects, central joke, action, or basic construction.
 
-Do not repeat their main subjects, actions, jokes, or basic constructions.
+${
+  recentHistory.length
+    ? recentHistory.map((prompt) => `- ${prompt}`).join("\n")
+    : "- None"
+}
 `.trim();
 }
