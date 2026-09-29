@@ -227,7 +227,7 @@ function JoinRoom() {
                 className={styles.submitButton}
                 onClick={submitDrawing}
               >
-                Submit drawing
+                Submit
               </button>
             </div>
           </section>
