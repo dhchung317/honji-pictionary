@@ -43,7 +43,7 @@ export async function scoreRoundWithAI(params: {
         `For each player, write a short reaction to their drawing. ` +
         `Be playful, witty, and lightly roast weak or ridiculous drawings when appropriate. ` +
         `You may use mild profanity, but keep it fun rather than cruel or personal. ` +
-        `Do not merely describe what is visible. Aim for roughly 25 words or fewer.\n\n` +
+        `Do not merely describe what is visible. Aim for roughly 20 words or fewer.\n\n` +
         `Drawings:\n` +
         submissions
           .map(

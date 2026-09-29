@@ -6,7 +6,11 @@ import { SubmissionCard } from "../components/SubmissionCard/SubmissionCard";
 import { useAsync } from "../hooks/useAsync";
 
 import { getRoundScore } from "../lib/roundScoreApi";
-import { getRoom, nextRound, quit } from "../lib/roomsApi";
+import {
+  getRoom,
+  // nextRound,
+  quit,
+} from "../lib/roomsApi";
 import { getSubmissionsByRoom } from "../lib/submissionsApi";
 import { getRankedSubmissions } from "../lib/rankedSubmissions";
 import { dummyRoundScore, dummySubmissions } from "../testData/playerResults";
@@ -43,11 +47,11 @@ function Results() {
     return getRankedSubmissions(submissions, roundScore.results);
   }, [roomId]);
 
-  const handleNextRound = async () => {
-    if (!roomId) return;
+  // const handleNextRound = async () => {
+  //   if (!roomId) return;
 
-    await nextRound(roomId);
-  };
+  //   await nextRound(roomId);
+  // };
 
   const handleQuit = async () => {
     if (!roomId) return;
@@ -79,9 +83,9 @@ function Results() {
           <p>No submissions yet.</p>
 
           <div className={styles.actions}>
-            <button className={styles.nextButton} onClick={handleNextRound}>
+            {/* <button className={styles.nextButton} onClick={handleNextRound}>
               Next Round
-            </button>
+            </button> */}
 
             <button className={styles.quitButton} onClick={handleQuit}>
               Quit
@@ -92,8 +96,10 @@ function Results() {
     );
   }
 
-  const winner = data[0];
-  const remainingSubmissions = data.slice(1);
+  const topThree = data.slice(0, 3);
+
+  const winner = topThree[0];
+  const runnersUp = topThree.slice(1);
 
   return (
     <main className={styles.page}>
@@ -108,9 +114,9 @@ function Results() {
           </div>
 
           <div className={styles.actions}>
-            <button className={styles.nextButton} onClick={handleNextRound}>
+            {/* <button className={styles.nextButton} onClick={handleNextRound}>
               Next Round
-            </button>
+            </button> */}
 
             <button className={styles.quitButton} onClick={handleQuit}>
               Quit
@@ -119,17 +125,19 @@ function Results() {
         </header>
 
         <div className={styles.resultsLayout}>
-          <section className={styles.winnerSection}>
-            <SubmissionCard
-              submission={winner.submission}
-              result={winner.result}
-              variant="host"
-            />
-          </section>
+          {winner && (
+            <section className={styles.winnerSection}>
+              <SubmissionCard
+                submission={winner.submission}
+                result={winner.result}
+                variant="host"
+              />
+            </section>
+          )}
 
           <section className={styles.submissionsSection}>
             <div className={styles.submissionsGrid}>
-              {remainingSubmissions.map(({ submission, result }) => (
+              {runnersUp.map(({ submission, result }) => (
                 <SubmissionCard
                   key={submission.id}
                   submission={submission}

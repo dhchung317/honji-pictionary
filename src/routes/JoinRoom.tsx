@@ -13,6 +13,7 @@ import { useAsync } from "../hooks/useAsync";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 
 import styles from "./JoinRoom.module.css";
+import { GameLoading } from "../components/GameLoading/GameLoading";
 
 const formatSeconds = (secs: number) => {
   const m = Math.floor(secs / 60);
@@ -165,11 +166,11 @@ function JoinRoom() {
 
   // Page states
   if (!roomId) {
-    return <p>Missing room id.</p>;
+    return <GameErrorPage type="MISSING_ROOM_ID" />;
   }
 
   if (roomLoading) {
-    return <div>Loading room…</div>;
+    return <GameLoading message="Loading your canvas..." />;
   }
 
   if (roomError) {
@@ -177,15 +178,13 @@ function JoinRoom() {
   }
 
   if (!room) {
-    return <div>Room not found.</div>;
+    return <GameErrorPage type="ROOM_NOT_FOUND" />;
   }
 
   return (
     <main className={styles.page}>
       <div className={styles.game}>
         <header className={styles.header}>
-          {/* <h3 className={styles.greeting}>Hello {name}</h3> */}
-
           {secondsLeft !== null && isDrawing && !hasSubmitted && (
             <span className={styles.timer}>{formatSeconds(secondsLeft)}</span>
           )}
@@ -234,10 +233,7 @@ function JoinRoom() {
         )}
 
         {hasSubmitted && (
-          <section className={styles.submitted}>
-            <h3>Submitted!</h3>
-            <p>Waiting for the host to score the round…</p>
-          </section>
+          <GameLoading message="Waiting for the host to score the round…" />
         )}
 
         {submissionError && (

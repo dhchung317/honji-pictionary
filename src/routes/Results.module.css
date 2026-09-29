@@ -2,29 +2,24 @@
 
 .page {
   width: 100%;
-  height: 100vh;
-
-  display: flex;
-  justify-content: center;
-
-  /* Smaller, responsive outer padding */
-  padding: clamp(1rem, 2vw, 2rem);
+  height: 100dvh;
 
   box-sizing: border-box;
 
+  padding: 1.5rem;
+
   overflow: hidden;
+
+  .quitButton {
+    background-color: rgba(255, 0, 0, 0.378);
+  }
 }
+
+/* ---------- Results ---------- */
 
 .results {
   width: 100%;
   height: 100%;
-
-  /*
-   * Important:
-   * Don't artificially restrict a TV/large monitor
-   * with the normal website max width.
-   */
-  max-width: none;
 
   display: flex;
   flex-direction: column;
@@ -50,6 +45,7 @@
 .heading {
   display: flex;
   align-items: center;
+
   gap: var(--space-lg);
 }
 
@@ -70,77 +66,88 @@
   font-weight: 600;
 }
 
-/* ---------- Results layout ---------- */
+/* ---------- Top 3 layout ---------- */
 
 .resultsLayout {
   flex: 1;
 
-  display: grid;
-
-  /*
-   * Winner gets ~40%.
-   * Results get ~60%.
-   *
-   * minmax(0, ...) is important — it allows BOTH
-   * columns to actually shrink.
-   */
-  grid-template-columns:
-    minmax(0, 0.8fr)
-    minmax(0, 1.2fr);
-
-  gap: clamp(1.5rem, 3vw, 4rem);
-
   min-width: 0;
   min-height: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(20rem, 0.9fr)
+    minmax(0, 1.6fr);
+
+  align-items: center;
+
+  gap: clamp(2rem, 3vw, 4rem);
+
+  /*
+   * This padding is INSIDE the available results area.
+   * It also provides space for the winner's border outset.
+   */
+  padding: 3rem 2rem;
+
+  box-sizing: border-box;
 }
 
 /* ---------- Winner ---------- */
 
 .winnerSection {
+  width: 100%;
+
   min-width: 0;
   min-height: 0;
 
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 
-  padding: clamp(2rem, 5vh, 4rem) clamp(2rem, 3vw, 3rem);
-
-  box-sizing: border-box;
+  /*
+   * No padding here.
+   * resultsLayout already provides the breathing room.
+   */
+  overflow: visible;
 }
 
-/* ---------- Submissions ---------- */
+.winnerSection > * {
+  width: 100%;
+  max-width: 34rem;
+}
+
+/* ---------- Runner ups ---------- */
 
 .submissionsSection {
+  width: 100%;
+
   min-width: 0;
   min-height: 0;
 
-  padding-top: var(--space-md);
-
-  overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
 .submissionsGrid {
   width: 100%;
-  height: 100%;
-
-  display: grid;
-
-  /*
-   * All three columns MUST fit inside the available
-   * right-hand space.
-   */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  /*
-   * Two equal rows.
-   */
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-
-  gap: clamp(0.5rem, 1vw, 1rem);
 
   min-width: 0;
   min-height: 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  align-items: start;
+
+  gap: clamp(1rem, 2vw, 2rem);
+}
+
+.submissionsGrid > * {
+  min-width: 0;
+
+  align-self: start;
 }
 
 /* ---------- Empty ---------- */
@@ -153,4 +160,69 @@
   padding: var(--space-xl);
 
   text-align: center;
+}
+
+/* ---------- Smaller screens ---------- */
+
+@media (max-width: 64rem) {
+  .page {
+    height: auto;
+    min-height: 100dvh;
+
+    padding: 1rem;
+
+    overflow: visible;
+  }
+
+  .results {
+    height: auto;
+    min-height: calc(100dvh - 2rem);
+  }
+
+  .resultsLayout {
+    flex: initial;
+
+    grid-template-columns: 1fr;
+
+    gap: 2rem;
+
+    /*
+     * Still provides room around the winner frame,
+     * without adding padding directly to winnerSection.
+     */
+    padding: 2rem 1rem;
+  }
+
+  .winnerSection > * {
+    max-width: 34rem;
+  }
+
+  .submissionsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 48rem) {
+  .resultsLayout {
+    display: flex;
+    flex-direction: column;
+
+    gap: 2rem;
+
+    padding: 1rem;
+  }
+
+  .winnerSection {
+    width: 100%;
+  }
+
+  .submissionsSection {
+    width: 100%;
+  }
+
+  .submissionsGrid {
+    grid-template-columns: 1fr;
+  }
 }

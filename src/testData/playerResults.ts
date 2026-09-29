@@ -62,7 +62,7 @@ export const dummyRoundScore: RoundScore = {
       playerId: "player-1",
       score: 85,
       rank: 1,
-      note: "A smooth criminal in jammies! This cat's got style.",
+      note: "A smooth criminal in jammies! This cat's got style. A smooth criminal in jammies! This cat's got style.",
     },
     {
       playerId: "player-2",
@@ -74,7 +74,7 @@ export const dummyRoundScore: RoundScore = {
       playerId: "player-3",
       score: 71,
       rank: 3,
-      note: "Bold interpretation with some questionable anatomy.",
+      note: "Bold interpretation with some questionable anatomy. Bold interpretation with some questionable anatomy.",
     },
     {
       playerId: "player-4",

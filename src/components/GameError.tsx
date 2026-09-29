@@ -25,6 +25,8 @@ export function GameErrorPage({ type }: Props) {
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
+        position: "absolute",
+        top: "40%",
       }}
     >
       <h1>{title}</h1>

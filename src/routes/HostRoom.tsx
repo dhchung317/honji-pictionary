@@ -13,8 +13,6 @@ import { getRoom, startRound } from "../lib/roomsApi";
 import { getViewerRole } from "../lib/viewer";
 import { GameLoading } from "../components/GameLoading/GameLoading";
 
-import logo from "../assets/honji.png";
-
 import styles from "./HostRoom.module.css";
 import { PlayerAvatar } from "../components/PlayerAvatar/PlayerAvatar";
 
@@ -161,7 +159,7 @@ function HostRoom() {
 
               <div className={styles.lobbyCenter}>
                 <div className={styles.logoSpace}>
-                  <img width={"100%"} src={logo} />
+                  <img width={"100%"} src={"/honji.png"} />
                 </div>
 
                 <h2 className={styles.stageTitle}>Waiting for players</h2>
@@ -217,11 +215,7 @@ function HostRoom() {
 
           {isScoring && (
             <div className={styles.roundContent}>
-              <h2 className={styles.stageTitle}>Scoring…</h2>
-
-              <p className={styles.stageMessage}>
-                Everyone's drawings are in. Calculating the results.
-              </p>
+              <GameLoading message="Everyone's drawings are in. Calculating the results." />
             </div>
           )}
 
