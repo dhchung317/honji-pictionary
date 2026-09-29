@@ -1,5 +1,5 @@
-import type { Room } from "./room";
-import type { Round } from "./round";
+import type { Room } from "./room.js";
+import type { Round } from "./round.js";
 
 export interface RoomState {
   room: Room;
