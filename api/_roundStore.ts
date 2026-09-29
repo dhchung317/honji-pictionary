@@ -1,4 +1,4 @@
-import { Round } from "../shared/round";
+import { Round } from "../shared/round.js";
 import { redis, TTL_SECONDS } from "./redis.js";
 
 const roundKey = (roomId: string, roundId: string) =>
