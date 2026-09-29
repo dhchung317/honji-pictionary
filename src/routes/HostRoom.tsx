@@ -85,7 +85,7 @@ function HostRoom() {
       throw new Error("Missing room id");
     }
 
-    setIsWaitingForRound(true);
+    setIsWaitingForRound(room?.status !== "SCORING_FAILED");
 
     try {
       await startRound(roomId);
@@ -220,6 +220,14 @@ function HostRoom() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {round?.status === "SCORING_FAILED" && (
+            <div className={styles.roundContent}>
+              <p>Scoring is unavailable. Your drawings are saved.</p>
+              <button onClick={handleStartRound} disabled={isStarting}>Retry scoring</button>
+              {startError && <p role="alert">{startError.message}</p>}
             </div>
           )}
 

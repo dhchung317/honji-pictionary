@@ -110,6 +110,7 @@ async function finishRound(room: Room, round: Round): Promise<Room> {
 }
 
 async function advanceScoringRoom(room: Room, round: Round): Promise<Room> {
+  if (round.scoringRetryAt && Date.now() < round.scoringRetryAt) return room;
   if (round.scoredAt) {
     return room;
   }
@@ -118,6 +119,9 @@ async function advanceScoringRoom(room: Room, round: Round): Promise<Room> {
   if (!acquired) return room;
 
   try {
+    const attempt = (round.scoringAttempts ?? 0) + 1;
+    round = { ...round, scoringAttempts: attempt };
+    await saveRound(round);
     const subs = await listSubmissions(room.id, round.id ?? "");
 
     if (subs.length !== 0) {
@@ -143,13 +147,20 @@ async function advanceScoringRoom(room: Room, round: Round): Promise<Room> {
       };
 
       await saveRoundScore(roundScore);
+    } else {
+      await saveRoundScore({ roomId: room.id, roundId: round.id, scoredAt: new Date().toISOString(), results: [] });
     }
 
     return finishRound(room, round);
   } catch (error) {
     console.error("[SCORING FAILED]", error);
 
-    return finishRound(room, round);
+    const failed = (round.scoringAttempts ?? 0) >= 3;
+    const updatedRound: Round = { ...round, status: failed ? "SCORING_FAILED" : "SCORING", scoringRetryAt: Date.now() + 15_000 };
+    await saveRound(updatedRound);
+    const updatedRoom: Room = { ...room, status: updatedRound.status };
+    await saveRoom(updatedRoom);
+    return updatedRoom;
   } finally {
     await redis.del(scoringLockKey(room.id, round.id));
   }

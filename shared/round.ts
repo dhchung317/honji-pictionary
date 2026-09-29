@@ -1,6 +1,7 @@
 export type RoundStatus =
   | "DRAWING"
   | "SCORING"
+  | "SCORING_FAILED"
   | "DONE";
 
 export interface Round {
@@ -13,4 +14,6 @@ export interface Round {
   roundEndAt: string;
   drawingDurationMs: number;
   scoredAt: string | null;
+  scoringAttempts?: number;
+  scoringRetryAt?: number;
 }
