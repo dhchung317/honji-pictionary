@@ -1,4 +1,5 @@
 import { authorize } from "./_session.js";
+import { acquireRoomMutation } from "./_mutationLock.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById, saveRoom } from "./_roomStore.js";
 import { Room } from "../shared/room.js";
@@ -11,6 +12,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const roomId = req.body?.roomId;
   if (!roomId) return res.status(400).json({ error: "roomId is required" });
 
+  const release = await acquireRoomMutation(roomId);
+  if (!release) return res.status(409).json({ error: "Room update in progress" });
+  try {
   const room = await getRoomById(roomId);
   if (!room) return res.status(404).json({ error: "Room not found" });
 
@@ -27,4 +31,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   await saveRoom(updated);
   return res.status(200).json(updated);
+  } finally { await release(); }
 }

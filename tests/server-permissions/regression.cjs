@@ -31,6 +31,7 @@ test("sessions reject missing, forged, other-role and other-room credentials", a
 test("a room code alone cannot start a round or consume AI", async () => {
  let called=false;
  const handler=load("api/start-round.ts", {
+  "./_mutationLock.js":{acquireRoomMutation:async()=>async()=>{}},
   "./_limits.js":{allowRequest:async()=>true},
   "./_session.js":{authorize:async (_req,res)=>{res.status(403).json({});return false;}},
   "./_roomStore.js":{getRoomById:async()=>({id:"ABCD",hostId:"host",status:"LOBBY"})},

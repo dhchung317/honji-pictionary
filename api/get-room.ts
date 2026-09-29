@@ -1,3 +1,4 @@
+import { acquireRoomMutation } from "./_mutationLock.js";
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { redis as kv, redis } from "./redis.js";
 import { getRoomById, saveRoom } from "./_roomStore.js";
@@ -169,6 +170,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
+  const release = await acquireRoomMutation(roomId);
+  if (!release) {
+    const room = await getRoomById(roomId);
+    if (!room) return res.status(404).json({ error: "Room not found" });
+    const round = room.currentRoundId ? await getRound(room.id, room.currentRoundId) : null;
+    return res.status(200).json({ room, round });
+  }
   try {
     const room = await getRoomById(roomId);
 
@@ -199,5 +207,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({
       error: "Failed to get room",
     });
+  } finally {
+    await release();
   }
 }
