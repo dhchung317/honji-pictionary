@@ -15,7 +15,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "ui": "vite",
+    "ui": "vite --host 0.0.0.0",
     "api": "vercel dev --listen 3000"
   },
   "dependencies": {
