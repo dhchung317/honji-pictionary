@@ -18,20 +18,15 @@ export function useAsync<T>(
 
     const run = async () => {
       try {
-        setError(null);
-
         const result = await fn();
 
         if (!cancelled) {
           setData(result);
+          setError(null);
         }
       } catch (err) {
         if (!cancelled) {
-          setError(
-            err instanceof Error
-              ? err
-              : new Error("Unknown error"),
-          );
+          setError(err instanceof Error ? err : new Error("Unknown error"));
         }
       } finally {
         if (!cancelled) {
