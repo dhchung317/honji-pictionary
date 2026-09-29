@@ -1,3 +1,4 @@
+import { sessionHeaders } from "../lib/session";
 import { upload } from "@vercel/blob/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
@@ -100,6 +101,7 @@ function JoinRoom() {
       blob,
       {
         access: "public",
+        headers: sessionHeaders(roomId, "PLAYER"),
         handleUploadUrl: "/api/blob-upload",
         clientPayload: JSON.stringify({
           roomId,

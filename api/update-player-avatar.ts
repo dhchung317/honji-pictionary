@@ -1,6 +1,7 @@
+import { authorize } from "./_session.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-import { updatePlayerAvatar } from "./_playerStore.js";
+import { getPlayer, updatePlayerAvatar } from "./_playerStore.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "PUT") {
@@ -22,6 +23,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
+  const existing = await getPlayer(playerId);
+  if (!existing) return res.status(404).json({ error: "Player not found" });
+  if (!await authorize(req, res, { role: "PLAYER", roomId: existing.roomId, id: playerId })) return;
   const player = await updatePlayerAvatar(playerId, avatarUrl);
 
   if (!player) {

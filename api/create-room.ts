@@ -1,3 +1,4 @@
+import { issueSession } from "./_session.js";
 // api/create-room.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createRoom } from "./_roomStore.js";
@@ -18,7 +19,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const room = await createRoom(hostId);
-    res.status(200).json(room);
+    const sessionToken = await issueSession({ role: "HOST", roomId: room.id, id: room.hostId });
+    res.status(200).json({ ...room, sessionToken });
   } catch (err) {
     console.error("[create-room] error", err);
     res.status(500).json({ error: "Failed to create room" });

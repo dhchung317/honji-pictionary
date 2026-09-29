@@ -1,3 +1,4 @@
+import { authorize } from "./_session.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById } from "./_roomStore.js";
 import { createOrReplaceSubmission } from "./_submissionStore.js";
@@ -31,6 +32,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res
       .status(400)
       .json({ error: "Cannot accept submission players outside round" });
+
+  if (!await authorize(req, res, { role: "PLAYER", roomId, id: playerId })) return;
 
   const now = Date.now();
   const endAt = round.roundEndAt;
