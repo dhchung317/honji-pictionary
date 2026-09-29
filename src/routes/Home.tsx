@@ -39,7 +39,7 @@ function Home() {
           <div>
             <img width="100%" src={logo} />
           </div>
-          <div style={{ marginTop: -50 }}>
+          <div>
             <h2 className={styles.title}>PICTIONARY</h2>
             <p className={styles.description}>
               Draw and see who comes out on top
