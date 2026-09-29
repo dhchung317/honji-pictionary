@@ -31,7 +31,14 @@ export async function getRoomById(id: string): Promise<Room | null> {
 }
 
 export async function saveRoom(room: Room): Promise<void> {
-  await kv.set(roomKey(room.id), room);
+  const saved = await kv.eval(`
+    local ttl = redis.call("PTTL", KEYS[1])
+    if ttl == -2 then return 0 end
+    if ttl == -1 then ttl = tonumber(ARGV[2]) end
+    redis.call("SET", KEYS[1], ARGV[1], "PX", math.max(ttl, 1))
+    return 1
+  `, [roomKey(room.id)], [JSON.stringify(room), TTL_SECONDS * 1000]);
+  if (saved === 0) throw new Error("Room expired during update");
 }
 
 export async function expireRoom(id: string, seconds: number): Promise<void> {
