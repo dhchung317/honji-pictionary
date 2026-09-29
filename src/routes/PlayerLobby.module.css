@@ -1,0 +1,115 @@
+/* ---------- Page ---------- */
+
+.page {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  padding: var(--space-lg) clamp(2rem, 4vw, 5rem);
+}
+
+/* ---------- Lobby ---------- */
+
+.lobby {
+  width: 100%;
+  max-width: 42rem;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-xl);
+}
+
+/* ---------- Header ---------- */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: var(--space-lg);
+
+  padding-bottom: var(--space-md);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.title {
+  margin: 0;
+
+  font-size: 1.5rem;
+}
+
+.roomId {
+  margin: 0.25rem 0 0;
+
+  color: var(--color-primary);
+
+  font-family: var(--font-room-code);
+  font-weight: 600;
+}
+
+.waiting {
+  margin: 0;
+
+  font-weight: 600;
+}
+
+/* ---------- Avatar ---------- */
+
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-md);
+}
+
+.avatarHeading {
+  text-align: center;
+}
+
+.avatarHeading h2 {
+  margin: 0;
+}
+
+.avatarHeading p {
+  margin: 0.5rem 0 0;
+}
+
+.canvasContainer {
+  width: 100%;
+  max-width: 32rem;
+
+  align-self: center;
+}
+
+/* ---------- Actions ---------- */
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: var(--space-md);
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 48rem) {
+  .page {
+    padding: var(--space-md);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .canvasContainer {
+    max-width: 100%;
+  }
+}

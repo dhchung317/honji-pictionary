@@ -7,6 +7,7 @@ import Join from "./routes/Join";
 import { Layout } from "./Layout";
 import PlayerResults from "./routes/PlayerResults";
 import NotFoundPage from "./routes/Fallback";
+import PlayerLobby from "./routes/PlayerLobby";
 
 function App() {
   return (
@@ -15,9 +16,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/host/:roomId" element={<HostRoom />} />
         <Route path="/join" element={<Join />} />
-        <Route path="/join/:roomId" element={<JoinRoom />} />
+        <Route path="/room/:roomId" element={<JoinRoom />} />
         <Route path="/room/:roomId/results" element={<Results />} />
         <Route path="/room/:roomId/playerresults" element={<PlayerResults />} />
+        <Route path="/room/:roomId/lobby" element={<PlayerLobby />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
