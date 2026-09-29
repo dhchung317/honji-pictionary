@@ -21,32 +21,27 @@
   display: flex;
   flex-direction: column;
 
-  gap: var(--space-xl);
+  gap: var(--space-md);
 }
 
 /* ---------- Header ---------- */
 
 .header {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: end;
 
-  gap: var(--space-lg);
-
-  padding-bottom: var(--space-md);
+  /* gap: var(--space-lg); */
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .title {
-  margin: 0;
-
   font-size: 1.5rem;
 }
 
 .roomId {
-  margin: 0.25rem 0 0;
-
   color: var(--color-primary);
 
   font-family: var(--font-room-code);
@@ -55,8 +50,6 @@
 
 .waiting {
   margin: 0;
-
-  font-weight: 600;
 }
 
 /* ---------- Avatar ---------- */
@@ -102,11 +95,6 @@
 @media (max-width: 48rem) {
   .page {
     padding: var(--space-md);
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .canvasContainer {

@@ -124,20 +124,15 @@ function PlayerLobby() {
   return (
     <main className={styles.page}>
       <div className={styles.lobby}>
-        <header className={styles.header}>
-          <div>
-            <h1 className={styles.title}>You're in!</h1>
-
-            <p className={styles.roomId}>
-              Room <strong>{room.id}</strong>
-            </p>
+        <div className={styles.header}>
+          <div className={styles.roomId}>
+            Room <strong>{room.id}</strong>
           </div>
-
-          <p className={styles.waiting}>Waiting for the host to start...</p>
-        </header>
+        </div>
 
         <section className={styles.avatarSection}>
           <div className={styles.avatarHeading}>
+            <p className={styles.waiting}>Waiting for the host to start...</p>
             <h2>Draw your avatar</h2>
 
             <p>Draw yourself while you wait for the game to start.</p>

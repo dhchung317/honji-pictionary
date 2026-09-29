@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { createRoom } from "../lib/roomsApi";
 
-import logo from "../assets/honji.png";
-
 import styles from "./Home.module.css";
 import { GameLoading } from "../components/GameLoading/GameLoading";
 
@@ -37,10 +35,10 @@ function Home() {
           }}
         >
           <div>
-            <img width="100%" src={logo} />
+            <img width="100%" src={'/honji-2.png'} />
           </div>
           <div>
-            <h2 className={styles.title}>PICTIONARY</h2>
+            <h2 className={styles.title}> inspired by Drawful</h2>
             <p className={styles.description}>
               Draw and see who comes out on top
             </p>
