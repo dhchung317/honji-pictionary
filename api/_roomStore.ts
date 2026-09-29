@@ -11,7 +11,7 @@ export async function createRoom(hostId: string): Promise<Room> {
     status: "LOBBY",
     createdAt: now.toISOString(),
     currentRoundId: null,
-    drawingDurationMs: 120_000,
+    drawingDurationMs: 180_000,
     promptHistory: [],
     theme: null,
   };

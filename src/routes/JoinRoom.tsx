@@ -1,16 +1,13 @@
 import { upload } from "@vercel/blob/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-
 import DrawingCanvas, {
   DrawingCanvasHandle,
-} from "../components/DrawingCanvas";
+} from "../components/DrawingCanvas/DrawingCanvas";
 import { GameErrorPage } from "../components/GameError";
-
 import { createSubmission } from "../lib/submissionsApi";
 import { getRoom } from "../lib/roomsApi";
 import { getViewerRole } from "../lib/viewer";
-
 import { useCountdown } from "../hooks/useCountdown";
 import { useAsync } from "../hooks/useAsync";
 import { useAsyncAction } from "../hooks/useAsyncAction";
@@ -54,7 +51,6 @@ function JoinRoom() {
   const room = roomState?.room ?? null;
   const round = roomState?.round ?? null;
 
-  const isLobby = room?.status === "LOBBY";
   const isDrawing = round?.status === "DRAWING";
   const isDone = round?.status === "DONE";
 
@@ -184,17 +180,11 @@ function JoinRoom() {
     return <div>Room not found.</div>;
   }
 
-  if (isLobby) {
-    return <div>Waiting for host to start...</div>;
-  }
-
   return (
     <main className={styles.page}>
       <div className={styles.game}>
-        <h1>Join Room</h1>
-
         <header className={styles.header}>
-          <h3 className={styles.greeting}>Hello {name}</h3>
+          {/* <h3 className={styles.greeting}>Hello {name}</h3> */}
 
           {secondsLeft !== null && isDrawing && !hasSubmitted && (
             <span className={styles.timer}>{formatSeconds(secondsLeft)}</span>
@@ -208,8 +198,8 @@ function JoinRoom() {
             <div className={styles.canvasContainer}>
               <DrawingCanvas
                 ref={canvasRef}
-                width={300}
-                height={300}
+                resolutionWidth={500}
+                resolutionHeight={500}
                 strokeColor="#000000"
                 strokeWidth={4}
               />

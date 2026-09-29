@@ -1,29 +1,42 @@
-.page {
-  min-height: 100vh;
-  width: 100%;
+/* ---------- Page ---------- */
 
-  padding: var(--space-xl);
+.page {
+  width: 100%;
+  min-height: 100dvh;
 }
 
 .room {
   width: 100%;
-  max-width: var(--page-max-width);
-  margin: 0 auto;
+  min-height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
 }
 
 /* ---------- Header ---------- */
 
 .header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-xl);
 
-  margin-bottom: var(--space-xl);
+  padding: var(--space-lg) var(--space-xl);
 }
 
 .title {
-  margin-bottom: var(--space-xs);
+  margin: 0;
+}
+
+.roomInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.roomCodeLabel {
+  font-size: 2em;
+  opacity: 0.65;
 }
 
 .roomCode {
@@ -31,49 +44,47 @@
 
   color: var(--color-primary);
 
-  font-size: 1.5rem;
+  font-family: var(--font-room-code);
+
+  font-size: 4rem;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
 
-/* ---------- Main game area ---------- */
-
-.gameArea {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 18rem;
-  gap: var(--space-xl);
-  align-items: start;
-}
-
-/* ---------- Current phase ---------- */
+/* ---------- Game stage ---------- */
 
 .stage {
-  min-height: 24rem;
+  position: relative;
+
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+
+  overflow: hidden;
 
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  padding: var(--space-xl);
-
-  text-align: center;
-
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-lg);
-
-  background: var(--color-surface-dark);
 }
 
+/* ---------- Shared phase content ---------- */
+
 .stageTitle {
-  margin-bottom: var(--space-md);
+  margin: 0 0 var(--space-sm);
 }
 
 .stageMessage {
   max-width: 32rem;
-  margin-bottom: var(--space-lg);
+  margin: 0;
 
   opacity: 0.75;
+}
+
+.playerCount {
+  margin: 0;
+
+  opacity: 0.7;
 }
 
 .startButton {
@@ -83,10 +94,175 @@
   border-color: var(--color-primary);
 }
 
+.error {
+  margin: 0;
+
+  color: var(--color-danger);
+}
+
+/* ---------- Lobby ---------- */
+
+/*
+  The player field fills the entire stage.
+
+  Players are assigned to these predefined slots based
+  on their position in the players array / join order.
+*/
+.lobbyPlayers {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+
+  padding: var(--space-lg) var(--space-xl);
+
+  pointer-events: none;
+}
+
+.lobbyPlayer {
+  min-width: 0;
+  width: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/*
+  Center column / center row is intentionally left open
+  for the Honji logo or another central graphic.
+
+      P1          P2
+
+  P3      LOGO        P4
+
+      P5          P6
+*/
+
+.playerSlot1 {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.playerSlot2 {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+.playerSlot3 {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.playerSlot4 {
+  grid-column: 5;
+  grid-row: 2;
+}
+
+.playerSlot5 {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.playerSlot6 {
+  grid-column: 4;
+  grid-row: 3;
+}
+
+.playerSlot7 {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.playerSlot8 {
+  grid-column: 5;
+  grid-row: 1;
+}
+
+.playerSlot9 {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.playerSlot10 {
+  grid-column: 5;
+  grid-row: 3;
+}
+
+/* ---------- Lobby center ---------- */
+
+.lobbyCenter {
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  pointer-events: none;
+}
+
+.logoSpace {
+  width: 30rem;
+}
+
+/* ---------- Lobby controls ---------- */
+
+.lobbyActions {
+  /* position: absolute;
+  bottom: var(--space-xl);
+  left: 50%; */
+
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+
+  /* transform: translateX(-50%); */
+
+  text-align: center;
+}
+
+/* ---------- Player avatars ---------- */
+
+.playerName {
+  max-width: 10rem;
+  margin-top: var(--space-sm);
+
+  overflow: hidden;
+
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Drawing / round phase ---------- */
+
+.roundContent {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: var(--space-xl);
+
+  text-align: center;
+}
+
 .promptLabel {
-  margin-bottom: var(--space-xs);
+  margin: 0 0 var(--space-xs);
 
   font-size: 0.9rem;
+
   opacity: 0.65;
 }
 
@@ -98,123 +274,67 @@
   font-weight: 700;
 }
 
-/* ---------- Players ---------- */
+.roundPlayers {
+  width: 100%;
 
-.playersPanel {
-  padding: var(--space-lg);
-
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-lg);
-
-  background: var(--color-surface-dark);
-}
-
-.playersHeader {
-  margin-bottom: var(--space-lg);
-}
-
-.playersTitle {
-  margin-bottom: var(--space-xs);
-}
-
-.playerCount {
-  margin: 0;
-
-  opacity: 0.7;
-}
-
-.playerList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.player {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-
-  min-height: 3rem;
-  padding: var(--space-sm);
-
-  border-radius: var(--radius-md);
-}
-
-/*
-  Placeholder for the drawable avatar system.
-
-  Later this can become an <img>, canvas export,
-  SVG, etc. without changing the overall layout.
-*/
-.avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  flex-shrink: 0;
+  flex: 1;
 
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
 
-  border: 1px solid var(--color-primary);
-  border-radius: 50%;
-
-  font-weight: 700;
+  gap: var(--space-xl);
 }
 
-.playerName {
-  overflow: hidden;
-
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.roundPlayer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
-/* ---------- Future round status ---------- */
 
 .playerStatus {
-  margin-left: auto;
+  margin-top: var(--space-xs);
 
   font-size: 0.8rem;
-  opacity: 0.65;
-}
-
-/* ---------- Empty lobby ---------- */
-
-.emptyPlayers {
-  margin: 0;
 
   opacity: 0.65;
 }
 
 /* ---------- Light mode ---------- */
 
-@media (prefers-color-scheme: light) {
-  .stage,
-  .playersPanel {
+/* @media (prefers-color-scheme: light) {
+  .avatar {
     background: var(--color-surface-light);
   }
-}
+} */
 
-/* ---------- Smaller displays ---------- */
+/* ---------- Temporary smaller-display fallback ---------- */
 
+/*
+  This is intentionally minimal.
+
+  The host screen's actual responsive behavior should be
+  designed once the desktop stage layout is finalized.
+*/
 @media (max-width: 48rem) {
-  .page {
-    padding: var(--space-lg) var(--space-md);
-  }
-
   .header {
-    flex-direction: column;
-    align-items: center;
-
-    text-align: center;
+    padding: var(--space-md);
   }
 
-  .gameArea {
-    grid-template-columns: 1fr;
+  .title {
+    font-size: 1.5rem;
   }
 
-  .playersPanel {
-    order: 2;
+  .avatar {
+    width: 6rem;
+
+    font-size: 2rem;
+  }
+
+  .logoSpace {
+    width: 10rem;
+    height: 7rem;
   }
 
   .prompt {

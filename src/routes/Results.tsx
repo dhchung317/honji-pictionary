@@ -1,63 +1,63 @@
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Submission } from "../../shared/submission";
-
 import { GameErrorPage } from "../components/GameError";
+import { SubmissionCard } from "../components/SubmissionCard/SubmissionCard";
 
 import { useAsync } from "../hooks/useAsync";
 
 import { getRoundScore } from "../lib/roundScoreApi";
 import { getRoom, nextRound, quit } from "../lib/roomsApi";
 import { getSubmissionsByRoom } from "../lib/submissionsApi";
+import { getRankedSubmissions } from "../lib/rankedSubmissions";
+import { dummyRoundScore, dummySubmissions } from "../testData/playerResults";
 
 import styles from "./Results.module.css";
+import { GameLoading } from "../components/GameLoading/GameLoading";
+
+const USE_DUMMY_DATA = false;
 
 function Results() {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
 
-  if (!roomId) {
-    throw new Error("Missing room id");
-  }
-
   const { data, loading, error } = useAsync(async () => {
+    if (USE_DUMMY_DATA) {
+      return getRankedSubmissions(dummySubmissions, dummyRoundScore.results);
+    }
+
+    if (!roomId) {
+      throw new Error("Missing room id");
+    }
+
     const roomState = await getRoom(roomId);
 
     if (!roomState.round) {
-      throw new Error("No current round");
+      throw new Error("NO_CURRENT_ROUND");
     }
 
-    const submissions = await getSubmissionsByRoom(roomId);
-    const roundScore = await getRoundScore(roomId, roomState.round.id);
+    const [submissions, roundScore] = await Promise.all([
+      getSubmissionsByRoom(roomId),
+      getRoundScore(roomId, roomState.round.id),
+    ]);
 
-    const rankedSubmissions = [...roundScore.results]
-      .sort((a, b) => a.rank - b.rank)
-      .map((result) =>
-        submissions.find(
-          (submission) => submission.playerId === result.playerId,
-        ),
-      )
-      .filter(
-        (submission): submission is Submission => submission !== undefined,
-      );
-
-    return {
-      roundScore,
-      submissions: rankedSubmissions,
-    };
+    return getRankedSubmissions(submissions, roundScore.results);
   }, [roomId]);
 
   const handleNextRound = async () => {
+    if (!roomId) return;
+
     await nextRound(roomId);
   };
 
   const handleQuit = async () => {
+    if (!roomId) return;
+
     await quit(roomId);
     navigate("/");
   };
 
   if (loading) {
-    return <p>Loading submissions…</p>;
+    return <GameLoading message="Loading results..." />;
   }
 
   if (error) {
@@ -68,9 +68,7 @@ function Results() {
     return null;
   }
 
-  const { roundScore, submissions } = data;
-
-  if (submissions.length === 0) {
+  if (data.length === 0) {
     return (
       <main className={styles.page}>
         <section className={styles.emptyState}>
@@ -94,7 +92,8 @@ function Results() {
     );
   }
 
-  const winner = submissions[0];
+  const winner = data[0];
+  const remainingSubmissions = data.slice(1);
 
   return (
     <main className={styles.page}>
@@ -103,7 +102,9 @@ function Results() {
           <div className={styles.heading}>
             <h1 className={styles.title}>Results</h1>
 
-            <p className={styles.roomId}>Room {roomId}</p>
+            <p className={styles.roomId}>
+              Room <strong>{roomId}</strong>
+            </p>
           </div>
 
           <div className={styles.actions}>
@@ -117,61 +118,28 @@ function Results() {
           </div>
         </header>
 
-        <section className={styles.winnerSection}>
-          <h2 className={styles.sectionTitle}>Winner</h2>
-
-          <p className={styles.winnerName}>
-            🏆 <strong>{winner.playerName}</strong>
-          </p>
-
-          <div className={styles.winnerCard}>
-            <img
-              className={styles.winnerImage}
-              src={winner.imageUrl}
-              alt={`Winning submission from ${winner.playerName}`}
+        <div className={styles.resultsLayout}>
+          <section className={styles.winnerSection}>
+            <SubmissionCard
+              submission={winner.submission}
+              result={winner.result}
+              variant="host"
             />
-          </div>
-        </section>
+          </section>
 
-        <section className={styles.submissionsSection}>
-          <h2 className={styles.sectionTitle}>All submissions</h2>
-
-          <div className={styles.submissionsGrid}>
-            {submissions.map((submission) => {
-              const result = roundScore.results.find(
-                (result) => result.playerId === submission.playerId,
-              );
-
-              return (
-                <article key={submission.id} className={styles.submissionCard}>
-                  <div className={styles.submissionHeader}>
-                    {submission.playerName}
-                  </div>
-
-                  <img
-                    className={styles.submissionImage}
-                    src={submission.imageUrl}
-                    alt={`Submission from ${submission.playerName}`}
-                  />
-
-                  <div className={styles.submissionDetails}>
-                    {result && (
-                      <>
-                        <div className={styles.score}>
-                          Score: {result.score}
-                        </div>
-
-                        {result.note && (
-                          <p className={styles.note}>{result.note}</p>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
+          <section className={styles.submissionsSection}>
+            <div className={styles.submissionsGrid}>
+              {remainingSubmissions.map(({ submission, result }) => (
+                <SubmissionCard
+                  key={submission.id}
+                  submission={submission}
+                  result={result}
+                  variant="host"
+                />
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   );

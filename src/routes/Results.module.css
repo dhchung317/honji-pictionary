@@ -1,31 +1,63 @@
-.page {
-  min-height: 100vh;
-  width: 100%;
+/* ---------- Page ---------- */
 
-  padding: var(--space-xl);
+.page {
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+
+  /* Smaller, responsive outer padding */
+  padding: clamp(1rem, 2vw, 2rem);
+
+  box-sizing: border-box;
+
+  overflow: hidden;
 }
 
 .results {
   width: 100%;
-  max-width: var(--page-max-width);
-  margin: 0 auto;
+  height: 100%;
+
+  /*
+   * Important:
+   * Don't artificially restrict a TV/large monitor
+   * with the normal website max width.
+   */
+  max-width: none;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
 }
 
+/* ---------- Header ---------- */
+
 .header {
+  flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-lg);
 
-  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .heading {
-  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
 }
 
 .title {
-  margin-bottom: var(--space-xs);
+  margin: 0;
+
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .roomId {
@@ -33,150 +65,92 @@
 
   color: var(--color-primary);
 
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.nextButton {
-  border-color: var(--color-primary);
-}
-
-.quitButton {
-  opacity: 0.75;
-}
-
-.winnerSection {
-  margin-bottom: var(--space-xl);
-  text-align: center;
-}
-
-.sectionTitle {
-  margin-bottom: var(--space-md);
-}
-
-.winnerName {
-  margin-bottom: var(--space-md);
-
-  font-size: 1.5rem;
-}
-
-.winnerCard {
-  width: 100%;
-  max-width: 32rem;
-  margin: 0 auto;
-
-  overflow: hidden;
-
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-lg);
-
-  background: var(--color-surface-dark);
-}
-
-.winnerImage {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.submissionsSection {
-  width: 100%;
-}
-
-.submissionsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-
-  gap: var(--space-lg);
-}
-
-.submissionCard {
-  overflow: hidden;
-
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-md);
-
-  background: var(--color-surface-dark);
-}
-
-.submissionHeader {
-  padding: var(--space-sm) var(--space-md);
-
-  font-size: 1.1rem;
+  font-family: var(--font-room-code);
+  font-size: 1rem;
   font-weight: 600;
 }
 
-.submissionImage {
-  display: block;
+/* ---------- Results layout ---------- */
+
+.resultsLayout {
+  flex: 1;
+
+  display: grid;
+
+  /*
+   * Winner gets ~40%.
+   * Results get ~60%.
+   *
+   * minmax(0, ...) is important — it allows BOTH
+   * columns to actually shrink.
+   */
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(0, 1.2fr);
+
+  gap: clamp(1.5rem, 3vw, 4rem);
+
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ---------- Winner ---------- */
+
+.winnerSection {
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding: clamp(2rem, 5vh, 4rem) clamp(2rem, 3vw, 3rem);
+
+  box-sizing: border-box;
+}
+
+/* ---------- Submissions ---------- */
+
+.submissionsSection {
+  min-width: 0;
+  min-height: 0;
+
+  padding-top: var(--space-md);
+
+  overflow: hidden;
+}
+
+.submissionsGrid {
   width: 100%;
-  height: auto;
+  height: 100%;
+
+  display: grid;
+
+  /*
+   * All three columns MUST fit inside the available
+   * right-hand space.
+   */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  /*
+   * Two equal rows.
+   */
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+
+  gap: clamp(0.5rem, 1vw, 1rem);
+
+  min-width: 0;
+  min-height: 0;
 }
 
-.submissionDetails {
-  padding: var(--space-md);
-}
-
-.score {
-  margin-bottom: var(--space-xs);
-
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.note {
-  margin: 0;
-
-  color: var(--color-text-dark);
-  opacity: 0.75;
-}
+/* ---------- Empty ---------- */
 
 .emptyState {
   width: 100%;
-  max-width: var(--page-max-width);
-  margin: 0 auto;
+  max-width: var(--player-max-width);
+
+  margin: auto;
   padding: var(--space-xl);
 
   text-align: center;
-}
-
-@media (prefers-color-scheme: light) {
-  .winnerCard,
-  .submissionCard {
-    background: var(--color-surface-light);
-  }
-
-  .note {
-    color: var(--color-text-light);
-  }
-}
-
-@media (max-width: 48rem) {
-  .page {
-    padding: var(--space-lg) var(--space-md);
-  }
-
-  .header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .heading {
-    text-align: center;
-  }
-
-  .actions {
-    justify-content: center;
-  }
-
-  .submissionsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(11.25rem, 1fr));
-
-    gap: var(--space-md);
-  }
 }

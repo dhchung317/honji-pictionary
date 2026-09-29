@@ -11,14 +11,19 @@ import { useAsyncAction } from "../hooks/useAsyncAction";
 import { getPlayersByRoom } from "../lib/playersApi";
 import { getRoom, startRound } from "../lib/roomsApi";
 import { getViewerRole } from "../lib/viewer";
+import { GameLoading } from "../components/GameLoading/GameLoading";
+
+import logo from "../assets/honji.png";
 
 import styles from "./HostRoom.module.css";
+import { PlayerAvatar } from "../components/PlayerAvatar/PlayerAvatar";
 
 function HostRoom() {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
 
   const [players, setPlayers] = useState<Player[]>([]);
+  const [isWaitingForRound, setIsWaitingForRound] = useState(false);
 
   /* ---------- Room state ---------- */
 
@@ -82,8 +87,21 @@ function HostRoom() {
       throw new Error("Missing room id");
     }
 
-    await startRound(roomId);
+    setIsWaitingForRound(true);
+
+    try {
+      await startRound(roomId);
+    } catch (error) {
+      setIsWaitingForRound(false);
+      throw error;
+    }
   });
+
+  useEffect(() => {
+    if (isDrawing) {
+      setIsWaitingForRound(false);
+    }
+  }, [isDrawing]);
 
   /* ---------- Results navigation ---------- */
 
@@ -102,11 +120,11 @@ function HostRoom() {
   /* ---------- Page states ---------- */
 
   if (!roomId) {
-    return <p>Missing room id.</p>;
+    return <GameErrorPage type="MISSING_ROOM_ID" />;
   }
 
   if (roomLoading) {
-    return <p>Loading room…</p>;
+    return <GameLoading message="Loading room..." />;
   }
 
   if (roomError) {
@@ -117,26 +135,51 @@ function HostRoom() {
     return <GameErrorPage type="ROOM_NOT_FOUND" />;
   }
 
+  if (isWaitingForRound) {
+    return <GameLoading message="Starting round..." />;
+  }
+
   return (
     <main className={styles.page}>
       <div className={styles.room}>
-        <header className={styles.header}>
-          <div>
-            <h1 className={styles.title}>Honji Pictionary</h1>
+        <section className={styles.stage}>
+          {isLobby && (
+            <>
+              <div className={styles.lobbyPlayers}>
+                {players.map((player, index) => (
+                  <div
+                    key={player.id}
+                    className={`${styles.lobbyPlayer} ${
+                      styles[`playerSlot${index + 1}`] ?? ""
+                    }`}
+                  >
+                    <PlayerAvatar player={player} />
+                    <span className={styles.playerName}>{player.name}</span>
+                  </div>
+                ))}
+              </div>
 
-            <p className={styles.roomCode}>{room.id}</p>
-          </div>
-        </header>
+              <div className={styles.lobbyCenter}>
+                <div className={styles.logoSpace}>
+                  <img width={"100%"} src={logo} />
+                </div>
 
-        <div className={styles.gameArea}>
-          <section className={styles.stage}>
-            {isLobby && (
-              <>
                 <h2 className={styles.stageTitle}>Waiting for players</h2>
 
+                <div className={styles.roomInfo}>
+                  <span className={styles.roomCodeLabel}>Room</span>
+                  <span className={styles.roomCode}>{room.id}</span>
+                </div>
+
+                <p className={styles.playerCount}>
+                  {players.length} {players.length === 1 ? "player" : "players"}{" "}
+                  joined
+                </p>
+              </div>
+
+              <div className={styles.lobbyActions}>
                 <p className={styles.stageMessage}>
-                  Share the room code. Once everyone has joined, start the
-                  round.
+                  Share room code <strong>{room.id}</strong> to join.
                 </p>
 
                 <button
@@ -147,67 +190,48 @@ function HostRoom() {
                   {isStarting ? "Starting…" : "Start Round"}
                 </button>
 
-                {startError && <p>{startError.message}</p>}
-              </>
-            )}
+                {startError && (
+                  <p className={styles.error}>{startError.message}</p>
+                )}
+              </div>
+            </>
+          )}
 
-            {isDrawing && (
-              <>
-                <p className={styles.promptLabel}>Draw</p>
+          {isDrawing && (
+            <div className={styles.roundContent}>
+              <p className={styles.promptLabel}>Draw</p>
+              <p className={styles.prompt}>{round.prompt}</p>
 
-                <p className={styles.prompt}>{round.prompt}</p>
-              </>
-            )}
-
-            {isScoring && (
-              <>
-                <h2 className={styles.stageTitle}>Scoring…</h2>
-
-                <p className={styles.stageMessage}>
-                  Everyone's drawings are in. Calculating the results.
-                </p>
-              </>
-            )}
-
-            {isDone && (
-              <>
-                <h2 className={styles.stageTitle}>Round finished</h2>
-
-                <p className={styles.stageMessage}>Loading results…</p>
-              </>
-            )}
-          </section>
-
-          <aside className={styles.playersPanel}>
-            <header className={styles.playersHeader}>
-              <h2 className={styles.playersTitle}>Players</h2>
-
-              <p className={styles.playerCount}>{players.length} joined</p>
-            </header>
-
-            <div className={styles.playerList}>
-              {players.length === 0 ? (
-                <p className={styles.emptyPlayers}>
-                  Waiting for someone to join…
-                </p>
-              ) : (
-                players.map((player) => (
-                  <div key={player.id} className={styles.player}>
-                    <div className={styles.avatar}>
-                      {player.name.charAt(0).toUpperCase()}
-                    </div>
+              <div className={styles.roundPlayers}>
+                {players.map((player) => (
+                  <div key={player.id} className={styles.roundPlayer}>
+                    <PlayerAvatar player={player} />
 
                     <span className={styles.playerName}>{player.name}</span>
-
-                    {isDrawing && (
-                      <span className={styles.playerStatus}>Drawing</span>
-                    )}
+                    <span className={styles.playerStatus}>Drawing</span>
                   </div>
-                ))
-              )}
+                ))}
+              </div>
             </div>
-          </aside>
-        </div>
+          )}
+
+          {isScoring && (
+            <div className={styles.roundContent}>
+              <h2 className={styles.stageTitle}>Scoring…</h2>
+
+              <p className={styles.stageMessage}>
+                Everyone's drawings are in. Calculating the results.
+              </p>
+            </div>
+          )}
+
+          {isDone && (
+            <div className={styles.roundContent}>
+              <h2 className={styles.stageTitle}>Round finished</h2>
+              <p className={styles.stageMessage}>Loading results…</p>
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
