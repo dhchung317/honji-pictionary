@@ -1,0 +1,25 @@
+.game-score {
+  display: inline-flex;
+  align-items: center;
+}
+
+.game-score img {
+  display: block;
+  width: auto;
+}
+
+/* Original artwork */
+.game-score--gold img {
+  filter: none;
+}
+
+/* Remove the gold/orange saturation */
+.game-score--silver img {
+  filter: grayscale(1) brightness(1.15);
+}
+
+/* Desaturate the gold into a muted brown/copper */
+.game-score--bronze img {
+  filter: sepia(2) saturate(2.75) hue-rotate(-45deg) brightness(0.68)
+    contrast(1.85);
+}
