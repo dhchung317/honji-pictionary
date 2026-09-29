@@ -1,7 +1,7 @@
 /* ---------- Page ---------- */
 
 .page {
-  min-height: 100vh;
+  min-height: 100dvh;
 
   display: flex;
   justify-content: center;
@@ -174,7 +174,7 @@
 
 @media (min-width: 1600px) and (min-height: 800px) {
   .page {
-    height: 100vh;
+    height: 100dvh;
     min-height: 0;
 
     padding: var(--space-lg) clamp(3rem, 4vw, 6rem);
