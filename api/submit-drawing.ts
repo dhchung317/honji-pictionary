@@ -1,4 +1,6 @@
 import { authorize } from "./_session.js";
+import { head } from "@vercel/blob";
+import { allowRequest, validImageUrl } from "./_limits.js";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById } from "./_roomStore.js";
 import { createOrReplaceSubmission } from "./_submissionStore.js";
@@ -34,6 +36,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .json({ error: "Cannot accept submission players outside round" });
 
   if (!await authorize(req, res, { role: "PLAYER", roomId, id: playerId })) return;
+  if (!await allowRequest(req, res, "submit", 6, 60, `${roomId}:${playerId}`)) return;
+  const prefix = `room/${roomId}/round/${round.id}/players/${playerId}`;
+  if (!validImageUrl(imageUrl, prefix + "-")) return res.status(400).json({ error: "Invalid drawing image" });
+  try {
+    const blob = await head(imageUrl);
+    if (blob.size > 2 * 1024 * 1024 || !["image/png", "image/jpeg", "image/webp"].includes(blob.contentType)) throw new Error("Invalid image");
+  } catch { return res.status(400).json({ error: "Drawing image could not be verified" }); }
 
   const now = Date.now();
   const endAt = round.roundEndAt;

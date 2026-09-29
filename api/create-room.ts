@@ -1,4 +1,5 @@
 import { issueSession } from "./_session.js";
+import { allowRequest } from "./_limits.js";
 // api/create-room.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createRoom } from "./_roomStore.js";
@@ -8,6 +9,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(405).json({ error: "Method not allowed" });
     return;
   }
+
+  if (!await allowRequest(req, res, "create", 10, 3600)) return;
+  if (!await allowRequest(req, res, "create-global", 100, 3600, "global")) return;
 
   const hostId = String(req.body?.hostId || "").trim();
 
