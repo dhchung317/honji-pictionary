@@ -39,7 +39,7 @@ function Join() {
 
     window.localStorage.setItem(`playerName:${roomCode}`, player.name);
 
-    navigate(roomCode);
+    navigate(`/room/${roomCode}/lobby`);
   };
 
   return (
