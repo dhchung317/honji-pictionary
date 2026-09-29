@@ -207,19 +207,27 @@ function JoinRoom() {
 
             <div className={styles.actions}>
               <button
-                className={styles.submitButton}
-                onClick={submitDrawing}
-                disabled={isSubmitting}
+                type="button"
+                className={styles.canvasButton}
+                onClick={() => canvasRef.current?.undo()}
               >
-                {isSubmitting ? "Submitting..." : "Submit drawing"}
+                Undo
               </button>
 
               <button
-                className={styles.clearButton}
                 type="button"
+                className={styles.canvasButton}
                 onClick={() => canvasRef.current?.clear()}
               >
                 Clear
+              </button>
+
+              <button
+                type="button"
+                className={styles.submitButton}
+                onClick={submitDrawing}
+              >
+                Submit drawing
               </button>
             </div>
           </section>

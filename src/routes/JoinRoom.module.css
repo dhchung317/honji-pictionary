@@ -44,13 +44,16 @@
 
 .actions {
   display: flex;
-  justify-self: center;
+  align-items: center;
   gap: var(--space-sm);
-  min-width: 32rem;
+
+  width: 100%;
+  max-width: 32rem;
+  margin-inline: auto;
 }
 
 .submitButton {
-  flex: 1;
+  flex: 2;
 
   padding: 0.75rem 1rem;
 
@@ -69,8 +72,9 @@
   opacity: 0.6;
 }
 
-.clearButton {
+.canvasButton {
   flex: 1;
+
   padding: 0.75rem 1rem;
 
   border: 3px solid var(--color-border);
@@ -80,13 +84,8 @@
   background: var(--color-surface);
 }
 
-.submitted {
-  padding: var(--space-lg);
-
-  text-align: center;
-
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
+.canvasButton:disabled {
+  opacity: 0.5;
 }
 
 .error {

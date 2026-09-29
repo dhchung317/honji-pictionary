@@ -1,27 +1,49 @@
+import { z } from "zod";
+import { zodTextFormat } from "openai/helpers/zod";
 import { openai } from "./openai.js";
 import {
-  buildPromptGeneratorInput,
-  buildPromptGeneratorInstructions,
+  PROMPT_INSTRUCTIONS,
+  buildPromptInput,
   getRandomPromptStyle,
 } from "./promptgenerator.js";
 
-export async function genPrompt(params: { history: string[] }) {
-  const { history } = params;
+const PromptResultSchema = z.object({
+  prompt: z
+    .string()
+    .min(3)
+    .max(100)
+    .refine((value) => !value.includes("\n"), "Prompt must be a single line"),
+});
 
+export async function genPrompt(params: { history: string[] }) {
   const style = getRandomPromptStyle();
 
-  const resp = await openai.responses.create({
-    model: "gpt-5.6-terra",
+  const resp = await openai.responses.parse({
+    model: "gpt-4o-mini",
 
-    instructions: buildPromptGeneratorInstructions(),
+    instructions: PROMPT_INSTRUCTIONS,
 
-    input: buildPromptGeneratorInput({
-      style,
-      recentPrompts: [...history],
-    }),
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: buildPromptInput({
+              style,
+              history: params.history,
+            }),
+          },
+        ],
+      },
+    ],
+
+    text: {
+      format: zodTextFormat(PromptResultSchema, "prompt_result"),
+    },
   });
 
-  const parsed = resp.output_text.trim();
+  const parsed = resp.output_parsed;
 
   if (!parsed) {
     throw new Error("AI returned no parsed output");
