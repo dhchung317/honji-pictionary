@@ -3,22 +3,32 @@ type Props = {
 };
 
 export function GameErrorPage({ type }: Props) {
-  const roomMissing = type === "ROOM_NOT_FOUND";
+  let title = "Couldn't load game";
+  let message =
+    "Something went wrong while loading the game. Please try again.";
+
+  if (type === "ROOM_NOT_FOUND") {
+    title = "Game not found";
+    message = "This game may have expired or the room code may be incorrect.";
+  }
+
+  if (type === "MISSING_ROOM_ID") {
+    title = "Missing room";
+    message = "No room code was provided.";
+  }
 
   return (
-    <main style={{display: 'flex', flexDirection:'column', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
-      <h1>
-        {roomMissing
-          ? "Game not found"
-          : "Couldn't load game"}
-      </h1>
-
-      <p>
-        {roomMissing
-          ? "This game may have expired or the room code may be incorrect."
-          : "Something went wrong while loading the game. Please try again."}
-      </p>
-
+    <main
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      <h1>{title}</h1>
+      <p>{message}</p>
       <a href="/">Return home</a>
     </main>
   );
