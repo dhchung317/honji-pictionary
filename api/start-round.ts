@@ -6,7 +6,7 @@ import { getRoomById, saveRoom } from "./_roomStore.js";
 import { listPlayers } from "./_playerStore.js";
 import { Room } from "../shared/room.js";
 import { genPrompt } from "./_aiGeneratePrompt.js";
-import { saveRound } from "./_roundStore.js";
+import { getRound, saveRound } from "./_roundStore.js";
 import type { Round } from "../shared/round.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -33,6 +33,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
   if (!await authorize(req, res, { role: "HOST", roomId: room.id, id: room.hostId })) return;
+    if (room.status === "SCORING_FAILED" && room.currentRoundId) {
+      const round = await getRound(room.id, room.currentRoundId);
+      if (!round) return res.status(404).json({ error: "Round not found" });
+      await saveRound({ ...round, status: "SCORING", scoringAttempts: 0, scoringRetryAt: 0 });
+      const updated: Room = { ...room, status: "SCORING" };
+      await saveRoom(updated);
+      return res.status(200).json(updated);
+    }
 
     if (room.status !== "LOBBY") {
       return res.status(400).json({ error: "Round already started" });

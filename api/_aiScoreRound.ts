@@ -78,5 +78,7 @@ export async function scoreRoundWithAI(params: {
     throw new Error("AI returned no parsed output");
   }
 
+  const ids = new Set(submissions.map(s => s.playerId));
+  if (parsed.rankedPlayerIds.length !== ids.size || new Set(parsed.rankedPlayerIds).size !== ids.size || parsed.rankedPlayerIds.some(id => !ids.has(id)) || parsed.notes.length !== ids.size || new Set(parsed.notes.map(n => n.playerId)).size !== ids.size || parsed.notes.some(n => !ids.has(n.playerId))) throw new Error("Incomplete scoring results");
   return parsed;
 }
