@@ -175,7 +175,7 @@ function JoinRoom() {
     return <GameLoading message="Loading your canvas..." />;
   }
 
-  if (roomError) {
+  if (roomError && (!room || roomError.message === "ROOM_NOT_FOUND")) {
     return <GameErrorPage type={roomError.message} />;
   }
 
@@ -185,6 +185,7 @@ function JoinRoom() {
 
   return (
     <main className={styles.page}>
+      {roomError && <p role="status">Connection interrupted. Reconnecting… Your drawing is still here.</p>}
       <div className={styles.game}>
         <header className={styles.header}>
           {secondsLeft !== null && isDrawing && !hasSubmitted && (
@@ -226,6 +227,7 @@ function JoinRoom() {
               <button
                 type="button"
                 className={styles.submitButton}
+                disabled={isSubmitting || !isDrawing}
                 onClick={submitDrawing}
               >
                 Submit
