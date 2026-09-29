@@ -41,7 +41,7 @@ export async function genPrompt(params: { history: string[] }) {
     text: {
       format: zodTextFormat(PromptResultSchema, "prompt_result"),
     },
-  });
+  }, { timeout: 45_000, maxRetries: 0 });
 
   const parsed = resp.output_parsed;
 

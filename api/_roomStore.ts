@@ -17,9 +17,12 @@ export async function createRoom(hostId: string): Promise<Room> {
   };
 
   // Upstash will JSON-serialize this object
-  await kv.set(roomKey(room.id), room, { ex: TTL_SECONDS });
+  for (let attempt = 0; attempt < 10; attempt++) {
+    room.id = generateRoomId();
+    if (await kv.set(roomKey(room.id), room, { ex: TTL_SECONDS, nx: true }) === "OK") return room;
+  }
+  throw new Error("Unable to allocate a room code");
 
-  return room;
 }
 
 export async function getRoomById(id: string): Promise<Room | null> {

@@ -1,5 +1,6 @@
 import { authorize } from "./_session.js";
 import { allowRequest } from "./_limits.js";
+import { acquireRoomMutation } from "./_mutationLock.js";
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById, saveRoom } from "./_roomStore.js";
 import { listPlayers } from "./_playerStore.js";
@@ -20,6 +21,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "Room id is required" });
   }
 
+  const release = await acquireRoomMutation(roomId);
+  if (!release) {
+    return res.status(409).json({ error: "Room update in progress" });
+  }
   try {
     const room = await getRoomById(roomId);
 
@@ -70,5 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err) {
     console.error("[start-round] error", err);
     res.status(500).json({ error: "Failed to start round" });
+  } finally {
+    await release();
   }
 }

@@ -1,4 +1,5 @@
 import { authorize } from "./_session.js";
+import { acquireRoomMutation } from "./_mutationLock.js";
 // api/quit-room.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById, saveRoom, expireRoom } from "./_roomStore.js";
@@ -10,6 +11,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const roomId = String((req.body as any)?.roomId || "").trim();
   if (!roomId) return res.status(400).json({ error: "roomId is required" });
 
+  const release = await acquireRoomMutation(roomId);
+  if (!release) return res.status(409).json({ error: "Room update in progress" });
+  try {
   const room = await getRoomById(roomId);
   if (!room) return res.status(404).json({ error: "Room not found" });
 
@@ -21,4 +25,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   await expireRoom(roomId, 60);
 
   return res.status(200).json({ ok: true });
+  } finally { await release(); }
 }

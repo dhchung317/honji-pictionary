@@ -1,5 +1,5 @@
 import { Submission } from "../shared/submission.js";
-import { generateId, redis as kv, touchKeys, TTL_SECONDS } from "./redis.js";
+import { generateId, redis as kv, TTL_SECONDS } from "./redis.js";
 
 const roomSubsKey = (roomId: string, roundId: string) =>
   `room:${roomId}:round:${roundId}:submissions`;
@@ -18,29 +18,21 @@ export async function createOrReplaceSubmission(
 ) {
   const uniqKey = submissionUniqKey(input.roomId, roundId, input.playerId);
 
-  // ensure 1 submission per player (replace)
-  const existingId = await kv.get<string>(uniqKey);
+  const candidate = { ...input, id: generateId(), createdAt: new Date().toISOString() };
+  const raw = await kv.eval<[string, number], string>(`
+    local existing = redis.call("GET", KEYS[1])
+    local sub = cjson.decode(ARGV[1])
+    if existing then sub.id = existing end
+    local sk = "submission:" .. sub.id
+    local encoded = cjson.encode(sub)
+    redis.call("SET", sk, encoded, "EX", ARGV[2])
+    redis.call("SET", KEYS[1], sub.id, "EX", ARGV[2])
+    if not existing then redis.call("RPUSH", KEYS[2], sub.id) end
+    redis.call("EXPIRE", KEYS[2], ARGV[2])
+    return encoded
+  `, [uniqKey, roomSubsKey(input.roomId, roundId)], [JSON.stringify(candidate), TTL_SECONDS]);
+  const sub: Submission = typeof raw === "string" ? JSON.parse(raw) : raw;
 
-  const id = existingId ?? generateId();
-  const sub: Submission = {
-    ...input,
-    id,
-    createdAt: new Date().toISOString(),
-  };
-
-  const sk = submissionKey(id);
-  const rsk = roomSubsKey(input.roomId, roundId);
-
-  await kv.set(sk, sub, { ex: TTL_SECONDS });
-  await kv.set(uniqKey, id, { ex: TTL_SECONDS });
-
-  // track ids (if new)
-  if (!existingId) {
-    await kv.rpush(rsk, id);
-  }
-  await kv.expire(rsk, TTL_SECONDS);
-
-  await touchKeys([sk, rsk, uniqKey]);
   return sub;
 }
 

@@ -70,7 +70,7 @@ export async function scoreRoundWithAI(params: {
     text: {
       format: zodTextFormat(ScoreResultSchema, "score_result"),
     },
-  });
+  }, { timeout: 45_000, maxRetries: 0 });
 
   const parsed = resp.output_parsed;
 
