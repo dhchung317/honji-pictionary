@@ -82,6 +82,7 @@
 }
 
 .playerCount {
+  font-size: 1.25rem;
   margin: 0;
 
   opacity: 0.7;
