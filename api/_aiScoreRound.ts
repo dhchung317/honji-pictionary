@@ -1,4 +1,3 @@
-// api/_aiScoreRound.ts
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod";
 import { openai } from "./openai.js";
@@ -26,22 +25,25 @@ export async function scoreRoundWithAI(params: {
 }) {
   const { prompt, submissions } = params;
 
-  // Build a single multimodal user message:
-  // - explain rubric
-  // - provide a mapping from "drawing #N" -> playerId
-  // - attach the images
   const content: Array<any> = [
     {
       type: "input_text",
       text:
-        `You are judging a drawing round.\n` +
-        `Prompt: "${prompt}".\n\n` +
-        `Rank the drawings from best to worst based on: (1) matches prompt, (2) clarity/readability, (3) creativity.\n` +
-        `Give every player a score from 0–100. Higher is better. Include exactly one results entry per playerId.` +
-        `Note that these drawings are done under tight time constraints, with no tools that allow for polish or detail` +
-        `That being said, feel free to roast the artist for bad drawings` +
-        `Instead of stating the obvious, use comedic and witty language, up to the edge of profanity, but be blunt and concise, 35 words soft limit` +
-        `Return ONLY the JSON schema.\n\n` +
+        `You are the judge for a fast-paced multiplayer drawing game.\n` +
+        `Drawing prompt: "${prompt}"\n\n` +
+        `Judge each drawing primarily on:\n` +
+        `1. Prompt match — how clearly and successfully it communicates the prompt.\n` +
+        `2. Visual effectiveness — composition, readability, creativity, expressiveness, and intentionality.\n\n` +
+        `Do not reward realism, detail, or technical polish by themselves. ` +
+        `A simple or crude drawing can beat a detailed drawing if it communicates the prompt more effectively.\n` +
+        `Players had very limited time and simple drawing tools. Judge within that context.\n\n` +
+        `Rank every drawing from best to worst and give every player a score from 0–100. ` +
+        `Scores should reflect meaningful differences between drawings and be consistent with the ranking. ` +
+        `Include exactly one result for every playerId.\n\n` +
+        `For each player, write a short reaction to their drawing. ` +
+        `Be playful, witty, and lightly roast weak or ridiculous drawings when appropriate. ` +
+        `You may use mild profanity, but keep it fun rather than cruel or personal. ` +
+        `Do not merely describe what is visible. Aim for roughly 25 words or fewer.\n\n` +
         `Drawings:\n` +
         submissions
           .map(
@@ -62,7 +64,8 @@ export async function scoreRoundWithAI(params: {
   }
 
   const resp = await openai.responses.parse({
-    model: "gpt-4o-mini", // supports structured outputs; pick a snapshot later if you want
+    model: "gpt-5.4-mini", // supports structured outputs; pick a snapshot later if you want
+    reasoning: { effort: "low" },
     input: [{ role: "user", content }],
     text: {
       format: zodTextFormat(ScoreResultSchema, "score_result"),
