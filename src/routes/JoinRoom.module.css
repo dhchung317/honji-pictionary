@@ -1,5 +1,5 @@
 .page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
 
@@ -15,8 +15,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
-  margin-bottom: var(--space-lg);
 }
 
 .greeting {
@@ -28,8 +26,6 @@
 }
 
 .prompt {
-  margin-bottom: var(--space-md);
-
   font-size: 1.25rem;
   font-weight: 600;
   text-align: center;
@@ -38,8 +34,6 @@
 .canvasContainer {
   display: flex;
   justify-content: center;
-
-  margin-bottom: var(--space-md);
 }
 
 .actions {
@@ -89,7 +83,5 @@
 }
 
 .error {
-  margin-top: var(--space-md);
-
   color: var(--color-danger);
 }

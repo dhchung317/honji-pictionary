@@ -144,7 +144,7 @@ function PlayerLobby() {
               resolutionWidth={500}
               resolutionHeight={500}
               strokeColor="#000000"
-              strokeWidth={4}
+              strokeWidth={8}
             />
           </div>
 

@@ -137,6 +137,8 @@ function HostRoom() {
     return <GameLoading message="Starting round..." />;
   }
 
+  const baseUrl = window.location.hostname;
+
   return (
     <main className={styles.page}>
       <div className={styles.room}>
@@ -168,18 +170,26 @@ function HostRoom() {
                   <span className={styles.roomCodeLabel}>Room</span>
                   <span className={styles.roomCode}>{room.id}</span>
                 </div>
+              </div>
 
+              <div className={styles.lobbyActions}>
                 <p className={styles.playerCount}>
                   {players.length} {players.length === 1 ? "player" : "players"}{" "}
                   joined
                 </p>
-              </div>
-
-              <div className={styles.lobbyActions}>
-                <p className={styles.stageMessage}>
-                  Share room code <strong>{room.id}</strong> to join.
-                </p>
-
+                <div style={{ fontSize: "1.25rem" }}>
+                  <p className={styles.stageMessage}>
+                    Enter{" "}
+                    <strong style={{ fontSize: "1.5rem" }}>{room.id}</strong>
+                  </p>
+                  <p className={styles.stageMessage}>
+                    at{" "}
+                    <strong style={{ fontSize: "1.25rem" }}>
+                      {baseUrl}/join
+                    </strong>{" "}
+                    to play.
+                  </p>
+                </div>
                 <button
                   className={styles.startButton}
                   onClick={handleStartRound}
