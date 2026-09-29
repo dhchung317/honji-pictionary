@@ -16,7 +16,10 @@ export function useAsync<T>(
   useEffect(() => {
     let cancelled = false;
 
+    let inFlight = false;
     const run = async () => {
+      if (inFlight) return;
+      inFlight = true;
       try {
         const result = await fn();
 
@@ -29,6 +32,7 @@ export function useAsync<T>(
           setError(err instanceof Error ? err : new Error("Unknown error"));
         }
       } finally {
+        inFlight = false;
         if (!cancelled) {
           setLoading(false);
         }

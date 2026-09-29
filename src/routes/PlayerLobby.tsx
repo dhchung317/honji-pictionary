@@ -115,7 +115,7 @@ function PlayerLobby() {
     return <GameLoading message="Loading room..." />;
   }
 
-  if (roomError) {
+  if (roomError && (!room || roomError.message === "ROOM_NOT_FOUND")) {
     return <GameErrorPage type={roomError.message} />;
   }
 
@@ -125,6 +125,7 @@ function PlayerLobby() {
 
   return (
     <main className={styles.page}>
+      {roomError && <p role="status">Connection interrupted. Reconnecting… Your drawing is still here.</p>}
       <div className={styles.lobby}>
         <div className={styles.header}>
           <div className={styles.roomId}>
