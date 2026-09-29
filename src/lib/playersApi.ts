@@ -1,3 +1,4 @@
+import { sessionHeaders } from "./session";
 import { Player } from "../../shared/player";
 /**
  * Register (or re-use) a player for this room + name.
@@ -13,7 +14,9 @@ export async function registerPlayer(
     body: JSON.stringify({ roomId, name }),
   });
   if (!res.ok) throw new Error("Failed to join room");
-  return res.json();
+  const player = await res.json();
+  localStorage.setItem(`playerSession:${roomId}`, player.sessionToken);
+  return player;
 }
 
 export async function getPlayersByRoom(roomId: string): Promise<Player[]> {
@@ -25,6 +28,7 @@ export async function getPlayersByRoom(roomId: string): Promise<Player[]> {
 }
 
 export async function updatePlayerAvatar(
+  roomId: string,
   playerId: string,
   avatarUrl: string,
 ): Promise<Player> {
@@ -32,6 +36,7 @@ export async function updatePlayerAvatar(
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      ...sessionHeaders(roomId, "PLAYER"),
     },
     body: JSON.stringify({
       playerId,

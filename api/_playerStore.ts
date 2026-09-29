@@ -89,3 +89,5 @@ export async function updatePlayerAvatar(
 
   return updatedPlayer;
 }
+
+export async function getPlayer(id: string): Promise<Player | null> { return kv.get<Player>(playerKey(id)); }

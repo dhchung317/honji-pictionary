@@ -1,3 +1,4 @@
+import { sessionHeaders } from "./session";
 import { Submission } from "../../shared/submission";
 
 export async function createSubmission(input: {
@@ -8,7 +9,7 @@ export async function createSubmission(input: {
 }): Promise<Submission> {
   const res = await fetch("/api/submit-drawing", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...sessionHeaders(input.roomId, "PLAYER") },
     body: JSON.stringify(input),
   });
   if (!res.ok) throw new Error("Failed to submit drawing");

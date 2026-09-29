@@ -1,3 +1,4 @@
+import { authorize } from "./_session.js";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
@@ -33,6 +34,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (!room) {
           throw new Error("Room not found");
+        }
+
+        if (!await authorize(req, res, { role: "PLAYER", roomId, id: playerId })) {
+          throw new Error("Invalid player session");
         }
 
         /* ---------- Avatar upload ---------- */
@@ -126,6 +131,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json(jsonResponse);
   } catch (error) {
+    if (res.headersSent) return;
     return res.status(400).json({
       error: (error as Error).message,
     });

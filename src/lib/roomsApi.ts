@@ -1,3 +1,4 @@
+import { sessionHeaders } from "./session";
 import { RoomState } from "../../shared/roomstate";
 
 export async function createRoom() {
@@ -15,7 +16,9 @@ export async function createRoom() {
     }),
   });
   if (!res.ok) throw new Error(res.statusText);
-  return res.json();
+  const room = await res.json();
+  localStorage.setItem(`hostSession:${room.id}`, room.sessionToken);
+  return room;
 }
 
 export async function getRoom(roomId: string): Promise<RoomState> {
@@ -35,7 +38,7 @@ export async function getRoom(roomId: string): Promise<RoomState> {
 export async function startRound(roomId: string) {
   const res = await fetch(`/api/start-round`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "HOST") },
     body: JSON.stringify({ roomId }),
   });
   if (!res.ok) throw new Error(res.statusText);
@@ -43,17 +46,19 @@ export async function startRound(roomId: string) {
 }
 
 export async function nextRound(roomId: string) {
-  await fetch("/api/next-round", {
+  const res = await fetch("/api/next-round", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "HOST") },
     body: JSON.stringify({ roomId }),
   });
+  if (!res.ok) throw new Error("Host action failed");
 }
 
 export async function quit(roomId: string) {
-  await fetch("/api/quit-room", {
+  const res = await fetch("/api/quit-room", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "HOST") },
     body: JSON.stringify({ roomId }),
   });
+  if (!res.ok) throw new Error("Host action failed");
 }

@@ -1,3 +1,4 @@
+import { sessionHeaders } from "../lib/session";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import DrawingCanvas, {
@@ -56,6 +57,7 @@ function PlayerLobby() {
       blob,
       {
         access: "public",
+        headers: sessionHeaders(roomId, "PLAYER"),
         handleUploadUrl: "/api/blob-upload",
         clientPayload: JSON.stringify({
           roomId,
@@ -65,7 +67,7 @@ function PlayerLobby() {
       },
     );
 
-    await updatePlayerAvatar(playerId, url);
+    await updatePlayerAvatar(roomId, playerId, url);
 
     setHasAvatar(true);
   });

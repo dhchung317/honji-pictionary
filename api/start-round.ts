@@ -1,3 +1,4 @@
+import { authorize } from "./_session.js";
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById, saveRoom } from "./_roomStore.js";
 import { listPlayers } from "./_playerStore.js";
@@ -24,6 +25,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!room) {
       return res.status(404).json({ error: "Room not found" });
     }
+
+  if (!await authorize(req, res, { role: "HOST", roomId: room.id, id: room.hostId })) return;
 
     if (room.status !== "LOBBY") {
       return res.status(400).json({ error: "Round already started" });
