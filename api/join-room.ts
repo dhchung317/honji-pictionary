@@ -14,8 +14,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!roomId || !name)
     return res.status(400).json({ error: "roomId and name required" });
 
-  if (name.length > 40 || !/^[A-Z2-9]{4}$/.test(roomId)) return res.status(400).json({ error: "Invalid room code or name (maximum 40 characters)" });
-  if (!await allowRequest(req, res, "join", 24, 60, roomId)) return;
+  if (name.length > 12 || !/^[A-Z2-9]{4}$/.test(roomId))
+    return res
+      .status(400)
+      .json({ error: "Invalid room code or name (maximum 12 characters)" });
+  if (!(await allowRequest(req, res, "join", 24, 60, roomId))) return;
 
   const room = await getRoomById(roomId);
   if (!room) return res.status(404).json({ error: "Room not found" });
@@ -24,10 +27,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const player = await upsertPlayer(roomId, name);
-    const sessionToken = await issueSession({ role: "PLAYER", roomId, id: player.id });
+    const sessionToken = await issueSession({
+      role: "PLAYER",
+      roomId,
+      id: player.id,
+    });
     res.status(200).json({ ...player, sessionToken });
   } catch (error) {
-    if (error instanceof Error && error.message === "ROOM_FULL") return res.status(409).json({ error: "Room is full (12 players maximum)" });
+    if (error instanceof Error && error.message === "ROOM_FULL")
+      return res
+        .status(409)
+        .json({ error: "Room is full (12 players maximum)" });
     res.status(503).json({ error: "Unable to join room" });
   }
 }
