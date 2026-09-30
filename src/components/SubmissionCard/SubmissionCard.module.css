@@ -1,177 +1,22 @@
-/* ---------- Card ---------- */
-
-.submissionCard {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  min-width: 0;
-
-  gap: 0.75rem;
-  padding: 1rem;
-
-  box-sizing: border-box;
-
-  overflow: hidden;
-
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-md);
-
-  background-color: #ff9a4c51;
-}
-
-/* ---------- Winner ---------- */
-
-.submissionCard.winnerCard {
-  max-width: 90%;
-  padding: 1.5rem;
-
-  overflow: visible;
-
-  border-style: solid;
-  border-color: transparent;
-
-  border-image-source: url("/frames/simple.png");
-  border-image-slice: 25%;
-  border-image-width: 80px;
-  border-image-outset: 25px;
-  border-image-repeat: round;
-}
-
-/* ---------- Header ---------- */
-
-.submissionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  min-width: 0;
-
-  gap: var(--space-sm);
-
-  font-weight: 600;
-}
-
-.rank {
-  flex-shrink: 0;
-
-  color: var(--color-primary);
-
-  font-weight: 700;
-}
-
-/* ---------- Image ---------- */
-
-.imageContainer {
-  position: relative;
-
-  width: 100%;
-  min-width: 0;
-
-  overflow: hidden;
-
-  border-radius: 12px;
-  background: white;
-}
-
-.submissionImage {
-  display: block;
-
-  width: 100%;
-  height: auto;
-
-  border-radius: 12px;
-}
-
-/* ---------- Score ---------- */
-
-.scoreBadge {
-  position: absolute;
-
-  top: 10px;
-  left: 10px;
-
-  z-index: 1;
-}
-
-.scoreBadge::before {
-  content: "";
-
-  position: absolute;
-
-  inset: -12px -20px;
-
-  z-index: -1;
-
-  background: radial-gradient(
-    ellipse,
-    rgba(255, 255, 255, 0.95) 25%,
-    rgba(255, 255, 255, 0.543) 50%,
-    transparent 75%
-  );
-}
-
-/* ---------- Details ---------- */
-
-.submissionCard:not(.winnerCard) {
-  height: 100%;
-}
-
-.submissionDetails:not(.winnerCard) {
-  flex: 1;
-}
-
-.submissionDetails {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  width: 100%;
-  min-width: 0;
-
-  box-sizing: border-box;
-
-  padding: 0.75rem;
-
-  border-radius: 12px;
-
-  background-color: #ffeccfa5;
-}
-
-/* ---------- Note ---------- */
-
-.note {
-  margin: 0;
-
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.25;
-
-  overflow-wrap: anywhere;
-
-  opacity: 0.75;
-}
-
-/* ---------- Winner differences ---------- */
-
-.winnerCard .note {
-  font-size: 1.25rem;
-}
-
-.winnerCard .submissionDetails {
-  padding: 1rem;
-}
-
-/* ---------- Mobile ---------- */
-
-@media (max-width: 48rem) {
-  .submissionCard.winnerCard {
-    padding: 1.25rem;
-
-    border-image-width: 40px;
-    border-image-outset: 10px;
-  }
-
-  .winnerCard .note {
-    font-size: 1rem;
-  }
+.submissionCard { display: flex; flex-direction: column; width: 100%; min-width: 0; min-height: 0; gap: 0.5rem; padding: 0.75rem; border: 3px solid var(--ink); border-radius: 0.9rem; background: var(--paper); box-shadow: 4px 4px var(--ink); }
+.winnerCard { background: #fff3ad; border-color: var(--ink); }
+.submissionHeader { display: flex; align-items: center; justify-content: space-between; min-width: 0; gap: 0.4rem; font-size: 0.85rem; font-weight: 850; }
+.submissionHeader > span:first-child { overflow-wrap: anywhere; }
+.rank { flex-shrink: 0; padding: 0.1rem 0.4rem; border: 2px solid var(--ink); border-radius: 0.3rem; background: #75ccff; }
+.winnerCard .rank { background: #ffdb27; }
+.imageContainer { position: relative; width: 100%; min-height: 0; overflow: hidden; border: 2px solid var(--ink); border-radius: 0.5rem; background: white; }
+.submissionImage { display: block; width: 100%; height: auto; object-fit: contain; }
+.scoreBadge { position: absolute; top: 0.4rem; left: 0.4rem; z-index: 1; padding: 0.2rem; border-radius: 0.3rem; background: #ffffffdd; }
+.submissionDetails { flex-shrink: 0; padding: 0.4rem; border-radius: 0.4rem; background: #75ccff33; text-align: center; }
+.note { font-size: clamp(0.7rem, 1.6dvh, 1rem); font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
+/* Host podium and fixed player winner: images yield space to names and notes. */
+.hostCard, .winnerCard { min-height: 0; }
+.hostCard .imageContainer, .winnerCard .imageContainer { flex: 1; }
+.hostCard .submissionImage, .winnerCard .submissionImage { height: 100%; }
+@media (max-width: 48rem), (max-height: 500px) {
+  .submissionCard { padding: 0.4rem; gap: 0.3rem; border-width: 2px; box-shadow: 2px 2px var(--ink); }
+  .submissionHeader { font-size: 0.75rem; }
+  .submissionDetails { padding: 0.25rem; }
+  .note { font-size: 0.7rem; }
+  .scoreBadge { top: 0.15rem; left: 0.15rem; transform: scale(0.75); transform-origin: top left; }
 }

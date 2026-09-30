@@ -132,11 +132,7 @@ function PlayerLobby() {
     <main className={styles.page}>
       {roomError && <p role="status">Connection interrupted. Reconnecting… Your drawing is still here.</p>}
       <div className={styles.lobby}>
-        <div className={styles.header}>
-          <div className={styles.roomId}>
-            Room <strong>{room.id}</strong>
-          </div>
-        </div>
+
 
         <section className={styles.avatarSection}>
           <div className={styles.avatarHeading}>
