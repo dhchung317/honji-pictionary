@@ -1,46 +1,44 @@
-# Review index
+# Test all MVP changes
 
-Base: `6c3fb66` (`fix-vh`). Original checkout is unchanged. No changes have been pushed or deployed.
+Branch: `test/mvp-hardening`, based on local `main` at `7147c7c`. This checkout is `/Users/hyunki/Desktop/honji-pictionary`. Original review commits were copied with cherry-pick and remain individually reviewable. `main` was not changed; nothing has been pushed or deployed. The extra mobile-height CSS commit on `fix-vh` was not included because this branch starts from main.
 
-## Grouped server branch: fix/mvp-server-safety
+## Start the app
 
-Three separate commits, in order:
+The repo already has installed dependencies and local environment configuration. Use matching development Redis and Blob stores for failure/cleanup tests. From this folder run `npm run api`, then open the local address it reports. `npm run ui` by itself does not provide the API. Create fresh rooms: sessions created before the permissions change cannot authenticate.
 
-1. [Server permissions](server-permissions.md)
-2. [Usage limits](usage-limits.md)
-3. [Concurrent writes](concurrent-writes.md)
+## Combined checklist
 
-Review individual commits in your editor or `git show COMMIT`. To compare the whole branch with the original use `git diff 6c3fb66..fix/mvp-server-safety`.
+1. Open a host window and join two players in separate browser profiles/devices. Upload avatars, start, draw, submit manually and at timeout, then view results and quit. Reload the lobby once to verify session persistence.
+2. Enter a 15-character name: it should work. More than 15 cannot be entered in the form; a direct 16-character API request should return 400. Duplicate-name suffixes also fit within 15 characters.
+3. Join ten players; the eleventh gets a visible room-full message. Confirm simultaneous joins cannot exceed the cap.
+4. From another browser with only the room code, host start/quit and other players' submissions must fail. Retry scoring also requires the host credential.
+5. Block room polls temporarily while drawing. The canvas/undo history should remain; unblock and submit the same image. Refreshing or closing the tab still loses unsaved drawings.
+6. Send simultaneous start or submission requests. Only one round/one submission per player should be saved; conflicting host actions can return 409.
+7. In a development-only mock, fail AI scoring three times. Drawings stay saved and the host sees Retry scoring. Restore successful scoring and retry the same round. Retries are authenticated and rate-limited.
+8. Inspect Redis expiry before and after state transitions. Room updates must preserve the remaining lifetime; expired rooms cannot be resurrected.
+9. Run the Blob cleanup dry-run below. Deletion is disabled by default and no live images were deleted during implementation.
 
-## Other independent branches
+## Guides
 
-- `fix/preserve-drawings` in `../preserve-drawings`: `docs/review/preserve-drawings.md`.
-- `fix/scoring-recovery` in `../scoring-recovery`: `docs/review/scoring-recovery.md`.
-- `fix/room-expiry` in `../room-expiry`: `docs/review/room-expiry.md`.
+- [Permissions](server-permissions.md)
+- [Usage limits](usage-limits.md): 15-character names, ten players.
+- [Concurrency](concurrent-writes.md)
+- [Drawing preservation](preserve-drawings.md)
+- [Scoring recovery](scoring-recovery.md)
+- [Room expiry](room-expiry.md)
+- [Temporary Blob retention](blob-cleanup.md): configuration and dry-run/deletion tests.
 
-## Combining approved changes later
-
-Create a fresh integration branch from the intended release base. Cherry-pick approved commit IDs in dependency order, or merge an entirely approved branch. Resolve overlapping edits, then rerun frontend/API type checks, production build, regression tests and the multi-browser game checklist. Never assume independently passing branches also pass after combination.
-
-No integration branch or approval is implied by these review commits. Permissions, usage limits and concurrency overlap, so selecting a later server commit alone may require adapting it. Public scoring retry should include permissions and room locking. Drawings/expiry can be reviewed independently.
-
-## Validation
-
-Frontend/API TypeScript checks and seven mocked-service regression tests pass across the fixes. Production builds and the final grouped server tests also pass. Live Redis Lua behavior, Blob uploads, AI scoring, deployment timeout settings and browser interaction still require the manual instructions. Existing lint errors and hook warnings predate this work.
-
-## Repeatable automated checks
-
-From each review folder:
+## Automated checks
 
 ```sh
 npm run build
 ./node_modules/.bin/tsc --noEmit --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck --esModuleInterop api/*.ts
+node --test tests/*/regression.cjs
+npm run lint
 ```
 
-For the grouped server branch:
+Build, frontend/API checks and regression tests are rerun after integration. Lint has four existing errors and four warnings; manual browser/service checks remain necessary. Regression tests mock paid services and never delete live files.
 
-```sh
-node --test tests/server-permissions/regression.cjs tests/usage-limits/regression.cjs tests/concurrent-writes/regression.cjs
-```
+## Blob cleanup setup
 
-The scoring and expiry branches each contain their own regression test command in the linked guide. `npm run lint` currently fails with the four existing errors and four warnings; these fixes introduce no additional lint findings.
+Set `CRON_SECRET` locally and in Vercel. The authenticated `/api/cleanup-blobs?dryRun=1` endpoint reports candidates without deletion. Enable `BLOB_CLEANUP_ENABLED=true` only after testing against a dedicated development store. Preview deployments always dry-run. The configured daily schedule takes effect after production deployment. Images are eligible after one hour and only when the room is absent; actual deletion is eventual, typically within about 25 hours at low volume. Files downloaded/cached by users cannot be recalled. See the Blob guide for details.
