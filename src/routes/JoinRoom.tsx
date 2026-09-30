@@ -255,7 +255,11 @@ function JoinRoom() {
         {round?.status === "SCORING_FAILED" && <p role="status">Scoring is unavailable. Your drawing is saved. Waiting for the host to retry.</p>}
 
         {hasSubmitted && round?.status !== "SCORING_FAILED" && (
-          <GameLoading inline message="Drawing submitted. Waiting for the other players and scoring…" />
+          <GameLoading inline message={round?.status === "SCORING"
+            ? "Drawing submitted. Scoring the drawings…"
+            : round?.frozenPlayerIds.length === 1
+              ? "Drawing submitted. Preparing scoring…"
+              : "Drawing submitted. Waiting for the other players…"} />
         )}
 
         {submissionError && (

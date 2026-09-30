@@ -1,3 +1,4 @@
+import { deferJsonResponse } from "./_deferredResponse.js";
 import { acquireRoomMutation } from "./_mutationLock.js";
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { redis as kv, redis } from "./redis.js";
@@ -181,14 +182,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  const release = await acquireRoomMutation(roomId);
-  if (!release) {
-    const room = await getRoomById(roomId);
-    if (!room) return res.status(404).json({ error: "Room not found" });
-    const round = room.currentRoundId ? await getRound(room.id, room.currentRoundId) : null;
-    return res.status(200).json({ room, round });
-  }
+  const flush = deferJsonResponse(res);
+  let release: (() => Promise<void>) | null = null;
   try {
+    const snapshot = await getRoomById(roomId);
+    if (!snapshot) return res.status(404).json({ error: "Room not found" });
+
+    // Waiting-room polling does not mutate anything. Taking the start lock
+    // here lets ordinary player polls reject the host's Start Round action.
+    if (snapshot.status === "LOBBY") {
+      const round = snapshot.currentRoundId ? await getRound(snapshot.id, snapshot.currentRoundId) : null;
+      return res.status(200).json({ room: snapshot, round });
+    }
+
+    release = await acquireRoomMutation(roomId);
+    if (!release) {
+      const round = snapshot.currentRoundId ? await getRound(snapshot.id, snapshot.currentRoundId) : null;
+      return res.status(200).json({ room: snapshot, round });
+    }
+
     const room = await getRoomById(roomId);
 
     if (!room) {
@@ -219,6 +231,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       error: "Failed to get room",
     });
   } finally {
-    await release();
+    try { if (release) await release(); } finally { flush(); }
   }
 }
