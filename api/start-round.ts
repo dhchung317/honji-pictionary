@@ -1,3 +1,4 @@
+import { deferJsonResponse } from "./_deferredResponse.js";
 import { authorize } from "./_session.js";
 import { allowRequest } from "./_limits.js";
 import { acquireRoomMutation } from "./_mutationLock.js";
@@ -25,6 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!release) {
     return res.status(409).json({ error: "Room update in progress" });
   }
+  const flush = deferJsonResponse(res);
   try {
     const room = await getRoomById(roomId);
 
@@ -86,6 +88,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error("[start-round] error", err);
     res.status(500).json({ error: "Failed to start round" });
   } finally {
-    await release();
+    try { await release(); } finally { flush(); }
   }
 }

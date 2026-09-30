@@ -86,3 +86,17 @@ Existing localStorage sessions are intentionally not imported: they may already 
 Manual test: create two rooms in separate host tabs, join two differently named players per room in new tabs in the same window, draw distinguishable images, and submit each before the timer. Verify each player sends its own playerId/session, each host only advances its room, and results contain the appropriate drawings. Submit one player, reload that tab while another is drawing, and confirm it stays in the submitted waiting state and does not upload a blank canvas at expiry. Player tabs must go to player results, including tabs opened from a host.
 
 Investigation of reported room CKJF confirmed a saved blank PNG and a completed scored round; it did not establish how that canvas became blank. The shared-tab identity collision is confirmed in the old code and reproduced in regression coverage. Browser-driven multiplayer reproduction still needs local review.
+
+## Start-round polling conflict
+
+Waiting-room reads no longer acquire the mutation lock used by Start Round. Previously, every host/player tab polled while taking that lock, so starting could receive a transient 409 Conflict. Drawing/scoring advancement and actual start requests remain locked; duplicate simultaneous starts are still rejected. Existing scoring recovery and concurrent-start tests pass, and a new test verifies ten concurrent lobby polls take no mutation locks.
+
+Test with multiple host/player tabs polling: start each room while its players are waiting, and verify no polling-induced Conflict. Confirm one round/prompt per room and that scoring and results still advance. A truly concurrent second start may still be rejected by design.
+
+## Early scoring and response cleanup
+
+Rooms 9BBM and MN8Y had a successful sole-player submission but stayed DRAWING until approximately the three-minute mark. MN8Y's mutation lock was still present immediately before that expiry even though its player's submission marker existed. An isolated direct start request released normally, so the precise runtime trigger was not reproduced. The handlers previously performed asynchronous lock cleanup after sending their JSON response; request teardown could leave cleanup unfinished.
+
+Start, room polling, quit and next-round handlers now hold JSON responses until awaited lock cleanup completes. Authentication/rate-limit/error responses inside the lock also follow that ordering. Regression tests verify start responses are sent after release and a sole-player submission advances DRAWING to SCORING well before its deadline. Existing concurrent-start and scoring-recovery checks remain passing. Single-player waiting copy now says Preparing scoring; active scoring has a separate message.
+
+Test a fresh single-player room: submit with at least one minute on the clock. Within the next polls the status should become SCORING, then DONE/results without waiting for expiry. Repeat with two players: remain DRAWING after the first, and advance after the second. Check Start, Quit and rejected requests still release locks. An already leaked lock is not forcibly deleted; it can persist until its original expiry. Full browser multiplayer reproduction remains a manual check.
