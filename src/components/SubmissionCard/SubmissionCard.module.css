@@ -4,9 +4,9 @@
 .submissionHeader > span:first-child { overflow-wrap: anywhere; }
 .rank { flex-shrink: 0; padding: 0.1rem 0.4rem; border: 2px solid var(--ink); border-radius: 0.3rem; background: #75ccff; }
 .winnerCard .rank { background: #ffdb27; }
-.imageContainer { position: relative; width: 100%; min-height: 0; overflow: hidden; border: 2px solid var(--ink); border-radius: 0.5rem; background: white; }
-.submissionImage { display: block; width: 100%; height: auto; object-fit: contain; }
-.scoreBadge { position: absolute; top: 0.4rem; left: 0.4rem; z-index: 1; padding: 0.2rem; border-radius: 0.3rem; background: #ffffffdd; }
+.imageContainer { position: relative; width: 100%; min-height: 0; overflow: visible; border: 2px solid var(--ink); border-radius: 0.5rem; background: white; }
+.submissionImage { display: block; width: 100%; height: auto; object-fit: contain; border-radius: 0.4rem; }
+.scoreBadge { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; transform: translate(-28%, -13%); transform-origin: top left; }
 .submissionDetails { flex-shrink: 0; padding: 0.4rem; border-radius: 0.4rem; background: #75ccff33; text-align: center; }
 .note { font-size: clamp(0.7rem, 1.6dvh, 1rem); font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
 /* Host podium and fixed player winner: images yield space to names and notes. */
@@ -18,5 +18,5 @@
   .submissionHeader { font-size: 0.75rem; }
   .submissionDetails { padding: 0.25rem; }
   .note { font-size: 0.7rem; }
-  .scoreBadge { top: 0.15rem; left: 0.15rem; transform: scale(0.75); transform-origin: top left; }
+  .scoreBadge { transform: translate(-28%, -13%) scale(0.85); }
 }

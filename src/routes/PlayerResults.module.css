@@ -6,7 +6,7 @@
 .winnerSection { display: flex; justify-content: center; min-height: 0; min-width: 0; padding: 0.5rem; }
 .winnerSection > * { height: 100%; width: 100%; max-width: 34rem; }
 /* This is the only scrolling region; the winner stays in view. */
-.submissionsSection { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 0.5rem; border: 2px solid var(--ink); border-radius: 0.8rem; background: #fffdf466; }
+.submissionsSection { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 1rem; border: 2px solid var(--ink); border-radius: 0.8rem; background: #fffdf466; }
 .desktopSubmissions { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 1rem; padding: 0.25rem; }
 .emptyState { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; text-align: center; }
 @media (max-width: 48rem) and (min-height: 501px) {

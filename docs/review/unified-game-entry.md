@@ -54,3 +54,25 @@ Build and all 19 regression checks passed. Changed TS/TSX lint has no errors; Jo
 ### Logo refinement
 
 The header now clips the actual original logo lettering into a self-contained SVG, retaining its custom shapes and yellow/cream/blue/red/green fills rather than approximating them with a font. The explosion frame is omitted and the dark background between the letters is transparent. The SVG asset was rendered locally and inspected. Home uses a larger logo with a small overlap behind the headline; the headline has a white outline to preserve legibility without increasing the card height. Recheck home at short portrait/landscape sizes with an error showing, and check header logo clarity and room-code centering. Full page browser inspection remains unavailable.
+
+### Score medals
+
+Results now put the score inside a gold, silver or bronze comic medal for ranks 1, 2 and 3. Medal color follows the awarded rank, not score thresholds. Other ranks use a blue spiky circular badge with no ribbon. The existing score numeral artwork is retained in its original colors, with the original score-threshold coloring (gold 75+, silver 50–74, bronze below 50). The badges use native SVG/CSS and do not add page height, change scores or affect scoring/ranking logic.
+
+Check both host and player results with ranks 1–10, particularly a score of 100, a zero score, tied scores with different assigned ranks, and short mobile/landscape layouts. Confirm scores sit in the center of each medal face and do not overlap rank/name/notes. Host badges use smaller numerals; mobile badges scale down with the existing overlay. Accessible labels include rank, score and medal color. Regression coverage verifies rank-based medal selection, ribbon absence below the podium and rank propagation from submission cards.
+
+### Dark header and score artwork correction
+
+The room header now has a dark charcoal/navy background, yellow room code and light blue label. Scores still render through GameScore using the existing numeral PNGs; the blackening filter was removed. Numeral colors use the original score thresholds independently of medal rank. Score medals/bursts straddle the image's upper-left corner instead of sitting inset inside it. The image wrapper allows the badge to extend past its border, while the image retains rounded corners. On small screens, badges retain their compact scale.
+
+Review header contrast, the original score artwork, and the badge overlap on both results views, especially narrow/short screens. Check that badges stay clear of names and notes and don't introduce page scrolling.
+
+### Consistent, smaller corner badges
+
+Host podium badges and the fixed player winner now share 20px numeral height / 70px badge width (previously host 84px and player 112px). Cards in the player results list use 16px numerals / 56px badges. The badge is shifted left by 32% of its width and up by 13% of its height so its round face covers the image's upper-left corner, with some overlap outside the card. Mobile retains a further compact scale. Extra padding inside the player results scroll panel keeps the overhanging badges from being clipped.
+
+Compare host and player winner badges at the same viewport size, then inspect silver, bronze and blue burst badges in the player list. Check that the upper-left image corner doesn't peek around the round medal, that name/rank remain legible, and that badges don't clip at the scroll panel edge or cause page scrolling.
+
+### Score thresholds restored
+
+Numeral PNGs use their original colors for scores 75 and above, grayscale/silver for 50–74 and the original copper/bronze filter below 50. Only the numeral images are filtered; medal faces and ribbons still follow rank. Check a gold first-place medal with a score below 50 and a silver second-place medal with a score above 75 to verify the two color rules are independent. Regression checks cover both sides of each threshold across ranks 1–4.
