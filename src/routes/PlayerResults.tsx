@@ -60,7 +60,6 @@ function PlayerResults() {
       <main className={styles.page}>
         <section className={styles.emptyState}>
           <h1>Results</h1>
-          <p>Room {roomId}</p>
           <p>No submissions yet.</p>
         </section>
       </main>
@@ -74,10 +73,6 @@ function PlayerResults() {
       <div className={styles.results}>
         <header className={styles.header}>
           <h1 className={styles.title}>Results</h1>
-
-          <p className={styles.roomId}>
-            Room <strong>{roomId}</strong>
-          </p>
         </header>
 
         <div className={styles.resultsLayout}>
@@ -88,7 +83,7 @@ function PlayerResults() {
             />
           </section>
 
-          <section className={styles.submissionsSection}>
+          <section className={styles.submissionsSection} tabIndex={0} aria-label="Other players’ results">
             {/* Desktop */}
             <div className={styles.desktopSubmissions}>
               {data.slice(1).map(({ submission, result }) => (
@@ -100,16 +95,6 @@ function PlayerResults() {
               ))}
             </div>
 
-            {/* Mobile */}
-            <div className={styles.mobileSubmissions}>
-              {data.map(({ submission, result }) => (
-                <SubmissionCard
-                  key={submission.id}
-                  submission={submission}
-                  result={result}
-                />
-              ))}
-            </div>
           </section>
         </div>
       </div>

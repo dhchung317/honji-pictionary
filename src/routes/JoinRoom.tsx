@@ -239,7 +239,7 @@ function JoinRoom() {
         {round?.status === "SCORING_FAILED" && <p role="status">Scoring is unavailable. Your drawing is saved. Waiting for the host to retry.</p>}
 
         {hasSubmitted && round?.status !== "SCORING_FAILED" && (
-          <GameLoading message="Waiting for the host to score the round…" />
+          <GameLoading inline message="Waiting for the host to score the round…" />
         )}
 
         {submissionError && (

@@ -161,15 +161,12 @@ function HostRoom() {
 
               <div className={styles.lobbyCenter}>
                 <div className={styles.logoSpace}>
-                  <img width={"100%"} src={"/honji.png"} />
+                  <img width={"100%"} src={"/honji.png"} alt="Honji" />
                 </div>
 
                 <h2 className={styles.stageTitle}>Waiting for players</h2>
 
-                <div className={styles.roomInfo}>
-                  <span className={styles.roomCodeLabel}>Room</span>
-                  <span className={styles.roomCode}>{room.id}</span>
-                </div>
+
               </div>
 
               <div className={styles.lobbyActions}>
@@ -237,7 +234,7 @@ function HostRoom() {
 
           {isScoring && (
             <div className={styles.roundContent}>
-              <GameLoading message="Everyone's drawings are in. Calculating the results." />
+              <GameLoading inline message="Everyone's drawings are in. Calculating the results." />
             </div>
           )}
 

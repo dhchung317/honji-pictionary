@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { GameErrorPage } from "../components/GameError";
 import { SubmissionCard } from "../components/SubmissionCard/SubmissionCard";
@@ -6,11 +6,7 @@ import { SubmissionCard } from "../components/SubmissionCard/SubmissionCard";
 import { useAsync } from "../hooks/useAsync";
 
 import { getRoundScore } from "../lib/roundScoreApi";
-import {
-  getRoom,
-  // nextRound,
-  quit,
-} from "../lib/roomsApi";
+import { getRoom } from "../lib/roomsApi";
 import { getSubmissionsByRoom } from "../lib/submissionsApi";
 import { getRankedSubmissions } from "../lib/rankedSubmissions";
 import { dummyRoundScore, dummySubmissions } from "../testData/playerResults";
@@ -21,7 +17,6 @@ import { GameLoading } from "../components/GameLoading/GameLoading";
 const USE_DUMMY_DATA = false;
 
 function Results() {
-  const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
 
   const { data, loading, error } = useAsync(async () => {
@@ -47,19 +42,6 @@ function Results() {
     return getRankedSubmissions(submissions, roundScore.results);
   }, [roomId]);
 
-  // const handleNextRound = async () => {
-  //   if (!roomId) return;
-
-  //   await nextRound(roomId);
-  // };
-
-  const handleQuit = async () => {
-    if (!roomId) return;
-
-    await quit(roomId);
-    navigate("/");
-  };
-
   if (loading) {
     return <GameLoading message="Loading results..." />;
   }
@@ -78,19 +60,9 @@ function Results() {
         <section className={styles.emptyState}>
           <h1>Results</h1>
 
-          <p className={styles.roomId}>Room {roomId}</p>
-
           <p>No submissions yet.</p>
 
-          <div className={styles.actions}>
-            {/* <button className={styles.nextButton} onClick={handleNextRound}>
-              Next Round
-            </button> */}
 
-            <button className={styles.quitButton} onClick={handleQuit}>
-              Quit
-            </button>
-          </div>
         </section>
       </main>
     );
@@ -107,21 +79,9 @@ function Results() {
         <header className={styles.header}>
           <div className={styles.heading}>
             <h1 className={styles.title}>Results</h1>
-
-            <p className={styles.roomId}>
-              Room <strong>{roomId}</strong>
-            </p>
           </div>
 
-          <div className={styles.actions}>
-            {/* <button className={styles.nextButton} onClick={handleNextRound}>
-              Next Round
-            </button> */}
 
-            <button className={styles.quitButton} onClick={handleQuit}>
-              Quit
-            </button>
-          </div>
         </header>
 
         <div className={styles.resultsLayout}>

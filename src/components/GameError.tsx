@@ -18,17 +18,7 @@ export function GameErrorPage({ type }: Props) {
   }
 
   return (
-    <main
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        position: "absolute",
-        top: "40%",
-      }}
-    >
+    <main className="state-page">
       <h1>{title}</h1>
       <p>{message}</p>
       <a href="/">Return home</a>
