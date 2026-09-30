@@ -42,3 +42,9 @@ Build, frontend/API checks and regression tests are rerun after integration. Lin
 ## Blob cleanup setup
 
 Set `CRON_SECRET` locally and in Vercel. The authenticated `/api/cleanup-blobs?dryRun=1` endpoint reports candidates without deletion. Enable `BLOB_CLEANUP_ENABLED=true` only after testing against a dedicated development store. Preview deployments always dry-run. The configured daily schedule takes effect after production deployment. Images are eligible after one hour and only when the room is absent; actual deletion is eventual, typically within about 25 hours at low volume. Files downloaded/cached by users cannot be recalled. See the Blob guide for details.
+
+## Player lobby redirects
+
+The avatar lobby renders only when the room status is LOBBY. During DRAWING, SCORING or SCORING_FAILED it redirects to the game; DONE redirects to player results. Navigation replaces the history entry. An expired room still shows Game not found.
+
+Test by opening `/room/CODE/lobby` directly during each phase. Confirm the avatar canvas does not appear outside the lobby and the address changes to the appropriate page. After results, press Back or reopen the lobby URL: it must return to results while the room exists. Verify an expired room shows the error page. If a future next-round action resets the room to LOBBY, the avatar lobby should be accessible again even if the previous round remains DONE.
