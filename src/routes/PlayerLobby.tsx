@@ -91,19 +91,19 @@ function PlayerLobby() {
   );
 
   const room = roomState?.room ?? null;
-  const round = roomState?.round ?? null;
+  const roomStatus = room?.status;
 
-  const isDrawing = round?.status === "DRAWING";
-
-  /* ---------- Start round navigation ---------- */
+  /* ---------- Keep the lobby limited to waiting rooms ---------- */
 
   useEffect(() => {
-    if (!roomId || !isDrawing) return;
+    if (!roomId || !roomStatus || roomStatus === "LOBBY") return;
 
-    navigate(`/room/${roomId}`, {
-      replace: true,
-    });
-  }, [roomId, isDrawing, navigate]);
+    const destination = roomStatus === "DONE"
+      ? `/room/${roomId}/playerresults`
+      : `/room/${roomId}`;
+
+    navigate(destination, { replace: true });
+  }, [roomId, roomStatus, navigate]);
 
   /* ---------- Page states ---------- */
 
@@ -121,6 +121,11 @@ function PlayerLobby() {
 
   if (!room) {
     return <GameErrorPage type="ROOM_NOT_FOUND" />;
+  }
+
+  // Avoid mounting the avatar canvas while the navigation effect runs.
+  if (room.status !== "LOBBY") {
+    return <GameLoading message="Opening your game..." />;
   }
 
   return (
