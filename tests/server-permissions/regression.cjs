@@ -34,7 +34,7 @@ test("a room code alone cannot start a round or consume AI", async () => {
   "./_mutationLock.js":{acquireRoomMutation:async()=>async()=>{}},
   "./_limits.js":{allowRequest:async()=>true},
   "./_session.js":{authorize:async (_req,res)=>{res.status(403).json({});return false;}},
-  "./_roomStore.js":{getRoomById:async()=>({id:"ABCD",hostId:"host",status:"LOBBY"})},
+  "./_roomStore.js":{getRoomById:async()=>({id:"ABCD",hostId:"host",status:"SCORING_FAILED",currentRoundId:"round"})},
   "./_playerStore.js":{}, "./_roundStore.js":{},
   "./_aiGeneratePrompt.js":{genPrompt:async()=>{called=true;}},
  }).default;

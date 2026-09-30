@@ -32,7 +32,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: "Room not found" });
     }
 
-  if (!await authorize(req, res, { role: "HOST", roomId: room.id, id: room.hostId })) return;
+    if (!await authorize(req, res, { role: "HOST", roomId: room.id, id: room.hostId })) return;
+    if (room.status !== "LOBBY" && room.status !== "SCORING_FAILED") return res.status(400).json({ error: "Round already started" });
+    if (!await allowRequest(req, res, "start", 6, 3600, roomId)) return;
+    if (!await allowRequest(req, res, "start-global", 100, 3600, "global")) return;
+
     if (room.status === "SCORING_FAILED" && room.currentRoundId) {
       const round = await getRound(room.id, room.currentRoundId);
       if (!round) return res.status(404).json({ error: "Round not found" });
@@ -46,8 +50,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Round already started" });
     }
 
-    if (!await allowRequest(req, res, "start", 6, 3600, roomId)) return;
-    if (!await allowRequest(req, res, "start-global", 100, 3600, "global")) return;
 
     const { prompt } = await genPrompt({ history: room.promptHistory });
 

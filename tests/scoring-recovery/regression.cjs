@@ -20,6 +20,7 @@ test("failed scoring retries then exposes failure, retaining drawings for a manu
  let round={id:"round",roomId:"ABCD",status:"SCORING",prompt:"cat",scoredAt:null,scoringAttempts:0};
  let attempts=0;const scores=[];
  const handler=load("api/get-room.ts",{
+  "./_mutationLock.js":{acquireRoomMutation:async()=>async()=>{}},
   "./redis.js":{redis:{set:async()=>"OK",del:async()=>{}}},
   "./_roomStore.js":{getRoomById:async()=>room,saveRoom:async v=>{room=v;}},
   "./_roundStore.js":{getRound:async()=>round,saveRound:async v=>{round=v;}},
@@ -35,6 +36,9 @@ test("failed scoring retries then exposes failure, retaining drawings for a manu
  assert.equal(room.status,"SCORING_FAILED");assert.equal(round.scoredAt,null);assert.equal(scores.length,0);
  await handler(req,response());assert.equal(attempts,3);
  const restart=load("api/start-round.ts",{
+ "./_mutationLock.js":{acquireRoomMutation:async()=>async()=>{}},
+ "./_session.js":{authorize:async()=>true},
+ "./_limits.js":{allowRequest:async()=>true},
  "./_roomStore.js":{getRoomById:async()=>room,saveRoom:async v=>{room=v;}},
  "./_roundStore.js":{getRound:async()=>round,saveRound:async v=>{round=v;}},
  "./_playerStore.js":{}, "./_aiGeneratePrompt.js":{genPrompt:()=>{throw Error("must preserve prompt");}}
