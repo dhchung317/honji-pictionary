@@ -185,7 +185,7 @@ function HostRoom() {
                   <p className={styles.stageMessage}>
                     at{" "}
                     <strong style={{ fontSize: "1.25rem" }}>
-                      {baseUrl}/join
+                      {baseUrl}
                     </strong>{" "}
                     to play.
                   </p>

@@ -10,7 +10,7 @@ Compete to see who draws the best!
 
 Host a new game at https://honji.xyz/
 
-Players enter their name and room code at https://honji.xyz/join
+Players enter their name and room code at https://honji.xyz/
 
 Hosts can start when everyone has joined 
 
