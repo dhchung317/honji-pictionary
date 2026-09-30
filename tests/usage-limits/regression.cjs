@@ -10,7 +10,7 @@ function load(file, mocks = {}) {
   const source = readFileSync(path.join(root, file), "utf8");
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
   const module = { exports: {} };
-  const sandbox = { module, exports: module.exports, require: id => id in mocks ? mocks[id] : require(id), crypto: crypto.webcrypto, Date, console: { ...console, error() {} }, setTimeout, clearTimeout, URL };
+  const sandbox = { module, exports: module.exports, require: id => id in mocks ? mocks[id] : require(id), crypto: crypto.webcrypto, Date, Error, console: { ...console, error() {} }, setTimeout, clearTimeout, URL };
   vm.runInNewContext(code, sandbox, { filename: file });
   return module.exports;
 }
@@ -29,4 +29,17 @@ test("limits reject over-budget requests and fail closed if Redis is unavailable
  const limited=response(); assert.equal(await allowRequest(req,limited,"test",1,60),false); assert.equal(limited.code,429);
  const failed=load("api/_limits.ts",{"./redis.js":{redis:{eval:async()=>{throw Error("offline");}}}});
  const unavailable=response(); assert.equal(await failed.allowRequest(req,unavailable,"test",1,60),false);assert.equal(unavailable.code,503);
+});
+
+test("join permits 15 characters, rejects 16, and displays room-full API errors",async()=>{
+ let full=false;
+ const handler=load("api/join-room.ts",{
+  "./_session.js":{issueSession:async()=>"token"},"./_limits.js":{allowRequest:async()=>true},
+  "./_roomStore.js":{getRoomById:async()=>({id:"ABCD",status:"LOBBY"})},
+  "./_playerStore.js":{upsertPlayer:async()=>{if(full)throw Error("ROOM_FULL");return {id:"p"};}}
+ }).default;
+ const req=name=>({method:"POST",body:{roomId:"ABCD",name}});
+ const okay=response();await handler(req("a".repeat(15)),okay);assert.equal(okay.code,200);
+ const tooLong=response();await handler(req("a".repeat(16)),tooLong);assert.equal(tooLong.code,400);assert.match(tooLong.body.error,/15 characters/);
+ full=true;const filled=response();await handler(req("Pat"),filled);assert.equal(filled.code,409);assert.match(filled.body.error,/10 players/);
 });

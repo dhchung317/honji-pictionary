@@ -33,6 +33,7 @@ function Join() {
       return;
     }
 
+    try {
     const player = await registerPlayer(roomCode, trimmedName);
 
     window.localStorage.setItem(`playerId:${roomCode}`, player.id);
@@ -40,6 +41,9 @@ function Join() {
     window.localStorage.setItem(`playerName:${roomCode}`, player.name);
 
     navigate(`/room/${roomCode}/lobby`);
+    } catch (error) {
+      setNameError(error instanceof Error ? error.message : "Unable to join room");
+    }
   };
 
   return (
@@ -61,6 +65,7 @@ function Join() {
 
             <input
               id="player-name"
+              maxLength={15}
               className={styles.input}
               value={name}
               onChange={(event) => {
