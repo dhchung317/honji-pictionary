@@ -8,7 +8,7 @@ function entry(registerPlayer, storage) {
  const source = readFileSync(path.resolve(__dirname,"../../src/lib/gameEntry.ts"),"utf8");
  const code = ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  const module={exports:{}};
- vm.runInNewContext(code,{module,exports:module.exports,require:()=>({registerPlayer}),localStorage:{setItem:(k,v)=>storage.set(k,v)},Error});
+ vm.runInNewContext(code,{module,exports:module.exports,require:()=>({registerPlayer}),sessionStorage:{setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},Error});
  return module.exports.joinGame;
 }
 test("join normalizes inputs and saves server-assigned identity",async()=>{

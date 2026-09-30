@@ -29,6 +29,7 @@ function JoinRoom() {
 
   const canvasRef = useRef<DrawingCanvasHandle | null>(null);
   const autoSubmittedRef = useRef(false);
+  const submissionInFlightRef = useRef(false);
 
   const [name, setName] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -72,6 +73,12 @@ function JoinRoom() {
       throw new Error("Round not loaded yet.");
     }
 
+    if (sessionStorage.getItem(`submittedRound:${roomId}`) === round.id) {
+      setHasSubmitted(true);
+      return;
+    }
+    if (submissionInFlightRef.current) return;
+
     if (round.status !== "DRAWING") {
       throw new Error("You can only submit while the round is in progress.");
     }
@@ -80,45 +87,54 @@ function JoinRoom() {
       throw new Error("Canvas not ready.");
     }
 
-    const playerId = localStorage.getItem(`playerId:${roomId}`);
+    const playerId = sessionStorage.getItem(`playerId:${roomId}`);
 
     if (!playerId) {
       throw new Error("Player id not found.");
     }
 
-    const blob = await new Promise<Blob>((resolve, reject) => {
-      canvasRef.current!.getCanvas()?.toBlob((blob) => {
-        if (blob) {
-          resolve(blob);
-        } else {
-          reject(new Error("Could not capture drawing."));
-        }
-      }, "image/png");
-    });
+    const canvas = canvasRef.current.getCanvas();
+    if (!canvas) throw new Error("Canvas not ready.");
 
-    const { url } = await upload(
-      `room/${roomId}/round/${round.id}/players/${playerId}.png`,
-      blob,
-      {
-        access: "public",
-        headers: sessionHeaders(roomId, "PLAYER"),
-        handleUploadUrl: "/api/blob-upload",
-        clientPayload: JSON.stringify({
-          roomId,
-          roundId: round.id,
-          playerId,
-        }),
-      },
-    );
+    submissionInFlightRef.current = true;
+    try {
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("Could not capture drawing."));
+          }
+        }, "image/png");
+      });
 
-    await createSubmission({
-      roomId,
-      playerId,
-      playerName: name.trim() || "Player",
-      imageUrl: url,
-    });
+      const { url } = await upload(
+        `room/${roomId}/round/${round.id}/players/${playerId}.png`,
+        blob,
+        {
+          access: "public",
+          headers: sessionHeaders(roomId, "PLAYER"),
+          handleUploadUrl: "/api/blob-upload",
+          clientPayload: JSON.stringify({
+            roomId,
+            roundId: round.id,
+            playerId,
+          }),
+        },
+      );
 
-    setHasSubmitted(true);
+      await createSubmission({
+        roomId,
+        playerId,
+        playerName: name.trim() || "Player",
+        imageUrl: url,
+      });
+
+      sessionStorage.setItem(`submittedRound:${roomId}`, round.id);
+      setHasSubmitted(true);
+    } finally {
+      submissionInFlightRef.current = false;
+    }
   });
 
   // Auto-submit when timer expires
@@ -130,7 +146,7 @@ function JoinRoom() {
 
     autoSubmittedRef.current = true;
     submitDrawing();
-  }, [isDrawing, isExpired, hasSubmitted, isSubmitting]);
+  }, [isDrawing, isExpired, hasSubmitted, isSubmitting, submitDrawing]);
 
   // Navigate to results when round finishes
   useEffect(() => {
@@ -153,7 +169,7 @@ function JoinRoom() {
   useEffect(() => {
     if (!roomId) return;
 
-    const savedName = localStorage.getItem(`playerName:${roomId}`);
+    const savedName = sessionStorage.getItem(`playerName:${roomId}`);
 
     if (savedName) {
       setName(savedName);
@@ -163,8 +179,8 @@ function JoinRoom() {
   // Reset submission state for a new round
   useEffect(() => {
     autoSubmittedRef.current = false;
-    setHasSubmitted(false);
-  }, [round?.id]);
+    setHasSubmitted(Boolean(roomId && round?.id && sessionStorage.getItem(`submittedRound:${roomId}`) === round.id));
+  }, [roomId, round?.id]);
 
   // Page states
   if (!roomId) {
@@ -230,7 +246,7 @@ function JoinRoom() {
                 disabled={isSubmitting || !isDrawing}
                 onClick={submitDrawing}
               >
-                Submit
+                {isSubmitting ? "Submitting…" : "Submit"}
               </button>
             </div>
           </section>
@@ -239,11 +255,11 @@ function JoinRoom() {
         {round?.status === "SCORING_FAILED" && <p role="status">Scoring is unavailable. Your drawing is saved. Waiting for the host to retry.</p>}
 
         {hasSubmitted && round?.status !== "SCORING_FAILED" && (
-          <GameLoading inline message="Waiting for the host to score the round…" />
+          <GameLoading inline message="Drawing submitted. Waiting for the other players and scoring…" />
         )}
 
         {submissionError && (
-          <div className={styles.error}>{submissionError.message}</div>
+          <div className={styles.error} role="alert">{submissionError.message}</div>
         )}
       </div>
     </main>

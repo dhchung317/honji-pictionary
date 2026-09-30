@@ -18,7 +18,7 @@ export async function registerPlayer(
     throw new Error(typeof body?.error === "string" ? body.error : "Failed to join room");
   }
   const player = await res.json();
-  localStorage.setItem(`playerSession:${roomId}`, player.sessionToken);
+  sessionStorage.setItem(`playerSession:${roomId}`, player.sessionToken);
   return player;
 }
 
