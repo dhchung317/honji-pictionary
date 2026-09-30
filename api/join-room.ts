@@ -14,10 +14,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!roomId || !name)
     return res.status(400).json({ error: "roomId and name required" });
 
-  if (name.length > 12 || !/^[A-Z2-9]{4}$/.test(roomId))
+  if (name.length > 15 || !/^[A-Z2-9]{4}$/.test(roomId))
     return res
       .status(400)
-      .json({ error: "Invalid room code or name (maximum 12 characters)" });
+      .json({ error: "Invalid room code or name (maximum 15 characters)" });
   if (!(await allowRequest(req, res, "join", 24, 60, roomId))) return;
 
   const room = await getRoomById(roomId);
@@ -37,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (error instanceof Error && error.message === "ROOM_FULL")
       return res
         .status(409)
-        .json({ error: "Room is full (12 players maximum)" });
+        .json({ error: "Room is full (10 players maximum)" });
     res.status(503).json({ error: "Unable to join room" });
   }
 }

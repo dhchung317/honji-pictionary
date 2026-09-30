@@ -33,7 +33,7 @@ export async function upsertPlayer(
   const rpk = roomPlayersKey(roomId);
   const pnk = playerNameKey(roomId, displayName.toLowerCase());
 
-  const admitted = await kv.eval<[string, number], number>(`if redis.call("SCARD",KEYS[1]) >= 12 then return 0 end; redis.call("SADD",KEYS[1],ARGV[1]); redis.call("EXPIRE",KEYS[1],ARGV[2]); return 1`, [rpk], [player.id, TTL_SECONDS]);
+  const admitted = await kv.eval<[string, number], number>(`if redis.call("SCARD",KEYS[1]) >= 10 then return 0 end; redis.call("SADD",KEYS[1],ARGV[1]); redis.call("EXPIRE",KEYS[1],ARGV[2]); return 1`, [rpk], [player.id, TTL_SECONDS]);
   if (!admitted) throw new Error("ROOM_FULL");
 
   await kv.set(pk, player, {
