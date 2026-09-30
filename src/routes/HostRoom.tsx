@@ -213,10 +213,14 @@ function HostRoom() {
               <div className={styles.roundPlayers}>
                 {players.map((player) => (
                   <div key={player.id} className={styles.roundPlayer}>
-                    <PlayerAvatar player={player} />
+                    <div className={styles.roundAvatar}>
+                      <PlayerAvatar player={player} />
+                    </div>
 
-                    <span className={styles.playerName}>{player.name}</span>
-                    <span className={styles.playerStatus}>Drawing</span>
+                    <div className={styles.roundPlayerDetails}>
+                      <span className={styles.playerName}>{player.name}</span>
+                      <span className={styles.playerStatus}>Drawing</span>
+                    </div>
                   </div>
                 ))}
               </div>
