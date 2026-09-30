@@ -2,11 +2,11 @@ import { sessionHeaders } from "./session";
 import { RoomState } from "../../shared/roomstate";
 
 export async function createRoom() {
-  let hostId = localStorage.getItem("hostId");
+  let hostId = sessionStorage.getItem("hostId");
 
   if (!hostId) {
     hostId = crypto.randomUUID();
-    localStorage.setItem("hostId", hostId);
+    sessionStorage.setItem("hostId", hostId);
   }
   const res = await fetch(`/api/create-room`, {
     method: "POST",
@@ -17,7 +17,7 @@ export async function createRoom() {
   });
   if (!res.ok) throw new Error(res.statusText);
   const room = await res.json();
-  localStorage.setItem(`hostSession:${room.id}`, room.sessionToken);
+  sessionStorage.setItem(`hostSession:${room.id}`, room.sessionToken);
   return room;
 }
 

@@ -76,3 +76,13 @@ Compare host and player winner badges at the same viewport size, then inspect si
 ### Score thresholds restored
 
 Numeral PNGs use their original colors for scores 75 and above, grayscale/silver for 50–74 and the original copper/bronze filter below 50. Only the numeral images are filtered; medal faces and ribbons still follow rank. Check a gold first-place medal with a score below 50 and a silver second-place medal with a score above 75 to verify the two color rules are independent. Regression checks cover both sides of each threshold across ranks 1–4.
+
+## Multi-tab sessions and submission state
+
+Host and player identities, credentials and submitted-round markers now use sessionStorage, which is isolated by tab and retained across reloads. Previously all tabs shared localStorage, so joining another player in the same room overwrote the identity used for uploads/submissions. Player identity takes precedence when a joined player tab was opened from a host tab. A successful submission is remembered on reload, and a synchronous guard prevents overlapping manual/timer submissions. The UI says Submitting while saving and distinguishes a saved drawing waiting on other players/scoring.
+
+Existing localStorage sessions are intentionally not imported: they may already contain another tab's identity. Start fresh test rooms and rejoin players after this update. Closing a tab ends its session; duplicating a tab initially copies its sessionStorage, so join from home with a different name to create an independent player. Multiple host tabs can create and run independent rooms. No image data is persisted in browser storage; only identity/session metadata is saved.
+
+Manual test: create two rooms in separate host tabs, join two differently named players per room in new tabs in the same window, draw distinguishable images, and submit each before the timer. Verify each player sends its own playerId/session, each host only advances its room, and results contain the appropriate drawings. Submit one player, reload that tab while another is drawing, and confirm it stays in the submitted waiting state and does not upload a blank canvas at expiry. Player tabs must go to player results, including tabs opened from a host.
+
+Investigation of reported room CKJF confirmed a saved blank PNG and a completed scored round; it did not establish how that canvas became blank. The shared-tab identity collision is confirmed in the old code and reproduced in regression coverage. Browser-driven multiplayer reproduction still needs local review.

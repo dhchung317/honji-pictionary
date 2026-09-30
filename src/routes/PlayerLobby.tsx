@@ -30,7 +30,7 @@ function PlayerLobby() {
       throw new Error("Missing room id.");
     }
 
-    const playerId = localStorage.getItem(`playerId:${roomId}`);
+    const playerId = sessionStorage.getItem(`playerId:${roomId}`);
 
     if (!playerId) {
       throw new Error("Player id not found.");
