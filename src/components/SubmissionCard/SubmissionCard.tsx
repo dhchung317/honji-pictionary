@@ -26,7 +26,9 @@ export function SubmissionCard({
     .filter(Boolean)
     .join(" ");
 
-  const scoreHeight = variant === "host" ? 24 : 32;
+  // Keep the host podium and player winner consistent; compact list cards
+  // use a smaller badge so more of each drawing remains visible.
+  const scoreHeight = variant === "host" || isWinner ? 20 : 16;
 
   return (
     <article className={className}>
@@ -45,7 +47,7 @@ export function SubmissionCard({
 
         {result && (
           <div className={styles.scoreBadge}>
-            <GameScore score={result.score} height={scoreHeight} />
+            <GameScore score={result.score} rank={result.rank} height={scoreHeight} />
           </div>
         )}
       </div>

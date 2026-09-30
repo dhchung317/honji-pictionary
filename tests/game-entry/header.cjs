@@ -39,3 +39,35 @@ test("quit appears only in the host results header",()=>{
   assert.match(html,/honji-wordmark.svg/);
  }
 });
+
+test("score medals follow rank rather than score thresholds, with ribbons only for the podium",()=>{
+ const {GameScore}=component("src/components/GameScore/GameScore.tsx");
+ for (const [rank, expected] of [[1,"gold"],[2,"silver"],[3,"bronze"],[4,"burst"],[10,"burst"]]) {
+  const html=renderToStaticMarkup(React.createElement(GameScore,{score:100,rank}));
+  assert.match(html,new RegExp(`game-score--${expected}`));
+  assert.equal(html.includes('class="game-score__ribbon"'),rank<=3);
+  assert.match(html,new RegExp(`rank ${rank}, score 100`));
+  assert.match(html,/score-font\/1.png/);
+ }
+ const lowWinner=renderToStaticMarkup(React.createElement(GameScore,{score:0,rank:1}));
+ assert.match(lowWinner,/game-score--gold/);
+ assert.match(lowWinner,/score-font\/0.png/);
+});
+test("submission cards pass awarded rank into their score badge",()=>{
+ const {SubmissionCard}=component("src/components/SubmissionCard/SubmissionCard.tsx", {
+  "../GameScore/GameScore":{GameScore:({score,rank})=>React.createElement("span",null,`rank:${rank},score:${score}`)}
+ });
+ const html=renderToStaticMarkup(React.createElement(SubmissionCard,{submission:{id:"s",playerName:"Artist",imageUrl:"/test-img/cat.png"},result:{rank:2,score:90}}));
+ assert.match(html,/rank:2,score:90/);
+});
+
+test("score numeral thresholds change independently of medal rank",()=>{
+ const {GameScore}=component("src/components/GameScore/GameScore.tsx");
+ for (const [score,color] of [[0,"bronze"],[49,"bronze"],[50,"silver"],[74,"silver"],[75,"gold"],[100,"gold"]]) {
+  for (const [rank,medal] of [[1,"gold"],[2,"silver"],[3,"bronze"],[4,"burst"]]) {
+   const html=renderToStaticMarkup(React.createElement(GameScore,{score,rank}));
+   assert.match(html,new RegExp(`game-score--${medal}`));
+   assert.match(html,new RegExp(`game-score__number--${color}`));
+  }
+ }
+});
