@@ -13,7 +13,10 @@ export async function registerPlayer(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ roomId, name }),
   });
-  if (!res.ok) throw new Error("Failed to join room");
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(typeof body?.error === "string" ? body.error : "Failed to join room");
+  }
   const player = await res.json();
   localStorage.setItem(`playerSession:${roomId}`, player.sessionToken);
   return player;

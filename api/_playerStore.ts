@@ -18,7 +18,8 @@ export async function upsertPlayer(
   while (
     await kv.get<string>(playerNameKey(roomId, displayName.toLowerCase()))
   ) {
-    displayName = `${trimmed} ${suffix}`;
+    const suffixText = ` ${suffix}`;
+    displayName = `${trimmed.slice(0, 15 - suffixText.length)}${suffixText}`;
     suffix++;
   }
 
