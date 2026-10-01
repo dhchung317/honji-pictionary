@@ -71,3 +71,12 @@ test("score numeral thresholds change independently of medal rank",()=>{
   }
  }
 });
+
+test("result image and frame explicitly preserve the natural image ratio",()=>{
+ const {SubmissionCard}=component("src/components/SubmissionCard/SubmissionCard.tsx", {
+  "../GameScore/GameScore":{GameScore:()=>null}
+ });
+ const html=renderToStaticMarkup(React.createElement(SubmissionCard,{submission:{id:"s",playerName:"Artist",imageUrl:"/drawing.png"},result:{rank:1,score:89},variant:"host"}));
+ assert.match(html,/class="imageFrame" style="aspect-ratio:1"/);
+ assert.match(html,/class="submissionImage" style="width:100%;height:auto;aspect-ratio:1"/);
+});
