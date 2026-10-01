@@ -1,3 +1,4 @@
+import { useState, type CSSProperties } from "react";
 import { Submission } from "../../../shared/submission";
 import { PlayerScore } from "../../../shared/roundscore";
 
@@ -17,6 +18,7 @@ export function SubmissionCard({
   variant = "default",
 }: SubmissionCardProps) {
   const isWinner = result?.rank === 1;
+  const [imageRatio, setImageRatio] = useState(1);
 
   const className = [
     styles.submissionCard,
@@ -31,7 +33,7 @@ export function SubmissionCard({
   const scoreHeight = variant === "host" || isWinner ? 20 : 16;
 
   return (
-    <article className={className}>
+    <article className={className} style={{ "--image-ratio": imageRatio } as CSSProperties}>
       <div className={styles.submissionHeader}>
         <span>{submission.playerName}</span>
 
@@ -39,10 +41,18 @@ export function SubmissionCard({
       </div>
 
       <div className={styles.imageContainer}>
+        <div className={styles.imageFrame} style={{ aspectRatio: imageRatio }}>
         <img
           className={styles.submissionImage}
+          style={{ width: "100%", height: "auto", aspectRatio: imageRatio }}
           src={submission.imageUrl}
           alt={`Submission from ${submission.playerName}`}
+          onLoad={event => {
+            const image = event.currentTarget;
+            if (image.naturalWidth && image.naturalHeight) {
+              setImageRatio(image.naturalWidth / image.naturalHeight);
+            }
+          }}
         />
 
         {result && (
@@ -50,6 +60,7 @@ export function SubmissionCard({
             <GameScore score={result.score} rank={result.rank} height={scoreHeight} />
           </div>
         )}
+        </div>
       </div>
 
       {result?.note && (

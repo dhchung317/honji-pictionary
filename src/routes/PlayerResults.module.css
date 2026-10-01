@@ -3,8 +3,8 @@
 .header { flex-shrink: 0; display: flex; justify-content: center; }
 .title { font-size: clamp(1.1rem, 3dvh, 1.75rem); font-weight: 900; padding: 0.15rem 1rem; background: #00c879; border: 2px solid var(--ink); transform: rotate(-2deg); }
 .resultsLayout { flex: 1; min-height: 0; min-width: 0; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(0.5rem, 2vw, 2rem); }
-.winnerSection { display: flex; justify-content: center; min-height: 0; min-width: 0; padding: 0.5rem; }
-.winnerSection > * { height: 100%; width: 100%; max-width: 34rem; }
+.winnerSection { container-type: size; display: flex; align-items: center; justify-content: center; min-height: 0; min-width: 0; padding: 0.5rem; }
+.winnerSection > * { height: auto; max-width: 34rem; }
 /* This is the only scrolling region; the winner stays in view. */
 .submissionsSection { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 1rem; border: 2px solid var(--ink); border-radius: 0.8rem; background: #fffdf466; }
 .desktopSubmissions { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 1rem; padding: 0.25rem; }
