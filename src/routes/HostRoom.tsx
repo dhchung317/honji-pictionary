@@ -6,6 +6,7 @@ import { Player } from "../../shared/player";
 import { GameErrorPage } from "../components/GameError";
 
 import { useAsync } from "../hooks/useAsync";
+import { useCountdown } from "../hooks/useCountdown";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 
 import { getPlayersByRoom } from "../lib/playersApi";
@@ -48,6 +49,7 @@ function HostRoom() {
   const isDrawing = round?.status === "DRAWING";
   const isScoring = round?.status === "SCORING";
   const isDone = round?.status === "DONE";
+  const { secondsLeft } = useCountdown(isDrawing ? round?.roundEndAt ?? null : null);
 
   /* ---------- Players ---------- */
 
@@ -204,7 +206,15 @@ function HostRoom() {
 
           {isDrawing && (
             <div className={styles.roundContent}>
-              <p className={styles.promptLabel}>Draw</p>
+              <div className={styles.roundHeading}>
+                <p className={styles.promptLabel}>Draw</p>
+                {secondsLeft !== null && (
+                  <div className={styles.timer} role="timer" aria-label="Drawing time remaining">
+                    <span className={styles.timerLabel}>Time left</span>
+                    <span>{Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, "0")}</span>
+                  </div>
+                )}
+              </div>
               <p className={styles.prompt}>{round.prompt}</p>
 
               <div className={styles.roundPlayers}>
