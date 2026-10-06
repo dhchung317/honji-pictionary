@@ -1,4 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useAsyncAction } from "../hooks/useAsyncAction";
+import { nextRound, quit } from "../lib/roomsApi";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { GameErrorPage } from "../components/GameError";
 import { SubmissionCard } from "../components/SubmissionCard/SubmissionCard";
@@ -18,6 +20,22 @@ const USE_DUMMY_DATA = false;
 
 function Results() {
   const { roomId } = useParams<{ roomId: string }>();
+  const navigate = useNavigate();
+  const { run: replay, loading: replayBusy, error: replayError } = useAsyncAction(async () => {
+    if (!roomId) return;
+    await nextRound(roomId);
+    navigate(`/host/${roomId}`, { replace: true });
+  });
+  const { run: home, loading: homeBusy, error: homeError } = useAsyncAction(async () => {
+    if (!roomId) return;
+    await quit(roomId);
+    navigate("/", { replace: true });
+  });
+  const actions = <div className={styles.replayActions}>
+    <button type="button" onClick={() => void replay()} disabled={replayBusy || homeBusy}>{replayBusy ? "Opening lobby…" : "Play another round"}</button>
+    <button type="button" onClick={() => void home()} disabled={replayBusy || homeBusy}>{homeBusy ? "Closing room…" : "Back to home"}</button>
+    {(replayError || homeError) && <p role="alert">{(replayError || homeError)?.message}</p>}
+  </div>;
 
   const { data, loading, error } = useAsync(async () => {
     if (USE_DUMMY_DATA) {
@@ -29,6 +47,11 @@ function Results() {
     }
 
     const roomState = await getRoom(roomId);
+
+    if (roomState.room.status === "LOBBY") {
+      navigate(`/host/${roomId}`, { replace: true });
+      return [];
+    }
 
     if (!roomState.round) {
       throw new Error("NO_CURRENT_ROUND");
@@ -61,6 +84,7 @@ function Results() {
           <h1>Results</h1>
 
           <p>No submissions yet.</p>
+          {actions}
 
 
         </section>
@@ -84,6 +108,7 @@ function Results() {
 
         </header>
 
+        {actions}
         <div className={styles.resultsLayout}>
           {winner && (
             <section className={styles.winnerSection}>

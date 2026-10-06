@@ -155,7 +155,7 @@ function JoinRoom() {
     const role = getViewerRole(room);
 
     if (role === "PLAYER") {
-      navigate(`/room/${roomId}/playerresults`, {
+      navigate(`/room/${roomId}/playerresults?round=${round?.id ?? ""}`, {
         replace: true,
       });
     } else {

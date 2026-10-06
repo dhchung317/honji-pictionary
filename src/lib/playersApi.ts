@@ -53,3 +53,16 @@ export async function updatePlayerAvatar(
 
   return res.json();
 }
+
+async function playerAction(roomId: string, action: "replay-player" | "leave-room", roundId?: string) {
+  const playerId = sessionStorage.getItem(`playerId:${roomId}`);
+  const res = await fetch(`/api/${action}`, { method: "POST", headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "PLAYER") }, body: JSON.stringify({ roomId, playerId, roundId }) });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error || "Unable to update your room.");
+  return body as { waitingForHost?: boolean };
+}
+export const replayPlayer = (roomId: string, roundId: string) => playerAction(roomId, "replay-player", roundId);
+export async function leaveRoom(roomId: string) {
+  await playerAction(roomId, "leave-room");
+  for (const key of ["playerId", "playerName", "playerSession", "submittedRound", "replayRound"]) sessionStorage.removeItem(`${key}:${roomId}`);
+}

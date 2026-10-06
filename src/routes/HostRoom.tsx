@@ -48,7 +48,7 @@ function HostRoom() {
   const isLobby = room?.status === "LOBBY";
   const isDrawing = round?.status === "DRAWING";
   const isScoring = round?.status === "SCORING";
-  const isDone = round?.status === "DONE";
+  const isDone = room?.status === "DONE" && round?.status === "DONE";
   const { secondsLeft } = useCountdown(isDrawing ? round?.roundEndAt ?? null : null);
 
   /* ---------- Players ---------- */
@@ -111,7 +111,7 @@ function HostRoom() {
     const role = getViewerRole(room);
 
     if (role === "PLAYER") {
-      navigate(`/room/${roomId}/playerresults`, { replace: true });
+      navigate(`/room/${roomId}/playerresults?round=${round?.id ?? ""}`, { replace: true });
     } else {
       navigate(`/room/${roomId}/results`, { replace: true });
     }

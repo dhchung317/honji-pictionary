@@ -191,14 +191,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Waiting-room polling does not mutate anything. Taking the start lock
     // here lets ordinary player polls reject the host's Start Round action.
     if (snapshot.status === "LOBBY") {
-      const round = snapshot.currentRoundId ? await getRound(snapshot.id, snapshot.currentRoundId) : null;
-      return res.status(200).json({ room: snapshot, round });
+      return res.status(200).json({ room: snapshot, round: null });
     }
 
     release = await acquireRoomMutation(roomId);
     if (!release) {
-      const round = snapshot.currentRoundId ? await getRound(snapshot.id, snapshot.currentRoundId) : null;
-      return res.status(200).json({ room: snapshot, round });
+      return res.status(200).json({ room: snapshot, round: null });
     }
 
     const room = await getRoomById(roomId);

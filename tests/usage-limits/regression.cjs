@@ -34,6 +34,8 @@ test("limits reject over-budget requests and fail closed if Redis is unavailable
 test("join permits 15 characters, rejects 16, and displays room-full API errors",async()=>{
  let full=false;
  const handler=load("api/join-room.ts",{
+  "./_mutationLock.js":{acquireRoomMutation:async()=>async()=>{}},
+  "./_deferredResponse.js":{deferJsonResponse:()=>()=>{}},
   "./_session.js":{issueSession:async()=>"token"},"./_limits.js":{allowRequest:async()=>true},
   "./_roomStore.js":{getRoomById:async()=>({id:"ABCD",status:"LOBBY"})},
   "./_playerStore.js":{upsertPlayer:async()=>{if(full)throw Error("ROOM_FULL");return {id:"p"};}}

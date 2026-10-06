@@ -35,6 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!await authorize(req, res, { role: "HOST", roomId: room.id, id: room.hostId })) return;
+    if (room.closed) return res.status(409).json({ error: "Room closed" });
     if (room.status !== "LOBBY" && room.status !== "SCORING_FAILED") return res.status(400).json({ error: "Round already started" });
     if (!await allowRequest(req, res, "start", 6, 3600, roomId)) return;
     if (!await allowRequest(req, res, "start-global", 100, 3600, "global")) return;
@@ -53,6 +54,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
 
+    const entrants = await listPlayers(roomId);
+    if (entrants.length === 0) return res.status(409).json({ error: "Wait for at least one player to join." });
     const { prompt } = await genPrompt({ history: room.promptHistory });
 
     const players = await listPlayers(roomId);

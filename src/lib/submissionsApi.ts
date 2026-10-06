@@ -18,9 +18,10 @@ export async function createSubmission(input: {
 
 export async function getSubmissionsByRoom(
   roomId: string,
+  roundId?: string,
 ): Promise<Submission[]> {
   const res = await fetch(
-    `/api/get-submissions?roomId=${encodeURIComponent(roomId)}`,
+    `/api/get-submissions?roomId=${encodeURIComponent(roomId)}${roundId ? `&round=${encodeURIComponent(roundId)}` : ""}`,
   );
   if (!res.ok) throw new Error("Failed to get submissions");
   return res.json();

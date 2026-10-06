@@ -4,4 +4,5 @@ export interface Player {
   name: string;
   joinedAt: string;
   avatarUrl?: string;
+  replayRoundId?: string;
 }
