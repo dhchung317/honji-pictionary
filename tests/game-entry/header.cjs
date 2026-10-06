@@ -32,10 +32,10 @@ test("home exposes hosting without a name and joining with required name/code",(
  assert.ok(!html.includes('href="/join"'));
 });
 
-test("quit appears only in the host results header",()=>{
+test("room-ending controls live in results rather than the shared header",()=>{
  for (const route of ["/room/ABCD/results", "/room/ABCD/playerresults", "/host/ABCD"]) {
   const html=renderToStaticMarkup(React.createElement(StaticRouter,{location:route},React.createElement(GameHeader)));
-  assert.equal(html.includes(">Quit</button>"), route.endsWith("/results"));
+  assert.equal(html.includes(">Quit</button>"), false);
   assert.match(html,/honji-wordmark.svg/);
  }
 });

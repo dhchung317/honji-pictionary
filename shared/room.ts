@@ -8,5 +8,7 @@ export interface Room {
   currentRoundId: string | null;
   drawingDurationMs: number;
   promptHistory: string[]; // optional but recommended
+  replayFromRoundId?: string;
+  closed?: boolean;
   theme: string | null; // optional: "animals", "food", etc.
 }

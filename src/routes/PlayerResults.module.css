@@ -21,3 +21,8 @@
   .desktopSubmissions { container-type: normal; height: auto; grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 0; }
   .desktopSubmissions > * { height: auto; }
 }
+
+.replayActions { flex-shrink: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; padding: 0.3rem; }
+.replayActions button { font-size: 0.85rem; }
+.replayActions button:first-child { background: #00c879; }
+.replayActions p { width: 100%; text-align: center; font-size: 0.85rem; }

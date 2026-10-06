@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!await authorize(req, res, { role: "HOST", roomId: room.id, id: room.hostId })) return;
 
-  const updated = { ...room, status: "DONE" as const };
+  const updated = { ...room, status: "DONE" as const, closed: true };
   await saveRoom(updated);
 
   await expireRoom(roomId, 60);
