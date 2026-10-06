@@ -9,7 +9,15 @@
 .submissionsGrid { height: 86%; container-type: size; align-items: center; justify-items: center; width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(0.5rem, 2vw, 1.5rem); min-height: 0; }
 .submissionsGrid > * { min-height: 0; height: 100%; }
 .emptyState { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; text-align: center; }
-@media (max-width: 48rem) and (min-height: 501px) {
-  .resultsLayout { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1.1fr) minmax(0, 1fr); }
-  .winnerSection > * { max-width: 100%; }
+/* Mobile results follow their content in one scrolling page. */
+@media (max-width: 48rem) {
+  .page { overflow-y: auto; overscroll-behavior: contain; }
+  .results { height: auto; }
+  .resultsLayout { flex: none; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+  .winnerSection { container-type: normal; align-items: flex-start; padding: 0; }
+  .winnerSection > * { width: 100%; max-width: 100%; height: auto; }
+  .submissionsSection { overflow: visible; scrollbar-gutter: auto; padding: 0; border: 0; background: none; }
+  .submissionsSection:has(.submissionsGrid:empty) { display: none; }
+  .submissionsGrid { container-type: normal; height: auto; grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 0; }
+  .submissionsGrid > * { height: auto; }
 }
