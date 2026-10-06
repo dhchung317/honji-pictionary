@@ -182,3 +182,28 @@
   .logo { width: min(100%, 24dvh); margin-top: -0.3rem; margin-bottom: -0.8rem; }
   .title { -webkit-text-stroke-width: 3px; }
 }
+
+/* A small card-edge tab opens instructions without shifting the entry form. */
+.card { position: relative; }
+.instructionsTab { position: absolute; top: 0.5rem; right: 1rem; z-index: 3; display: flex; align-items: center; gap: 0.4rem; min-height: 2rem; padding: 0.3rem 0.6rem; border-radius: 0.4rem; background: #75ccff; font-size: 0.7rem; font-weight: 850; box-shadow: 2px 2px 0 var(--ink); }
+.instructionsTab span { display: grid; place-items: center; width: 1rem; height: 1rem; border: 1px solid var(--ink); border-radius: 50%; font-size: 0.7rem; }
+.instructionsModal { width: min(38rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); margin: auto; padding: clamp(1rem, 3vw, 2rem); overflow-y: auto; overscroll-behavior: contain; border: 3px solid var(--ink); border-radius: 1rem; background: var(--paper); color: var(--ink); box-shadow: 6px 6px 0 var(--ink); }
+.instructionsModal::backdrop { background: #161616b8; }
+.instructionsHeader { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.instructionsHeader h2 { margin: 0; font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 900; letter-spacing: -0.04em; }
+.closeInstructions { flex-shrink: 0; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; background: #ff4b51; font-size: 1.5rem; line-height: 1; box-shadow: 2px 2px var(--ink); }
+.instructionsIntro { margin: 1rem 0; color: #4b4a43; font-size: 0.9rem; }
+.screenTip { padding: 0.85rem 1rem; border: 2px solid var(--ink); border-radius: 0.6rem; background: #fff3ad; }
+.screenTip strong { display: block; margin-bottom: 0.3rem; font-size: 0.9rem; }
+.screenTip p, .playSteps p { margin: 0.25rem 0 0; font-size: 0.85rem; line-height: 1.5; }
+.playSteps { display: grid; gap: 1rem; margin: 1.25rem 0; padding-left: 1.5rem; }
+.playSteps li { padding-left: 0.3rem; }
+.playSteps li::marker { color: #007bc6; font-weight: 900; }
+.playSteps strong { font-size: 0.95rem; }
+.instructionsNote { padding-top: 0.8rem; border-top: 1px solid #d3cec0; font-size: 0.8rem; color: #4b4a43; }
+.gotItButton { width: 100%; margin-top: 1rem; background: #00c879; }
+
+/* Reserve room for the tab and keep tall cards reachable on short screens. */
+.page { overflow-y: auto; justify-content: safe center; }
+.card { flex-shrink: 0; }
+.hero { padding-top: 1.75rem; }
