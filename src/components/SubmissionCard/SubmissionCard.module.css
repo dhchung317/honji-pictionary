@@ -49,3 +49,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Portrait and landscape phones use content height instead of podium sizing. */
+@media (max-width: 48rem) {
+  .submissionCard:is(.hostCard, .winnerCard) { width: 100%; height: auto; }
+}
