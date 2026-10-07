@@ -15,7 +15,9 @@ export async function registerPlayer(
   });
   if (!res.ok) {
     const body = await res.json().catch(() => null);
-    throw new Error(typeof body?.error === "string" ? body.error : "Failed to join room");
+    throw new Error(
+      typeof body?.error === "string" ? body.error : "Failed to join room",
+    );
   }
   const player = await res.json();
   sessionStorage.setItem(`playerSession:${roomId}`, player.sessionToken);
@@ -54,22 +56,62 @@ export async function updatePlayerAvatar(
   return res.json();
 }
 
-async function playerAction(roomId: string, action: "replay-player" | "leave-room", roundId?: string) {
+async function playerAction(
+  roomId: string,
+  action: "replay-player" | "leave-room",
+  roundId?: string,
+) {
   const playerId = sessionStorage.getItem(`playerId:${roomId}`);
-  const res = await fetch(`/api/${action}`, { method: "POST", headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "PLAYER") }, body: JSON.stringify({ roomId, playerId, roundId }) });
+  const res = await fetch(`/api/${action}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...sessionHeaders(roomId, "PLAYER"),
+    },
+    body: JSON.stringify({ roomId, playerId, roundId }),
+  });
   const body = await res.json();
   if (!res.ok) throw new Error(body.error || "Unable to update your room.");
   return body as { waitingForHost?: boolean };
 }
-export const replayPlayer = (roomId: string, roundId: string) => playerAction(roomId, "replay-player", roundId);
+export const replayPlayer = (roomId: string, roundId: string) =>
+  playerAction(roomId, "replay-player", roundId);
 export async function leaveRoom(roomId: string) {
   await playerAction(roomId, "leave-room");
-  for (const key of ["playerId", "playerName", "playerSession", "submittedRound", "replayRound"]) sessionStorage.removeItem(`${key}:${roomId}`);
+  for (const key of [
+    "playerId",
+    "playerName",
+    "playerSession",
+    "submittedRound",
+    "replayRound",
+  ])
+    sessionStorage.removeItem(`${key}:${roomId}`);
 }
 
-export async function setPlayerReady(roomId: string, ready: boolean, lobbyVersion: number) {
-  const res = await fetch("/api/set-ready", { method: "POST", headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "PLAYER") }, body: JSON.stringify({ roomId, playerId: sessionStorage.getItem(`playerId:${roomId}`), ready, lobbyVersion }) });
+export class RoundStartingError extends Error {}
+
+export async function setPlayerReady(
+  roomId: string,
+  ready: boolean,
+  lobbyVersion: number,
+) {
+  const res = await fetch("/api/set-ready", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...sessionHeaders(roomId, "PLAYER"),
+    },
+    body: JSON.stringify({
+      roomId,
+      playerId: sessionStorage.getItem(`playerId:${roomId}`),
+      ready,
+      lobbyVersion,
+    }),
+  });
   const body = await res.json();
-  if (!res.ok) throw new Error(body.error || "Unable to change readiness.");
+  if (!res.ok) {
+    if (body.code === "ROUND_STARTING") throw new RoundStartingError(body.error);
+    throw new Error(body.error || "Unable to change readiness.");
+  }
   return body as { ready: boolean; autoStartAt: string | null };
 }

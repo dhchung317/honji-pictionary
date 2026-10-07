@@ -5,7 +5,7 @@ import { allowRequest } from "./_limits.js";
 import { acquireRoomMutation } from "./_mutationLock.js";
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { getRoomById, saveRoom } from "./_roomStore.js";
-import { listPlayers } from "./_playerStore.js";
+import { listPlayers, savePlayer } from "./_playerStore.js";
 import { Room } from "../shared/room.js";
 import { genPrompt } from "./_aiGeneratePrompt.js";
 import { getRound, saveRound } from "./_roundStore.js";
@@ -28,6 +28,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(409).json({ error: "Room update in progress" });
   }
   const flush = deferJsonResponse(res);
+  let startingRoom: Room | null = null;
   try {
     const room = await getRoomById(roomId);
 
@@ -35,16 +36,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(404).json({ error: "Room not found" });
     }
 
-    if (!await authorize(req, res, { role: "HOST", roomId: room.id, id: room.hostId })) return;
+    if (
+      !(await authorize(req, res, {
+        role: "HOST",
+        roomId: room.id,
+        id: room.hostId,
+      }))
+    )
+      return;
     if (room.closed) return res.status(409).json({ error: "Room closed" });
-    if (room.status !== "LOBBY" && room.status !== "SCORING_FAILED") return res.status(400).json({ error: "Round already started" });
-    if (!await allowRequest(req, res, "start", 6, 3600, roomId)) return;
-    if (!await allowRequest(req, res, "start-global", 100, 3600, "global")) return;
+    if (room.status !== "LOBBY" && room.status !== "SCORING_FAILED")
+      return res.status(400).json({ error: "Round already started" });
+    if (!(await allowRequest(req, res, "start", 6, 3600, roomId))) return;
+    if (!(await allowRequest(req, res, "start-global", 100, 3600, "global")))
+      return;
 
     if (room.status === "SCORING_FAILED" && room.currentRoundId) {
       const round = await getRound(room.id, room.currentRoundId);
       if (!round) return res.status(404).json({ error: "Round not found" });
-      await saveRound({ ...round, status: "SCORING", scoringAttempts: 0, scoringRetryAt: 0 });
+      await saveRound({
+        ...round,
+        status: "SCORING",
+        scoringAttempts: 0,
+        scoringRetryAt: 0,
+      });
       const updated: Room = { ...room, status: "SCORING" };
       await saveRoom(updated);
       return res.status(200).json(updated);
@@ -54,15 +69,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Round already started" });
     }
 
-
     const entrants = await listPlayers(roomId);
     if (req.body?.autoStart === true) {
       const current = await syncLobbyCountdown(room);
-      if ((room.lobbyVersion ?? 0) !== req.body.lobbyVersion || !current.autoStartAt || Date.parse(current.autoStartAt) > Date.now() || entrants.length === 0 || !entrants.every(player => player.ready === true)) {
-        return res.status(409).json({ error: "Automatic start was cancelled or is not due yet." });
+      if (
+        (room.lobbyVersion ?? 0) !== req.body.lobbyVersion ||
+        !current.autoStartAt ||
+        Date.parse(current.autoStartAt) > Date.now() ||
+        entrants.length === 0 ||
+        !entrants.every((player) => player.ready === true)
+      ) {
+        return res
+          .status(409)
+          .json({ error: "Automatic start was cancelled or is not due yet." });
       }
     }
-    if (entrants.length === 0) return res.status(409).json({ error: "Wait for at least one player to join." });
+    if (entrants.length === 0)
+      return res
+        .status(409)
+        .json({ error: "Wait for at least one player to join." });
+    startingRoom = { ...room, status: "STARTING", autoStartAt: null };
+    await saveRoom(startingRoom);
     const { prompt } = await genPrompt({ history: room.promptHistory });
 
     const players = await listPlayers(roomId);
@@ -97,8 +124,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(200).json(updated);
   } catch (err) {
     console.error("[start-round] error", err);
+    if (startingRoom) {
+      // Require fresh readiness after a failed start instead of restarting in a loop.
+      for (const player of await listPlayers(roomId))
+        await savePlayer({ ...player, ready: false });
+      await saveRoom({
+        ...startingRoom,
+        status: "LOBBY",
+        lobbyVersion: (startingRoom.lobbyVersion ?? 0) + 1,
+        autoStartAt: null,
+      });
+    }
     res.status(500).json({ error: "Failed to start round" });
   } finally {
-    try { await release(); } finally { flush(); }
+    try {
+      await release();
+    } finally {
+      flush();
+    }
   }
 }
