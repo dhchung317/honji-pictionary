@@ -176,6 +176,9 @@ function HostRoom() {
         />
       );
       break;
+    case "STARTING":
+      content = <GameLoading inline message="Starting round…" />;
+      break;
     case "DRAWING":
       content = round ? (
         <HostDrawingView

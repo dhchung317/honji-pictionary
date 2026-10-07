@@ -1,4 +1,10 @@
-export type RoomStatus = "LOBBY" | "DRAWING" | "SCORING" | "SCORING_FAILED" | "DONE";
+export type RoomStatus =
+  | "LOBBY"
+  | "STARTING"
+  | "DRAWING"
+  | "SCORING"
+  | "SCORING_FAILED"
+  | "DONE";
 
 export interface Room {
   id: string;

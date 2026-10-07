@@ -221,6 +221,9 @@ function JoinRoom() {
 
   let content;
   switch (view) {
+    case "STARTING":
+      content = <GameLoading inline message="Starting round…" />;
+      break;
     case "DRAWING":
       content = hasSubmitted ? (
         <GameLoading

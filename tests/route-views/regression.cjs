@@ -115,7 +115,7 @@ test("closed and lobby phases take precedence over stale round status", () => {
     "CLOSED",
   );
 });
-for (const status of ["SCORING", "SCORING_FAILED", "LOBBY", "DONE"]) {
+for (const status of ["STARTING", "SCORING", "SCORING_FAILED", "LOBBY", "DONE"]) {
   test(`player canvas is absent during ${status}`, () => {
     assert.ok(
       !types(render("JoinRoom", status).tree).includes("PlayerDrawing"),
@@ -151,4 +151,35 @@ test("round phase wins when polling catches a room transition between writes", (
     getRoomView({ room: { status: "DRAWING" }, round: { status: "SCORING" } }),
     "SCORING",
   );
+});
+
+test("starting takes precedence over previous completed round", () => {
+  assert.equal(getRoomView({room: {status: "STARTING"}, round: {status: "DONE"}}), "STARTING");
+});
+test("host and player show starting message", () => {
+  for (const route of ["HostRoom", "JoinRoom"]) {
+    const tree = render(route, "STARTING").tree;
+    assert.ok(types(tree).includes("Loading"));
+    assert.ok(!types(tree).includes("PlayerDrawing"));
+    assert.ok(!types(tree).includes("HostLobby"));
+  }
+});
+
+test("avatar readiness is disabled during starting and shows pending confirmation", () => {
+  const { PlayerAvatarView } = load("src/routes/views/PlayerAvatarView.tsx", {
+    "../../components/DrawingCanvas/DrawingCanvas": { default: "AvatarCanvas" },
+  });
+  function buttons(tree) {
+    if (!tree || typeof tree !== "object") return [];
+    if (Array.isArray(tree)) return tree.flatMap(buttons);
+    return [...(tree.type === "button" ? [tree] : []), ...buttons(tree.props?.children)];
+  }
+  const props = { room: {status: "LOBBY"}, avatarCanvasRef: {current: null}, isReady: true };
+  const starting = buttons(PlayerAvatarView({...props, isStarting: true})).find(b => "aria-pressed" in b.props);
+  assert.equal(starting.props.disabled, true);
+  assert.equal(starting.props.children, "Starting…");
+  const pending = buttons(PlayerAvatarView({...props, readyBusy: true})).find(b => "aria-pressed" in b.props);
+  assert.equal(pending.props.disabled, true);
+  assert.equal(pending.props.children, "Updating…");
+  assert.equal(pending.props["aria-pressed"], true);
 });

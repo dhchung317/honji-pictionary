@@ -6,7 +6,7 @@ import { GameErrorPage } from "../components/GameError";
 import { GameLoading } from "../components/GameLoading/GameLoading";
 import { useAsync } from "../hooks/useAsync";
 import { useCountdown } from "../hooks/useCountdown";
-import { getPlayersByRoom, setPlayerReady } from "../lib/playersApi";
+import { getPlayersByRoom, setPlayerReady, RoundStartingError } from "../lib/playersApi";
 import { getRoom } from "../lib/roomsApi";
 import { upload } from "@vercel/blob/client";
 import { useAsyncAction } from "../hooks/useAsyncAction";
@@ -21,6 +21,7 @@ function PlayerLobby() {
   const { roomId } = useParams<{ roomId: string }>();
   const [hasAvatar, setHasAvatar] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [startingVersion, setStartingVersion] = useState<number | null>(null);
   const expectedReady = useRef<boolean | null>(null);
 
   const avatarCanvasRef = useRef<DrawingCanvasHandle | null>(null);
@@ -102,6 +103,9 @@ function PlayerLobby() {
     roomStatus === "LOBBY" ? (room?.autoStartAt ?? null) : null,
   );
   useEffect(() => {
+    expectedReady.current = null;
+  }, [room?.lobbyVersion]);
+  useEffect(() => {
     const me = roomState?.players.find(
       (player) => player.id === sessionStorage.getItem(`playerId:${roomId}`),
     );
@@ -117,11 +121,24 @@ function PlayerLobby() {
     error: readyError,
   } = useAsyncAction(async () => {
     if (!roomId || !room) return;
-    const reply = await setPlayerReady(
-      roomId,
-      !isReady,
-      room.lobbyVersion ?? 0,
-    );
+    if (
+      room.status !== "LOBBY" ||
+      startingVersion === (room.lobbyVersion ?? 0)
+    ) return;
+    let reply;
+    try {
+      reply = await setPlayerReady(
+        roomId,
+        !isReady,
+        room.lobbyVersion ?? 0,
+      );
+    } catch (error) {
+      if (error instanceof RoundStartingError) {
+        setStartingVersion(room.lobbyVersion ?? 0);
+        return;
+      }
+      throw error;
+    }
     expectedReady.current = reply.ready;
     setIsReady(reply.ready);
   });
@@ -129,7 +146,10 @@ function PlayerLobby() {
   /* ---------- Keep the lobby limited to waiting rooms ---------- */
 
   useEffect(() => {
-    if (!roomId || !roomStatus || room?.closed || roomStatus === "LOBBY")
+    if (
+      !roomId || !roomStatus || room?.closed ||
+      roomStatus === "LOBBY" || roomStatus === "STARTING"
+    )
       return;
 
     const destination =
@@ -162,7 +182,7 @@ function PlayerLobby() {
     return <PhaseMessageView message="The host has closed this room." />;
 
   // Avoid mounting the avatar canvas while the navigation effect runs.
-  if (room.status !== "LOBBY") {
+  if (room.status !== "LOBBY" && room.status !== "STARTING") {
     return <GameLoading message="Opening your game..." />;
   }
 
@@ -181,6 +201,10 @@ function PlayerLobby() {
         toggleReady={toggleReady}
         isSubmittingAvatar={isSubmittingAvatar}
         hasAvatar={hasAvatar}
+        isStarting={
+          room.status === "STARTING" ||
+          startingVersion === (room.lobbyVersion ?? 0)
+        }
         readyBusy={readyBusy}
         isReady={isReady}
         readyError={readyError}

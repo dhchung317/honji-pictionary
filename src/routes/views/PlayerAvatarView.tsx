@@ -12,6 +12,7 @@ type Props = {
   toggleReady: () => unknown;
   isSubmittingAvatar: boolean;
   hasAvatar: boolean;
+  isStarting: boolean;
   readyBusy: boolean;
   isReady: boolean;
   readyError: Error | null;
@@ -25,6 +26,7 @@ export function PlayerAvatarView({
   toggleReady,
   isSubmittingAvatar,
   hasAvatar,
+  isStarting,
   readyBusy,
   isReady,
   readyError,
@@ -35,7 +37,9 @@ export function PlayerAvatarView({
       <section className={styles.avatarSection}>
         <div className={styles.avatarHeading}>
           <p className={styles.waiting}>
-            {room.autoStartAt
+            {isStarting
+              ? "Starting round…"
+              : room.autoStartAt
               ? `Everyone’s ready! Starting in ${Math.max(1, startSeconds ?? 5)}…`
               : "The round starts five seconds after everyone is ready."}
           </p>
@@ -58,7 +62,7 @@ export function PlayerAvatarView({
                 className={styles.submitButton}
                 type="button"
                 onClick={submitAvatar}
-                disabled={isSubmittingAvatar}
+                disabled={isStarting || isSubmittingAvatar}
               >
                 {isSubmittingAvatar
                   ? "Saving..."
@@ -80,9 +84,13 @@ export function PlayerAvatarView({
               type="button"
               aria-pressed={isReady}
               onClick={() => void toggleReady()}
-              disabled={readyBusy || isSubmittingAvatar}
+              disabled={isStarting || readyBusy || isSubmittingAvatar}
             >
-              {readyBusy ? "..." : isReady ? "Unready" : "Ready"}
+              {isStarting
+                ? "Starting…"
+                : readyBusy
+                  ? "Updating…"
+                  : isReady ? "Unready" : "Ready"}
             </button>
           </div>
         </div>
