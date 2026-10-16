@@ -4,9 +4,9 @@
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   padding: 0.2rem clamp(0.6rem, 3vw, 2rem);
-  border-bottom: 3px solid #161616;
-  background: #202431;
-  color: #fffdf4;
+  border-bottom: 3px solid var(--color-border);
+  background: var(--color-header);
+  color: var(--color-header-text);
   position: relative;
   z-index: 5;
 }
@@ -19,7 +19,7 @@
   height: auto;
 }
 .brand:focus-visible {
-  outline: 3px solid #008fff;
+  outline: 3px solid var(--color-spark-blue);
   outline-offset: 3px;
 }
 .room {
@@ -31,14 +31,14 @@
   line-height: 1;
 }
 .label {
-  color: #75ccff;
+  color: var(--color-blue);
   font-size: 0.55rem;
   font-weight: 850;
   text-transform: uppercase;
   letter-spacing: 0.2em;
 }
 .code {
-  color: #ffdb27;
+  color: var(--color-yellow);
   padding-left: 0.12em;
   font-family: var(--font-room-code);
   font-size: 1.3rem;
@@ -50,7 +50,7 @@
 .actions button {
   padding: 0.25rem 0.65rem;
   font-size: 0.8rem;
-  background: #ff4b51;
+  background: var(--color-red);
 }
 .error {
   position: absolute;
@@ -58,8 +58,13 @@
   right: 0.5rem;
   max-width: min(24rem, 90vw);
   padding: 0.5rem;
-  background: #fffdf4;
-  border: 2px solid #b81b30;
-  color: #981128;
+  background: var(--color-panel);
+  border: 2px solid var(--color-danger-border);
+  color: var(--color-danger);
   font-size: 0.85rem;
+}
+
+.themeControl {
+  grid-column: 3;
+  justify-self: end;
 }

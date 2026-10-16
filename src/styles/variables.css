@@ -1,20 +1,52 @@
 :root {
-  /* Colors */
-  --color-background: #f5f5f5;
-  --color-surface: #ffffff;
+  color-scheme: light;
 
-  --color-text: #1a1a1a;
-  --color-text-muted: #6b6b6b;
+  /* Theme surfaces and readable foregrounds. */
+  --color-page: #ffdb27;
+  --color-panel: #fffdf4;
+  --color-panel-muted: #f2eee0;
+  --color-input: #ffffff;
+  --color-text: #161616;
+  --color-text-muted: #4b4a43;
+  --color-placeholder: #77746a;
+  --color-border: #161616;
+  --color-divider: #d3cec0;
+  --color-shadow: #161616;
+  --color-primary: #007bc6;
+  --color-primary-hover: #005f99;
+  --color-focus: #007bc6;
+  --color-highlight-panel: #fff3ad;
+  --color-feedback: #75ccff33;
+  --color-results-well: #fffdf466;
+  --color-title-outline: #ffffff;
+  --color-pattern: #16161622;
+  --color-page-stripe: #fff7b8aa;
+  --color-danger: #981128;
+  --color-danger-border: #b81b30;
+  --color-danger-panel: #fff0f1;
+  --color-overlay: #161616b8;
 
-  --color-primary: #678093de;
-  --color-primary-hover: #636277ca;
-
-  --color-danger: #dc2626;
-
-  --color-border: #dedede;
-  --color-app-background: #faebdb;
-
-  --color-card-background: #ffffff42;
+  /* Bright controls and artwork stay consistent in both themes. */
+  --color-action-text: #161616;
+  --color-blue: #75ccff;
+  --color-green: #00c879;
+  --color-red: #ff4b51;
+  --color-yellow: #ffdb27;
+  --color-ready-selected: #fff3ad;
+  --color-spark-blue: #008fff;
+  --color-spark-green: #00be78;
+  --color-spark-red: #ff3547;
+  --color-header: #202431;
+  --color-header-text: #fffdf4;
+  --color-artwork-paper: #ffffff;
+  --color-artwork-ink: #161616;
+  --color-medal-blue-inner: #c9edff;
+  --color-medal-gold-inner: #fff3ad;
+  --color-medal-silver: #bccbd7;
+  --color-medal-silver-inner: #edf4fa;
+  --color-medal-bronze: #cd8751;
+  --color-medal-bronze-inner: #f4c89f;
+  --color-medal-shine: #fffdf4;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -37,4 +69,32 @@
   --font-room-code: "Atkinson Hyperlegible Mono", monospace;
 
   --font-size-h2: 2rem;
+}
+
+/* An explicit choice wins over the operating system preference. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-page: #171b2a;
+  --color-panel: #252c40;
+  --color-panel-muted: #202638;
+  --color-input: #1c2233;
+  --color-text: #fff8e8;
+  --color-text-muted: #c3c8d6;
+  --color-placeholder: #a9b2c5;
+  --color-border: #8793ad;
+  --color-divider: #4b5670;
+  --color-shadow: #0b0e17;
+  --color-primary: #75ccff;
+  --color-primary-hover: #b4e4ff;
+  --color-focus: #75ccff;
+  --color-highlight-panel: #3a3424;
+  --color-feedback: #75ccff18;
+  --color-results-well: #252c4080;
+  --color-title-outline: #252c40;
+  --color-pattern: #fff8e80d;
+  --color-page-stripe: #75ccff08;
+  --color-danger: #ffabb5;
+  --color-danger-border: #ed8295;
+  --color-danger-panel: #402533;
+  --color-overlay: #090c16cc;
 }

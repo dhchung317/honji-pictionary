@@ -6,9 +6,9 @@
   display: block;
   width: 100%;
   height: auto;
-  border: 3px solid var(--ink);
+  border: 3px solid var(--color-border);
   border-radius: 0.65rem;
-  box-shadow: 4px 4px var(--ink);
+  box-shadow: 4px 4px var(--color-shadow);
   touch-action: none;
-  background: white;
+  background: var(--color-artwork-paper);
 }

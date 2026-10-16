@@ -19,16 +19,16 @@
   gap: 1rem;
   max-width: 34rem;
   padding: 1.25rem;
-  background: var(--paper);
-  border: 3px solid var(--ink);
+  background: var(--color-panel);
+  border: 3px solid var(--color-border);
   border-radius: 1rem;
-  box-shadow: 5px 5px var(--ink);
+  box-shadow: 5px 5px var(--color-shadow);
 }
 .spinner {
   width: 2.5rem;
   height: 2.5rem;
-  border: 0.3rem solid #16161622;
-  border-top-color: #008fff;
+  border: 0.3rem solid var(--color-pattern);
+  border-top-color: var(--color-spark-blue);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

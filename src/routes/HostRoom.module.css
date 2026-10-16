@@ -294,14 +294,6 @@
   opacity: 0.65;
 }
 
-/* ---------- Light mode ---------- */
-
-/* @media (prefers-color-scheme: light) {
-  .avatar {
-    background: var(--color-surface-light);
-  }
-} */
-
 /* ---------- Mobile host layout ---------- */
 
 @media (max-width: 48rem) {
@@ -376,10 +368,10 @@
 }
 .lobbyCenter {
   padding: 0.5rem 1rem;
-  background: var(--paper);
-  border: 3px solid var(--ink);
+  background: var(--color-panel);
+  border: 3px solid var(--color-border);
   border-radius: 1rem;
-  box-shadow: 5px 5px var(--ink);
+  box-shadow: 5px 5px var(--color-shadow);
 }
 .stageTitle {
   font-size: clamp(1.2rem, 3dvh, 2rem);
@@ -393,12 +385,12 @@
   opacity: 1;
   font-weight: 850;
   padding: 0.15rem 0.65rem;
-  background: #00c879;
-  border: 2px solid var(--ink);
+  background: var(--color-green);
+  border: 2px solid var(--color-border);
   transform: rotate(-2deg);
 }
 .startButton {
-  background: #ff4b51;
+  background: var(--color-red);
 }
 .lobbyPlayer {
   width: min(6rem, 10vw, 15dvh);
@@ -408,18 +400,18 @@
   gap: 0.5rem;
 }
 .promptLabel {
-  background: #00c879;
+  background: var(--color-green);
   padding: 0.1rem 0.6rem;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--color-border);
   font-weight: 850;
   opacity: 1;
 }
 .prompt {
   padding: 0.5rem 1rem;
-  background: var(--paper);
-  border: 3px solid var(--ink);
+  background: var(--color-panel);
+  border: 3px solid var(--color-border);
   border-radius: 0.75rem;
-  box-shadow: 4px 4px var(--ink);
+  box-shadow: 4px 4px var(--color-shadow);
   font-size: clamp(1rem, 3dvh, 2rem);
 }
 .roundPlayers {
@@ -428,11 +420,11 @@
 }
 .roundPlayer {
   padding: 0.4rem;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--color-border);
   border-radius: 0.75rem;
-  background: var(--paper);
+  background: var(--color-panel);
   width: min(8rem, 14vw, 23dvh);
-  box-shadow: 3px 3px var(--ink);
+  box-shadow: 3px 3px var(--color-shadow);
 }
 .roundPlayer .playerName {
   font-size: 0.85rem;
@@ -505,10 +497,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.15rem 0.65rem;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--color-border);
   border-radius: 0.4rem;
-  background: #ff4b51;
-  color: var(--ink);
+  background: var(--color-red);
+  color: var(--color-action-text);
   font-family: var(--font-room-code);
   font-size: clamp(1rem, 2.5dvh, 1.4rem);
   font-weight: 850;
@@ -531,7 +523,12 @@
 .readyStatus {
   font-size: 0.7rem;
   font-weight: 800;
-  background: var(--paper);
+  background: var(--color-panel);
   border-radius: 0.3rem;
   padding: 0.1rem 0.3rem;
+}
+
+.playerCount,
+.promptLabel {
+  color: var(--color-action-text);
 }

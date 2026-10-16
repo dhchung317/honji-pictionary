@@ -29,7 +29,12 @@ function component(file, mocks = {}) {
   });
   return module.exports;
 }
+const themeMock = {
+  ThemeToggle: () =>
+    React.createElement("select", { "aria-label": "Color theme" }),
+};
 const { GameHeader } = component("src/components/GameHeader/GameHeader.tsx", {
+  "../ThemeToggle/ThemeToggle": themeMock,
   "../../hooks/useAsyncAction": {
     useAsyncAction: () => ({ run: () => {}, loading: false, error: null }),
   },
@@ -65,6 +70,7 @@ test("header follows host, player lobby, drawing and results room routes", () =>
 });
 test("home exposes hosting without a name and joining with required name/code", () => {
   const Home = component("src/routes/Home.tsx", {
+    "../components/ThemeToggle/ThemeToggle": themeMock,
     "../hooks/useGameEntry": {
       useGameEntry: () => ({
         busy: null,

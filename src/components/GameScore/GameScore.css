@@ -1,23 +1,23 @@
 .game-score {
-  --medal-fill: #75ccff;
-  --medal-inner: #c9edff;
+  --medal-fill: var(--color-blue);
+  --medal-inner: var(--color-medal-blue-inner);
   position: relative;
   display: block;
   width: var(--score-badge-size);
   flex-shrink: 0;
-  filter: drop-shadow(2px 2px 0 #161616);
+  filter: drop-shadow(2px 2px 0 var(--color-artwork-ink));
 }
 .game-score--gold {
-  --medal-fill: #ffdb27;
-  --medal-inner: #fff3ad;
+  --medal-fill: var(--color-yellow);
+  --medal-inner: var(--color-medal-gold-inner);
 }
 .game-score--silver {
-  --medal-fill: #bccbd7;
-  --medal-inner: #edf4fa;
+  --medal-fill: var(--color-medal-silver);
+  --medal-inner: var(--color-medal-silver-inner);
 }
 .game-score--bronze {
-  --medal-fill: #cd8751;
-  --medal-inner: #f4c89f;
+  --medal-fill: var(--color-medal-bronze);
+  --medal-inner: var(--color-medal-bronze-inner);
 }
 .game-score__art {
   display: block;
@@ -27,24 +27,24 @@
 }
 .game-score__face {
   fill: var(--medal-fill);
-  stroke: #161616;
+  stroke: var(--color-artwork-ink);
   stroke-width: 2.5;
   stroke-linejoin: round;
 }
 .game-score__ring {
   fill: var(--medal-inner);
-  stroke: #161616;
+  stroke: var(--color-artwork-ink);
   stroke-width: 1.5;
 }
 .game-score__ribbon {
-  fill: #ff4b51;
-  stroke: #161616;
+  fill: var(--color-red);
+  stroke: var(--color-artwork-ink);
   stroke-width: 2.5;
   stroke-linejoin: round;
 }
 .game-score__shine {
   fill: none;
-  stroke: #fffdf4;
+  stroke: var(--color-medal-shine);
   stroke-width: 3;
   stroke-linecap: round;
 }

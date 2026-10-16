@@ -13,10 +13,8 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* color-scheme: light dark; */
-
-  color: var(--color-text-dark);
-  background-color: var(--color-background-dark);
+  color: var(--color-text);
+  background-color: var(--color-page);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -32,9 +30,7 @@ body,
 }
 
 body {
-  /* margin: 0; */
-  /* min-height: 100vh; */
-  background-color: var(--color-app-background);
+  background-color: var(--color-page);
 }
 
 a {
@@ -44,7 +40,7 @@ a {
 }
 
 a:hover {
-  color: var(--color-primary-hover-dark);
+  color: var(--color-primary-hover);
 }
 
 h1 {
@@ -69,7 +65,7 @@ button {
   font-weight: 500;
   font-family: inherit;
 
-  background-color: var(--color-surface-dark);
+  background-color: var(--color-panel);
 
   cursor: pointer;
   transition: border-color 0.25s;
@@ -81,7 +77,7 @@ button:hover {
 
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 3px solid var(--color-focus);
 }
 
 button:disabled {
@@ -92,25 +88,7 @@ button:disabled {
   width: 100%;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-  }
-
-  a:hover {
-  }
-
-  button {
-  }
-}
-
 /* Every screen owns only its available viewport area. */
-:root {
-  --ink: #161616;
-  --paper: #fffdf4;
-  --color-primary: #007bc6;
-  --color-border: #161616;
-  --color-app-background: #ffdb27;
-}
 .app-root {
   --game-header-height: 3.25rem;
   --game-content-height: 100dvh;
@@ -120,14 +98,15 @@ button:disabled {
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(#16161622 1.2px, transparent 1.2px) 0 0 / 14px 14px,
+    radial-gradient(var(--color-pattern) 1.2px, transparent 1.2px) 0 0 / 14px
+      14px,
     linear-gradient(
       120deg,
       transparent 32%,
-      #fff7b8aa 32% 56%,
+      var(--color-page-stripe) 32% 56%,
       transparent 56%
     ),
-    #ffdb27;
+    var(--color-page);
   overflow: clip;
 }
 .app-root[data-room="true"] {
@@ -143,15 +122,15 @@ button:disabled {
   min-height: 0;
 }
 button {
-  border: 2px solid var(--ink);
+  border: 2px solid var(--color-border);
   border-radius: 0.6rem;
-  background: #75ccff;
-  color: var(--ink);
+  background: var(--color-blue);
+  color: var(--color-action-text);
   font-weight: 800;
-  box-shadow: 3px 3px 0 var(--ink);
+  box-shadow: 3px 3px 0 var(--color-shadow);
 }
 button:hover:not(:disabled) {
-  border-color: var(--ink);
+  border-color: var(--color-border);
   filter: brightness(1.05);
 }
 button:disabled {
@@ -159,7 +138,7 @@ button:disabled {
 }
 button:focus-visible,
 a:focus-visible {
-  outline: 3px solid #007bc6;
+  outline: 3px solid var(--color-focus);
   outline-offset: 3px;
 }
 .state-page {
@@ -178,10 +157,10 @@ a:focus-visible {
 .state-page p {
   max-width: 34rem;
   padding: 1rem;
-  background: var(--paper);
-  border: 2px solid var(--ink);
+  background: var(--color-panel);
+  border: 2px solid var(--color-border);
   border-radius: 0.75rem;
-  box-shadow: 4px 4px var(--ink);
+  box-shadow: 4px 4px var(--color-shadow);
 }
 @media (max-width: 40rem) {
   .app-root {
@@ -217,13 +196,13 @@ a:focus-visible {
   );
 }
 .app-root[data-room="true"]::before {
-  background: #008fff;
+  background: var(--color-spark-blue);
   left: -4rem;
   top: 15%;
   transform: rotate(-15deg);
 }
 .app-root[data-room="true"]::after {
-  background: #00be78;
+  background: var(--color-spark-green);
   right: -4rem;
   bottom: -3rem;
   transform: rotate(15deg);
