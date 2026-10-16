@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Player } from "../../shared/player";
@@ -44,6 +44,27 @@ function HostRoom() {
 
   const room = roomState?.room ?? null;
   const round = roomState?.round ?? null;
+  const { secondsLeft: startSeconds } = useCountdown(room?.status === "LOBBY" ? room.autoStartAt ?? null : null);
+  const automaticAttempt = useRef<string | null>(null);
+  const [autoStartError, setAutoStartError] = useState<string | null>(null);
+  useEffect(() => {
+    if (room?.status !== "LOBBY" || !room.autoStartAt) {
+      automaticAttempt.current = null;
+      setAutoStartError(null);
+      return;
+    }
+    const deadline = room.autoStartAt;
+    const timeout = setTimeout(() => {
+      if (automaticAttempt.current === deadline) return;
+      automaticAttempt.current = deadline;
+      setIsWaitingForRound(true);
+      void startRound(room.id, { lobbyVersion: room.lobbyVersion ?? 0 }).catch(error => {
+        setIsWaitingForRound(false);
+        setAutoStartError(error instanceof Error ? error.message : "Automatic start failed. Use Start Round to retry.");
+      });
+    }, Math.max(0, Date.parse(deadline) - Date.now()));
+    return () => clearTimeout(timeout);
+  }, [room?.status, room?.autoStartAt, room?.lobbyVersion, room?.id]);
 
   const isLobby = room?.status === "LOBBY";
   const isDrawing = round?.status === "DRAWING";
@@ -157,6 +178,7 @@ function HostRoom() {
                   >
                     <PlayerAvatar player={player} />
                     <span className={styles.playerName}>{player.name}</span>
+                    <span className={styles.readyStatus}>{player.ready ? "Ready ✓" : "Not ready"}</span>
                   </div>
                 ))}
               </div>
@@ -166,7 +188,7 @@ function HostRoom() {
                   <img width={"100%"} src={"/honji.png"} alt="Honji" />
                 </div>
 
-                <h2 className={styles.stageTitle}>Waiting for players</h2>
+                <h2 className={styles.stageTitle}>{room.autoStartAt ? `Starting in ${Math.max(1, startSeconds ?? 5)}…` : "Waiting for players"}</h2>
 
 
               </div>
@@ -176,6 +198,8 @@ function HostRoom() {
                   {players.length} {players.length === 1 ? "player" : "players"}{" "}
                   joined
                 </p>
+                <p className={styles.readyCount}>{players.filter(player => player.ready).length} / {players.length} ready</p>
+                {autoStartError && <p role="alert" className={styles.error}>{autoStartError} Use Start Round to retry.</p>}
                 <div style={{ fontSize: "1.25rem" }}>
                   <p className={styles.stageMessage}>
                     Enter{" "}
@@ -192,7 +216,7 @@ function HostRoom() {
                 <button
                   className={styles.startButton}
                   onClick={handleStartRound}
-                  disabled={isStarting || players.length === 0}
+                  disabled={isStarting || players.length === 0 || Boolean(room.autoStartAt && !autoStartError)}
                 >
                   {isStarting ? "Starting…" : "Start Round"}
                 </button>

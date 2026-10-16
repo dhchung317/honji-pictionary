@@ -5,4 +5,5 @@ export interface Player {
   joinedAt: string;
   avatarUrl?: string;
   replayRoundId?: string;
+  ready?: boolean;
 }

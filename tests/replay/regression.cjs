@@ -8,7 +8,7 @@ const crypto = require('node:crypto');
 function load(file, mocks = {}) {
  const code = ts.transpileModule(readFileSync(path.resolve(__dirname, '../..', file), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
  const module = { exports: {} };
- vm.runInNewContext(code, { module, exports: module.exports, require: id => id in mocks ? mocks[id] : id === './_deferredResponse.js' ? load('api/_deferredResponse.ts') : require(id), crypto: crypto.webcrypto, Date, console });
+ vm.runInNewContext(code, { module, exports: module.exports, require: id => id in mocks ? mocks[id] : id === './_lobbyReady.js' ? load('api/_lobbyReady.ts', mocks) : id === './_deferredResponse.js' ? load('api/_deferredResponse.ts') : require(id), crypto: crypto.webcrypto, Date, console });
  return module.exports;
 }
 function response() { return { code: 200, status(n) { this.code = n; return this; }, json(body) { this.body = body; return this; } }; }

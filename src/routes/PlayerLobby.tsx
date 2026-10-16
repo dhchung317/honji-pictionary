@@ -7,6 +7,8 @@ import DrawingCanvas, {
 import { GameErrorPage } from "../components/GameError";
 import { GameLoading } from "../components/GameLoading/GameLoading";
 import { useAsync } from "../hooks/useAsync";
+import { useCountdown } from "../hooks/useCountdown";
+import { getPlayersByRoom, setPlayerReady } from "../lib/playersApi";
 import { getRoom } from "../lib/roomsApi";
 import { upload } from "@vercel/blob/client";
 import { useAsyncAction } from "../hooks/useAsyncAction";
@@ -18,6 +20,8 @@ function PlayerLobby() {
   const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
   const [hasAvatar, setHasAvatar] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const expectedReady = useRef<boolean | null>(null);
 
   const avatarCanvasRef = useRef<DrawingCanvasHandle | null>(null);
 
@@ -84,7 +88,9 @@ function PlayerLobby() {
         throw new Error("Missing room id");
       }
 
-      return getRoom(roomId);
+      const state = await getRoom(roomId);
+      const players = await getPlayersByRoom(roomId);
+      return { ...state, players };
     },
     [roomId],
     { intervalMs: 3000 },
@@ -92,15 +98,43 @@ function PlayerLobby() {
 
   const room = roomState?.room ?? null;
   const roomStatus = room?.status;
+  const { secondsLeft: startSeconds } = useCountdown(
+    roomStatus === "LOBBY" ? (room?.autoStartAt ?? null) : null,
+  );
+  useEffect(() => {
+    const me = roomState?.players.find(
+      (player) => player.id === sessionStorage.getItem(`playerId:${roomId}`),
+    );
+    const observed = me?.ready === true;
+    if (expectedReady.current !== null && expectedReady.current !== observed)
+      return;
+    expectedReady.current = null;
+    setIsReady(observed);
+  }, [roomState, roomId]);
+  const {
+    run: toggleReady,
+    loading: readyBusy,
+    error: readyError,
+  } = useAsyncAction(async () => {
+    if (!roomId || !room) return;
+    const reply = await setPlayerReady(
+      roomId,
+      !isReady,
+      room.lobbyVersion ?? 0,
+    );
+    expectedReady.current = reply.ready;
+    setIsReady(reply.ready);
+  });
 
   /* ---------- Keep the lobby limited to waiting rooms ---------- */
 
   useEffect(() => {
     if (!roomId || !roomStatus || roomStatus === "LOBBY") return;
 
-    const destination = roomStatus === "DONE"
-      ? `/room/${roomId}/playerresults`
-      : `/room/${roomId}`;
+    const destination =
+      roomStatus === "DONE"
+        ? `/room/${roomId}/playerresults`
+        : `/room/${roomId}`;
 
     navigate(destination, { replace: true });
   }, [roomId, roomStatus, navigate]);
@@ -130,13 +164,19 @@ function PlayerLobby() {
 
   return (
     <main className={styles.page}>
-      {roomError && <p role="status">Connection interrupted. Reconnecting… Your drawing is still here.</p>}
+      {roomError && (
+        <p role="status">
+          Connection interrupted. Reconnecting… Your drawing is still here.
+        </p>
+      )}
       <div className={styles.lobby}>
-
-
         <section className={styles.avatarSection}>
           <div className={styles.avatarHeading}>
-            <p className={styles.waiting}>Waiting for the host to start...</p>
+            <p className={styles.waiting}>
+              {room.autoStartAt
+                ? `Everyone’s ready! Starting in ${Math.max(1, startSeconds ?? 5)}…`
+                : "The round starts five seconds after everyone is ready."}
+            </p>
             <h2>Draw your avatar</h2>
 
             <p>Draw yourself while you wait for the game to start.</p>
@@ -150,30 +190,46 @@ function PlayerLobby() {
               strokeColor="#000000"
               strokeWidth={8}
             />
+            <div className={styles.actionsBox}>
+              <div className={styles.actions}>
+                <button
+                  className={styles.submitButton}
+                  type="button"
+                  onClick={submitAvatar}
+                  disabled={isSubmittingAvatar}
+                >
+                  {isSubmittingAvatar
+                    ? "Saving..."
+                    : hasAvatar
+                      ? "Update"
+                      : "Submit"}
+                </button>
+
+                <button
+                  className={styles.clearButton}
+                  type="button"
+                  onClick={() => avatarCanvasRef.current?.clear()}
+                >
+                  Clear
+                </button>
+              </div>
+              <button
+                className={styles.readyButton}
+                type="button"
+                aria-pressed={isReady}
+                onClick={() => void toggleReady()}
+                disabled={readyBusy || isSubmittingAvatar}
+              >
+                {readyBusy ? "..." : isReady ? "Unready" : "Ready"}
+              </button>
+            </div>
           </div>
 
-          <div className={styles.actions}>
-            <button
-              className={styles.submitButton}
-              type="button"
-              onClick={submitAvatar}
-              disabled={isSubmittingAvatar}
-            >
-              {isSubmittingAvatar
-                ? "Saving..."
-                : hasAvatar
-                  ? "Update avatar"
-                  : "Use as my avatar"}
-            </button>
-
-            <button
-              className={styles.clearButton}
-              type="button"
-              onClick={() => avatarCanvasRef.current?.clear()}
-            >
-              Clear
-            </button>
-          </div>
+          {readyError && (
+            <p className={styles.error} role="alert">
+              {readyError.message}
+            </p>
+          )}
           {avatarError && <p className={styles.error}>{avatarError.message}</p>}
         </section>
       </div>

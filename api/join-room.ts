@@ -1,3 +1,4 @@
+import { syncLobbyCountdown } from "./_lobbyReady.js";
 import { acquireRoomMutation } from "./_mutationLock.js";
 import { deferJsonResponse } from "./_deferredResponse.js";
 import { issueSession } from "./_session.js";
@@ -33,6 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const player = await upsertPlayer(roomId, name);
+    await syncLobbyCountdown(room);
     const sessionToken = await issueSession({
       role: "PLAYER",
       roomId,
