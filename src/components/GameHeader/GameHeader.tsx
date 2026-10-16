@@ -1,4 +1,5 @@
 import { Link, useMatch } from "react-router-dom";
+import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 import styles from "./GameHeader.module.css";
 
 export function GameHeader() {
@@ -14,6 +15,9 @@ export function GameHeader() {
       <div className={styles.room} aria-label={`Room ${roomId}`}>
         <span className={styles.label}>Room</span>
         <strong className={styles.code}>{roomId}</strong>
+      </div>
+      <div className={styles.themeControl}>
+        <ThemeToggle />
       </div>
     </header>
   );

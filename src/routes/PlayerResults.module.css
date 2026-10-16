@@ -23,8 +23,8 @@
   font-size: clamp(1.1rem, 3dvh, 1.75rem);
   font-weight: 900;
   padding: 0.15rem 1rem;
-  background: #00c879;
-  border: 2px solid var(--ink);
+  background: var(--color-green);
+  border: 2px solid var(--color-border);
   transform: rotate(-2deg);
 }
 .resultsLayout {
@@ -56,9 +56,9 @@
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   padding: 1rem;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--color-border);
   border-radius: 0.8rem;
-  background: #fffdf466;
+  background: var(--color-results-well);
 }
 .desktopSubmissions {
   display: grid;
@@ -133,10 +133,14 @@
   font-size: 0.85rem;
 }
 .replayActions button:first-child {
-  background: #00c879;
+  background: var(--color-green);
 }
 .replayActions p {
   width: 100%;
   text-align: center;
   font-size: 0.85rem;
+}
+
+.title {
+  color: var(--color-action-text);
 }

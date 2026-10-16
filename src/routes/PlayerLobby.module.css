@@ -32,8 +32,8 @@
 }
 .waiting {
   display: inline-block;
-  background: #00c879;
-  border: 2px solid var(--ink);
+  background: var(--color-green);
+  border: 2px solid var(--color-border);
   padding: 0.15rem 0.6rem;
   border-radius: 3px;
   font-weight: 800;
@@ -61,13 +61,13 @@
   font-size: 0.85rem;
 }
 .submitButton {
-  background: #00c879;
+  background: var(--color-green);
 }
 .clearButton {
-  background: var(--paper);
+  background: var(--color-panel);
 }
 .error {
-  color: #981128;
+  color: var(--color-danger);
   font-size: 0.8rem;
 }
 @media (max-height: 500px) and (min-width: 550px) {
@@ -94,11 +94,11 @@
 }
 
 .readyButton {
-  background: #00c879;
+  background: var(--color-green);
   font-size: 0.85rem;
 }
 .readyButton[aria-pressed="true"] {
-  background: #fff3ad;
+  background: var(--color-ready-selected);
 }
 /* Reserve room for readiness without hiding the avatar controls. */
 .canvasContainer {
@@ -112,4 +112,11 @@
     width: min(45vw, calc(var(--game-content-height) - 2rem));
     grid-row: 1 / 5;
   }
+}
+
+.waiting {
+  color: var(--color-action-text);
+}
+.clearButton {
+  color: var(--color-text);
 }

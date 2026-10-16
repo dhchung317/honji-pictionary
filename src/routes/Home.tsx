@@ -1,5 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useGameEntry } from "../hooks/useGameEntry";
+import { ThemeToggle } from "../components/ThemeToggle/ThemeToggle";
 import styles from "./Home.module.css";
 
 function Home() {
@@ -17,6 +18,9 @@ function Home() {
       <div className={styles.diamondRed} aria-hidden="true" />
       <div className={styles.sparkGreen} aria-hidden="true" />
       <section className={styles.card} aria-labelledby="home-title">
+        <div className={styles.themeControl}>
+          <ThemeToggle />
+        </div>
         <button
           className={styles.instructionsTab}
           type="button"

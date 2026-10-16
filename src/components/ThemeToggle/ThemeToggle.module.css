@@ -1,0 +1,53 @@
+.toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  width: 3.75rem;
+  height: 2rem;
+  padding: 0.25rem;
+  border: 2px solid var(--color-border);
+  border-radius: 2rem;
+  background: var(--color-panel);
+  color: var(--color-text);
+  box-shadow: 2px 2px 0 var(--color-shadow);
+}
+.toggle svg {
+  position: relative;
+  z-index: 1;
+  width: 1.15rem;
+  height: 1.15rem;
+  pointer-events: none;
+}
+.thumb {
+  position: absolute;
+  left: 0.15rem;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  background: var(--color-yellow);
+  transition: transform 160ms ease;
+  pointer-events: none;
+}
+.sun {
+  color: var(--color-action-text);
+}
+.toggle[aria-checked="true"] .thumb {
+  transform: translateX(1.75rem);
+}
+.toggle[aria-checked="true"] .sun {
+  color: var(--color-text-muted);
+}
+.toggle[aria-checked="true"] .moon {
+  color: var(--color-action-text);
+}
+.toggle:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .thumb {
+    transition: none;
+  }
+}
