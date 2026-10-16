@@ -1,9 +1,10 @@
+import { useEffect } from "react";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { nextRound, quit } from "../lib/roomsApi";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { GameErrorPage } from "../components/GameError";
-import { SubmissionCard } from "../components/SubmissionCard/SubmissionCard";
+import { ResultsView } from "./views/ResultsView";
 
 import { useAsync } from "../hooks/useAsync";
 
@@ -13,7 +14,7 @@ import { getSubmissionsByRoom } from "../lib/submissionsApi";
 import { getRankedSubmissions } from "../lib/rankedSubmissions";
 import { dummyRoundScore, dummySubmissions } from "../testData/playerResults";
 
-import styles from "./Results.module.css";
+import { HostReplayActions } from "./views/HostReplayActions";
 import { GameLoading } from "../components/GameLoading/GameLoading";
 
 const USE_DUMMY_DATA = false;
@@ -21,49 +22,63 @@ const USE_DUMMY_DATA = false;
 function Results() {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const { run: replay, loading: replayBusy, error: replayError } = useAsyncAction(async () => {
+  const {
+    run: replay,
+    loading: replayBusy,
+    error: replayError,
+  } = useAsyncAction(async () => {
     if (!roomId) return;
     await nextRound(roomId);
     navigate(`/host/${roomId}`, { replace: true });
   });
-  const { run: home, loading: homeBusy, error: homeError } = useAsyncAction(async () => {
+  const {
+    run: home,
+    loading: homeBusy,
+    error: homeError,
+  } = useAsyncAction(async () => {
     if (!roomId) return;
     await quit(roomId);
     navigate("/", { replace: true });
   });
-  const actions = <div className={styles.replayActions}>
-    <button type="button" onClick={() => void replay()} disabled={replayBusy || homeBusy}>{replayBusy ? "Opening lobby…" : "Play another round"}</button>
-    <button type="button" onClick={() => void home()} disabled={replayBusy || homeBusy}>{homeBusy ? "Closing room…" : "Back to home"}</button>
-    {(replayError || homeError) && <p role="alert">{(replayError || homeError)?.message}</p>}
-  </div>;
+  const actions = (
+    <HostReplayActions
+      replay={replay}
+      home={home}
+      replayBusy={replayBusy}
+      homeBusy={homeBusy}
+      replayError={replayError}
+      homeError={homeError}
+    />
+  );
+
+  const {
+    data: roomState,
+    loading: roomLoading,
+    error: roomError,
+  } = useAsync(() => getRoom(roomId!), [roomId], { intervalMs: 3000 });
+  const roundId = roomState?.room.currentRoundId;
+  const showingResults =
+    roomState?.room.closed || roomState?.room.status === "DONE";
+  useEffect(() => {
+    if (roomId && roomState && !showingResults)
+      navigate(`/host/${roomId}`, { replace: true });
+  }, [roomId, roomState, showingResults, navigate]);
 
   const { data, loading, error } = useAsync(async () => {
-    if (USE_DUMMY_DATA) {
+    if (USE_DUMMY_DATA)
       return getRankedSubmissions(dummySubmissions, dummyRoundScore.results);
-    }
-
-    if (!roomId) {
-      throw new Error("Missing room id");
-    }
-
-    const roomState = await getRoom(roomId);
-
-    if (roomState.room.status === "LOBBY") {
-      navigate(`/host/${roomId}`, { replace: true });
-      return [];
-    }
-
-    if (!roomState.round) {
-      throw new Error("NO_CURRENT_ROUND");
-    }
-
+    if (!showingResults || !roundId || !roomId) return null;
     const [submissions, roundScore] = await Promise.all([
-      getSubmissionsByRoom(roomId),
-      getRoundScore(roomId, roomState.round.id),
+      getSubmissionsByRoom(roomId, roundId),
+      getRoundScore(roomId, roundId),
     ]);
-
     return getRankedSubmissions(submissions, roundScore.results);
-  }, [roomId]);
+  }, [roomId, roundId, showingResults]);
+
+  if (roomError && (!roomState || roomError.message === "ROOM_NOT_FOUND"))
+    return <GameErrorPage type={roomError.message} />;
+  if (roomLoading || !showingResults)
+    return <GameLoading message="Opening your game…" />;
 
   if (loading) {
     return <GameLoading message="Loading results..." />;
@@ -74,68 +89,26 @@ function Results() {
   }
 
   if (!data) {
-    return null;
+    return <GameLoading message="Loading results…" />;
   }
-
-  if (data.length === 0) {
-    return (
-      <main className={styles.page}>
-        <section className={styles.emptyState}>
-          <h1>Results</h1>
-
-          <p>No submissions yet.</p>
-          {actions}
-
-
-        </section>
-      </main>
-    );
-  }
-
-  const topThree = data.slice(0, 3);
-
-  const winner = topThree[0];
-  const runnersUp = topThree.slice(1);
 
   return (
-    <main className={styles.page}>
-      <div className={styles.results}>
-        <header className={styles.header}>
-          <div className={styles.heading}>
-            <h1 className={styles.title}>Results</h1>
-          </div>
-
-
-        </header>
-
-        {actions}
-        <div className={styles.resultsLayout}>
-          {winner && (
-            <section className={styles.winnerSection}>
-              <SubmissionCard
-                submission={winner.submission}
-                result={winner.result}
-                variant="host"
-              />
-            </section>
+    <ResultsView
+      data={data}
+      actions={
+        <>
+          {roomError && (
+            <p role="status">Connection interrupted. Reconnecting…</p>
           )}
-
-          <section className={styles.submissionsSection}>
-            <div className={styles.submissionsGrid}>
-              {runnersUp.map(({ submission, result }) => (
-                <SubmissionCard
-                  key={submission.id}
-                  submission={submission}
-                  result={result}
-                  variant="host"
-                />
-              ))}
-            </div>
-          </section>
-        </div>
-      </div>
-    </main>
+          {roomState?.room.closed ? (
+            <p role="status">This room is closed.</p>
+          ) : (
+            actions
+          )}
+        </>
+      }
+      host
+    />
   );
 }
-
 export default Results;

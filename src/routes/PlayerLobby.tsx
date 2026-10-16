@@ -1,9 +1,7 @@
 import { sessionHeaders } from "../lib/session";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import DrawingCanvas, {
-  DrawingCanvasHandle,
-} from "../components/DrawingCanvas/DrawingCanvas";
+import { DrawingCanvasHandle } from "../components/DrawingCanvas/DrawingCanvas";
 import { GameErrorPage } from "../components/GameError";
 import { GameLoading } from "../components/GameLoading/GameLoading";
 import { useAsync } from "../hooks/useAsync";
@@ -15,6 +13,8 @@ import { useAsyncAction } from "../hooks/useAsyncAction";
 import { updatePlayerAvatar } from "../lib/playersApi";
 
 import styles from "./PlayerLobby.module.css";
+import { PlayerAvatarView } from "./views/PlayerAvatarView";
+import { PhaseMessageView } from "./views/PhaseMessageView";
 
 function PlayerLobby() {
   const navigate = useNavigate();
@@ -129,7 +129,8 @@ function PlayerLobby() {
   /* ---------- Keep the lobby limited to waiting rooms ---------- */
 
   useEffect(() => {
-    if (!roomId || !roomStatus || roomStatus === "LOBBY") return;
+    if (!roomId || !roomStatus || room?.closed || roomStatus === "LOBBY")
+      return;
 
     const destination =
       roomStatus === "DONE"
@@ -137,7 +138,7 @@ function PlayerLobby() {
         : `/room/${roomId}`;
 
     navigate(destination, { replace: true });
-  }, [roomId, roomStatus, navigate]);
+  }, [roomId, roomStatus, room?.closed, navigate]);
 
   /* ---------- Page states ---------- */
 
@@ -157,6 +158,9 @@ function PlayerLobby() {
     return <GameErrorPage type="ROOM_NOT_FOUND" />;
   }
 
+  if (room.closed)
+    return <PhaseMessageView message="The host has closed this room." />;
+
   // Avoid mounting the avatar canvas while the navigation effect runs.
   if (room.status !== "LOBBY") {
     return <GameLoading message="Opening your game..." />;
@@ -169,70 +173,19 @@ function PlayerLobby() {
           Connection interrupted. Reconnecting… Your drawing is still here.
         </p>
       )}
-      <div className={styles.lobby}>
-        <section className={styles.avatarSection}>
-          <div className={styles.avatarHeading}>
-            <p className={styles.waiting}>
-              {room.autoStartAt
-                ? `Everyone’s ready! Starting in ${Math.max(1, startSeconds ?? 5)}…`
-                : "The round starts five seconds after everyone is ready."}
-            </p>
-            <h2>Draw your avatar</h2>
-
-            <p>Draw yourself while you wait for the game to start.</p>
-          </div>
-
-          <div className={styles.canvasContainer}>
-            <DrawingCanvas
-              ref={avatarCanvasRef}
-              resolutionWidth={500}
-              resolutionHeight={500}
-              strokeColor="#000000"
-              strokeWidth={8}
-            />
-            <div className={styles.actionsBox}>
-              <div className={styles.actions}>
-                <button
-                  className={styles.submitButton}
-                  type="button"
-                  onClick={submitAvatar}
-                  disabled={isSubmittingAvatar}
-                >
-                  {isSubmittingAvatar
-                    ? "Saving..."
-                    : hasAvatar
-                      ? "Update"
-                      : "Submit"}
-                </button>
-
-                <button
-                  className={styles.clearButton}
-                  type="button"
-                  onClick={() => avatarCanvasRef.current?.clear()}
-                >
-                  Clear
-                </button>
-              </div>
-              <button
-                className={styles.readyButton}
-                type="button"
-                aria-pressed={isReady}
-                onClick={() => void toggleReady()}
-                disabled={readyBusy || isSubmittingAvatar}
-              >
-                {readyBusy ? "..." : isReady ? "Unready" : "Ready"}
-              </button>
-            </div>
-          </div>
-
-          {readyError && (
-            <p className={styles.error} role="alert">
-              {readyError.message}
-            </p>
-          )}
-          {avatarError && <p className={styles.error}>{avatarError.message}</p>}
-        </section>
-      </div>
+      <PlayerAvatarView
+        room={room}
+        startSeconds={startSeconds}
+        avatarCanvasRef={avatarCanvasRef}
+        submitAvatar={submitAvatar}
+        toggleReady={toggleReady}
+        isSubmittingAvatar={isSubmittingAvatar}
+        hasAvatar={hasAvatar}
+        readyBusy={readyBusy}
+        isReady={isReady}
+        readyError={readyError}
+        avatarError={avatarError}
+      />
     </main>
   );
 }

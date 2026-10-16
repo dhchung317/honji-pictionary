@@ -2,9 +2,7 @@ import { sessionHeaders } from "../lib/session";
 import { upload } from "@vercel/blob/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import DrawingCanvas, {
-  DrawingCanvasHandle,
-} from "../components/DrawingCanvas/DrawingCanvas";
+import { DrawingCanvasHandle } from "../components/DrawingCanvas/DrawingCanvas";
 import { GameErrorPage } from "../components/GameError";
 import { createSubmission } from "../lib/submissionsApi";
 import { getRoom } from "../lib/roomsApi";
@@ -14,6 +12,9 @@ import { useAsync } from "../hooks/useAsync";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 
 import styles from "./JoinRoom.module.css";
+import { PlayerDrawingView } from "./views/PlayerDrawingView";
+import { PhaseMessageView } from "./views/PhaseMessageView";
+import { getRoomView } from "../lib/roomView";
 import { GameLoading } from "../components/GameLoading/GameLoading";
 
 const formatSeconds = (secs: number) => {
@@ -54,7 +55,8 @@ function JoinRoom() {
   const room = roomState?.room ?? null;
   const round = roomState?.round ?? null;
 
-  const isDrawing = round?.status === "DRAWING";
+  const view = getRoomView(roomState);
+  const isDrawing = view === "DRAWING" && round?.status === "DRAWING";
   const isDone = round?.status === "DONE";
 
   const { secondsLeft, isExpired } = useCountdown(round?.roundEndAt ?? null);
@@ -163,7 +165,12 @@ function JoinRoom() {
         replace: true,
       });
     }
-  }, [isDone, room, roomId, navigate]);
+  }, [isDone, room, roomId, round?.id, navigate]);
+
+  useEffect(() => {
+    if (roomId && view === "LOBBY")
+      navigate(`/room/${roomId}/lobby`, { replace: true });
+  }, [roomId, view, navigate]);
 
   // Restore player name
   useEffect(() => {
@@ -179,7 +186,13 @@ function JoinRoom() {
   // Reset submission state for a new round
   useEffect(() => {
     autoSubmittedRef.current = false;
-    setHasSubmitted(Boolean(roomId && round?.id && sessionStorage.getItem(`submittedRound:${roomId}`) === round.id));
+    setHasSubmitted(
+      Boolean(
+        roomId &&
+        round?.id &&
+        sessionStorage.getItem(`submittedRound:${roomId}`) === round.id,
+      ),
+    );
   }, [roomId, round?.id]);
 
   // Page states
@@ -199,71 +212,75 @@ function JoinRoom() {
     return <GameErrorPage type="ROOM_NOT_FOUND" />;
   }
 
+  if (view === "CLOSED")
+    return <PhaseMessageView message="The host has closed this room." />;
+  if (view === "LOBBY" || view === "DONE")
+    return <GameLoading message="Opening your game…" />;
+  if (view === "DRAWING" && (!round || !name.trim()))
+    return <GameLoading message="Loading your canvas…" />;
+
+  let content;
+  switch (view) {
+    case "DRAWING":
+      content = hasSubmitted ? (
+        <GameLoading
+          inline
+          message={
+            round?.frozenPlayerIds.length === 1
+              ? "Drawing submitted. Preparing scoring…"
+              : "Drawing submitted. Waiting for the other players…"
+          }
+        />
+      ) : (
+        <PlayerDrawingView
+          key={round!.id}
+          round={round!}
+          canvasRef={canvasRef}
+          isSubmitting={isSubmitting}
+          submitDrawing={submitDrawing}
+        />
+      );
+      break;
+    case "SCORING":
+      content = (
+        <GameLoading
+          inline
+          message={
+            hasSubmitted
+              ? "Drawing submitted. Scoring the drawings…"
+              : "Drawing time is over. Scoring the drawings…"
+          }
+        />
+      );
+      break;
+    case "SCORING_FAILED":
+      content = (
+        <PhaseMessageView message="Scoring is unavailable. Waiting for the host to retry." />
+      );
+      break;
+    default:
+      content = <GameLoading inline message="Opening your game…" />;
+  }
+
   return (
     <main className={styles.page}>
-      {roomError && <p role="status">Connection interrupted. Reconnecting… Your drawing is still here.</p>}
+      {roomError && (
+        <p role="status">
+          Connection interrupted. Reconnecting… Your drawing is still here.
+        </p>
+      )}
       <div className={styles.game}>
         <header className={styles.header}>
           {secondsLeft !== null && isDrawing && !hasSubmitted && (
             <span className={styles.timer}>{formatSeconds(secondsLeft)}</span>
           )}
         </header>
-
-        {name.trim() && !hasSubmitted && (
-          <section>
-            <p className={styles.prompt}>{round?.prompt}</p>
-
-            <div className={styles.canvasContainer}>
-              <DrawingCanvas
-                ref={canvasRef}
-                resolutionWidth={500}
-                resolutionHeight={500}
-                strokeColor="#000000"
-                strokeWidth={6}
-              />
-            </div>
-
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.canvasButton}
-                onClick={() => canvasRef.current?.undo()}
-              >
-                Undo
-              </button>
-
-              <button
-                type="button"
-                className={styles.canvasButton}
-                onClick={() => canvasRef.current?.clear()}
-              >
-                Clear
-              </button>
-
-              <button
-                type="button"
-                className={styles.submitButton}
-                disabled={isSubmitting || !isDrawing}
-                onClick={submitDrawing}
-              >
-                {isSubmitting ? "Submitting…" : "Submit"}
-              </button>
-            </div>
-          </section>
-        )}
-
-        {round?.status === "SCORING_FAILED" && <p role="status">Scoring is unavailable. Your drawing is saved. Waiting for the host to retry.</p>}
-
-        {hasSubmitted && round?.status !== "SCORING_FAILED" && (
-          <GameLoading inline message={round?.status === "SCORING"
-            ? "Drawing submitted. Scoring the drawings…"
-            : round?.frozenPlayerIds.length === 1
-              ? "Drawing submitted. Preparing scoring…"
-              : "Drawing submitted. Waiting for the other players…"} />
-        )}
+        {content}
 
         {submissionError && (
-          <div className={styles.error} role="alert">{submissionError.message}</div>
+          <div className={styles.error} role="alert">
+            {submissionError.message}
+          </div>
         )}
       </div>
     </main>
