@@ -110,7 +110,8 @@ export async function setPlayerReady(
   });
   const body = await res.json();
   if (!res.ok) {
-    if (body.code === "ROUND_STARTING") throw new RoundStartingError(body.error);
+    if (body.code === "ROUND_STARTING")
+      throw new RoundStartingError(body.error);
     throw new Error(body.error || "Unable to change readiness.");
   }
   return body as { ready: boolean; autoStartAt: string | null };

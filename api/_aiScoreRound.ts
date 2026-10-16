@@ -63,14 +63,17 @@ export async function scoreRoundWithAI(params: {
     });
   }
 
-  const resp = await openai.responses.parse({
-    model: "gpt-5.4-mini", // supports structured outputs; pick a snapshot later if you want
-    reasoning: { effort: "low" },
-    input: [{ role: "user", content }],
-    text: {
-      format: zodTextFormat(ScoreResultSchema, "score_result"),
+  const resp = await openai.responses.parse(
+    {
+      model: "gpt-5.4-mini", // supports structured outputs; pick a snapshot later if you want
+      reasoning: { effort: "low" },
+      input: [{ role: "user", content }],
+      text: {
+        format: zodTextFormat(ScoreResultSchema, "score_result"),
+      },
     },
-  }, { timeout: 45_000, maxRetries: 0 });
+    { timeout: 45_000, maxRetries: 0 },
+  );
 
   const parsed = resp.output_parsed;
 
@@ -78,7 +81,15 @@ export async function scoreRoundWithAI(params: {
     throw new Error("AI returned no parsed output");
   }
 
-  const ids = new Set(submissions.map(s => s.playerId));
-  if (parsed.rankedPlayerIds.length !== ids.size || new Set(parsed.rankedPlayerIds).size !== ids.size || parsed.rankedPlayerIds.some(id => !ids.has(id)) || parsed.notes.length !== ids.size || new Set(parsed.notes.map(n => n.playerId)).size !== ids.size || parsed.notes.some(n => !ids.has(n.playerId))) throw new Error("Incomplete scoring results");
+  const ids = new Set(submissions.map((s) => s.playerId));
+  if (
+    parsed.rankedPlayerIds.length !== ids.size ||
+    new Set(parsed.rankedPlayerIds).size !== ids.size ||
+    parsed.rankedPlayerIds.some((id) => !ids.has(id)) ||
+    parsed.notes.length !== ids.size ||
+    new Set(parsed.notes.map((n) => n.playerId)).size !== ids.size ||
+    parsed.notes.some((n) => !ids.has(n.playerId))
+  )
+    throw new Error("Incomplete scoring results");
   return parsed;
 }

@@ -149,7 +149,12 @@ async function advanceScoringRoom(room: Room, round: Round): Promise<Room> {
 
       await saveRoundScore(roundScore);
     } else {
-      await saveRoundScore({ roomId: room.id, roundId: round.id, scoredAt: new Date().toISOString(), results: [] });
+      await saveRoundScore({
+        roomId: room.id,
+        roundId: round.id,
+        scoredAt: new Date().toISOString(),
+        results: [],
+      });
     }
 
     return finishRound(room, round);
@@ -157,7 +162,11 @@ async function advanceScoringRoom(room: Room, round: Round): Promise<Room> {
     console.error("[SCORING FAILED]", error);
 
     const failed = (round.scoringAttempts ?? 0) >= 3;
-    const updatedRound: Round = { ...round, status: failed ? "SCORING_FAILED" : "SCORING", scoringRetryAt: Date.now() + 15_000 };
+    const updatedRound: Round = {
+      ...round,
+      status: failed ? "SCORING_FAILED" : "SCORING",
+      scoringRetryAt: Date.now() + 15_000,
+    };
     await saveRound(updatedRound);
     const updatedRoom: Room = { ...room, status: updatedRound.status };
     await saveRoom(updatedRoom);
@@ -232,6 +241,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       error: "Failed to get room",
     });
   } finally {
-    try { if (release) await release(); } finally { flush(); }
+    try {
+      if (release) await release();
+    } finally {
+      flush();
+    }
   }
 }

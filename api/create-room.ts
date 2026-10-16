@@ -10,8 +10,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  if (!await allowRequest(req, res, "create", 10, 3600)) return;
-  if (!await allowRequest(req, res, "create-global", 100, 3600, "global")) return;
+  if (!(await allowRequest(req, res, "create", 10, 3600))) return;
+  if (!(await allowRequest(req, res, "create-global", 100, 3600, "global")))
+    return;
 
   const hostId = String(req.body?.hostId || "").trim();
 
@@ -23,7 +24,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const room = await createRoom(hostId);
-    const sessionToken = await issueSession({ role: "HOST", roomId: room.id, id: room.hostId });
+    const sessionToken = await issueSession({
+      role: "HOST",
+      roomId: room.id,
+      id: room.hostId,
+    });
     res.status(200).json({ ...room, sessionToken });
   } catch (err) {
     console.error("[create-room] error", err);

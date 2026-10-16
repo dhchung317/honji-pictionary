@@ -14,17 +14,28 @@ export function useGameEntry() {
     pending.current = true;
     setBusy(action);
     setError(null);
-    try { await work(); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to enter the game. Please try again."); }
-    finally { pending.current = false; setBusy(null); }
+    try {
+      await work();
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Unable to enter the game. Please try again.",
+      );
+    } finally {
+      pending.current = false;
+      setBusy(null);
+    }
   }
-  const hostGame = () => perform("HOST", async () => {
-    const room = await createRoom();
-    navigate(`/host/${room.id}`);
-  });
-  const joinRoom = (name: string, code: string) => perform("JOIN", async () => {
-    const player = await joinGame(name, code);
-    navigate(`/room/${player.roomId}/lobby`);
-  });
+  const hostGame = () =>
+    perform("HOST", async () => {
+      const room = await createRoom();
+      navigate(`/host/${room.id}`);
+    });
+  const joinRoom = (name: string, code: string) =>
+    perform("JOIN", async () => {
+      const player = await joinGame(name, code);
+      navigate(`/room/${player.roomId}/lobby`);
+    });
   return { busy, error, hostGame, joinRoom };
 }

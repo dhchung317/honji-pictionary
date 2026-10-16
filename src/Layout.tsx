@@ -7,7 +7,9 @@ export function Layout() {
   return (
     <div className="app-root" data-room={Boolean(host || player)}>
       <GameHeader />
-      <div className="app-main"><Outlet /></div>
+      <div className="app-main">
+        <Outlet />
+      </div>
     </div>
   );
 }

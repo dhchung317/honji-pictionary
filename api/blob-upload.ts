@@ -31,19 +31,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           throw new Error("Missing clientPayload");
         }
 
-
         const room = await getRoomById(roomId);
 
         if (!room) {
           throw new Error("Room not found");
         }
 
-        if (!await authorize(req, res, { role: "PLAYER", roomId, id: playerId })) {
+        if (
+          !(await authorize(req, res, { role: "PLAYER", roomId, id: playerId }))
+        ) {
           throw new Error("Invalid player session");
         }
 
-        if (!await allowRequest(req, res, "upload", 6, 60, `${roomId}:${playerId}`)) throw new Error("Upload limit reached");
-        if (!await allowRequest(req, res, "upload-room", 60, 60, roomId)) throw new Error("Room upload limit reached");
+        if (
+          !(await allowRequest(
+            req,
+            res,
+            "upload",
+            6,
+            60,
+            `${roomId}:${playerId}`,
+          ))
+        )
+          throw new Error("Upload limit reached");
+        if (!(await allowRequest(req, res, "upload-room", 60, 60, roomId)))
+          throw new Error("Room upload limit reached");
 
         /* ---------- Avatar upload ---------- */
 
@@ -67,8 +79,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           if (pathname !== safePath) throw new Error("Invalid upload path");
           return {
             maximumSizeInBytes: 2 * 1024 * 1024,
-          validUntil: Date.now() + 60_000,
-          allowedContentTypes: ["image/jpeg", "image/png", "image/webp"],
+            validUntil: Date.now() + 60_000,
+            allowedContentTypes: ["image/jpeg", "image/png", "image/webp"],
 
             addRandomSuffix: true,
 

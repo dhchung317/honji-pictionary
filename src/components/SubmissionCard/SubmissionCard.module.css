@@ -1,48 +1,185 @@
-.submissionCard { display: flex; flex-direction: column; width: 100%; min-width: 0; min-height: 0; gap: 0.5rem; padding: 0.75rem; border: 3px solid var(--ink); border-radius: 0.9rem; background: var(--paper); box-shadow: 4px 4px var(--ink); }
-.winnerCard { background: #fff3ad; border-color: var(--ink); }
-.submissionHeader { display: flex; align-items: center; justify-content: space-between; min-width: 0; gap: 0.4rem; font-size: 0.85rem; font-weight: 850; }
-.submissionHeader > span:first-child { overflow-wrap: anywhere; }
-.rank { flex-shrink: 0; padding: 0.1rem 0.4rem; border: 2px solid var(--ink); border-radius: 0.3rem; background: #75ccff; }
-.winnerCard .rank { background: #ffdb27; }
-.imageContainer { width: 100%; min-height: 0; display: flex; justify-content: center; align-items: center; }
-.imageFrame { position: relative; width: 100%; height: auto; aspect-ratio: var(--image-ratio); align-self: center; flex-shrink: 0; border: 2px solid var(--ink); border-radius: 0.5rem; background: white; }
-.submissionImage { display: block; width: 100%; height: auto; aspect-ratio: var(--image-ratio); border-radius: 0.4rem; }
-.scoreBadge { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; transform: translate(-28%, -13%); transform-origin: top left; }
-.submissionDetails { flex: 1; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0.4rem; border-radius: 0.4rem; background: #75ccff33; text-align: center; }
-.note { font-size: clamp(0.7rem, 1.6dvh, 1rem); font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }
+.submissionCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 3px solid var(--ink);
+  border-radius: 0.9rem;
+  background: var(--paper);
+  box-shadow: 4px 4px var(--ink);
+}
+.winnerCard {
+  background: #fff3ad;
+  border-color: var(--ink);
+}
+.submissionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 850;
+}
+.submissionHeader > span:first-child {
+  overflow-wrap: anywhere;
+}
+.rank {
+  flex-shrink: 0;
+  padding: 0.1rem 0.4rem;
+  border: 2px solid var(--ink);
+  border-radius: 0.3rem;
+  background: #75ccff;
+}
+.winnerCard .rank {
+  background: #ffdb27;
+}
+.imageContainer {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.imageFrame {
+  position: relative;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--image-ratio);
+  align-self: center;
+  flex-shrink: 0;
+  border: 2px solid var(--ink);
+  border-radius: 0.5rem;
+  background: white;
+}
+.submissionImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--image-ratio);
+  border-radius: 0.4rem;
+}
+.scoreBadge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  transform: translate(-28%, -13%);
+  transform-origin: top left;
+}
+.submissionDetails {
+  flex: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  border-radius: 0.4rem;
+  background: #75ccff33;
+  text-align: center;
+}
+.note {
+  font-size: clamp(0.7rem, 1.6dvh, 1rem);
+  font-weight: 650;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
 @media (max-width: 48rem), (max-height: 500px) {
-  .submissionCard { padding: 0.4rem; gap: 0.3rem; border-width: 2px; box-shadow: 2px 2px var(--ink); }
-  .submissionHeader { font-size: 0.75rem; }
-  .submissionDetails { padding: 0.25rem; }
-  .note { font-size: 0.7rem; }
-  .scoreBadge { transform: translate(-28%, -13%) scale(0.85); }
+  .submissionCard {
+    padding: 0.4rem;
+    gap: 0.3rem;
+    border-width: 2px;
+    box-shadow: 2px 2px var(--ink);
+  }
+  .submissionHeader {
+    font-size: 0.75rem;
+  }
+  .submissionDetails {
+    padding: 0.25rem;
+  }
+  .note {
+    font-size: 0.7rem;
+  }
+  .scoreBadge {
+    transform: translate(-28%, -13%) scale(0.85);
+  }
 }
 
 /* Host podium cards follow their content instead of stretching around a
    smaller image. Their sections provide the available viewport height. */
-.hostCard, .winnerCard {
+.hostCard,
+.winnerCard {
   --host-padding: clamp(0.6rem, 1.8dvh, 1.25rem);
   --host-chrome: clamp(9rem, 26cqh, 13rem);
-  width: min(100%, max(0px, calc((100cqh - var(--host-chrome)) * var(--image-ratio) + 2 * var(--host-padding) + 6px)));
+  width: min(
+    100%,
+    max(
+      0px,
+      calc(
+        (100cqh - var(--host-chrome)) * var(--image-ratio) + 2 *
+          var(--host-padding) + 6px
+      )
+    )
+  );
   padding: var(--host-padding);
   gap: clamp(0.5rem, 1.4dvh, 1rem);
 }
-.hostCard .imageContainer, .winnerCard .imageContainer { flex: 0 0 auto; container-type: normal; }
-.hostCard .imageFrame, .winnerCard .imageFrame { width: 100%; }
-.hostCard .submissionHeader, .winnerCard .submissionHeader { font-size: clamp(0.85rem, 2dvh, 1.2rem); }
-.hostCard .submissionDetails, .winnerCard .submissionDetails { padding: clamp(0.6rem, 1.6dvh, 1.25rem); border-radius: 0.6rem; }
-.hostCard .note, .winnerCard .note { font-size: clamp(0.8rem, 2.2dvh, 1.25rem); line-height: 1.35; }
+.hostCard .imageContainer,
+.winnerCard .imageContainer {
+  flex: 0 0 auto;
+  container-type: normal;
+}
+.hostCard .imageFrame,
+.winnerCard .imageFrame {
+  width: 100%;
+}
+.hostCard .submissionHeader,
+.winnerCard .submissionHeader {
+  font-size: clamp(0.85rem, 2dvh, 1.2rem);
+}
+.hostCard .submissionDetails,
+.winnerCard .submissionDetails {
+  padding: clamp(0.6rem, 1.6dvh, 1.25rem);
+  border-radius: 0.6rem;
+}
+.hostCard .note,
+.winnerCard .note {
+  font-size: clamp(0.8rem, 2.2dvh, 1.25rem);
+  line-height: 1.35;
+}
 @media (max-width: 48rem), (max-height: 500px) {
-  .hostCard, .winnerCard { --host-padding: 0.5rem; --host-chrome: 8rem; gap: 0.5rem; }
-  .hostCard .submissionHeader, .winnerCard .submissionHeader { font-size: 0.75rem; }
-  .hostCard .submissionDetails, .winnerCard .submissionDetails { padding: 0.4rem; }
-  .hostCard .note, .winnerCard .note { font-size: 0.75rem; line-height: 1.25; }
+  .hostCard,
+  .winnerCard {
+    --host-padding: 0.5rem;
+    --host-chrome: 8rem;
+    gap: 0.5rem;
+  }
+  .hostCard .submissionHeader,
+  .winnerCard .submissionHeader {
+    font-size: 0.75rem;
+  }
+  .hostCard .submissionDetails,
+  .winnerCard .submissionDetails {
+    padding: 0.4rem;
+  }
+  .hostCard .note,
+  .winnerCard .note {
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
 }
 
 /* Runner-up columns share one footprint regardless of note length. */
 .hostCard:not(.winnerCard) {
   height: 100%;
-  width: min(100%, max(0px, calc(100cqh - var(--host-chrome) + 2 * var(--host-padding) + 6px)));
+  width: min(
+    100%,
+    max(0px, calc(100cqh - var(--host-chrome) + 2 * var(--host-padding) + 6px))
+  );
 }
 .hostCard .submissionHeader > span:first-child {
   white-space: nowrap;
@@ -52,5 +189,8 @@
 
 /* Portrait and landscape phones use content height instead of podium sizing. */
 @media (max-width: 48rem) {
-  .submissionCard:is(.hostCard, .winnerCard) { width: 100%; height: auto; }
+  .submissionCard:is(.hostCard, .winnerCard) {
+    width: 100%;
+    height: auto;
+  }
 }

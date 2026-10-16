@@ -16,16 +16,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     typeof ready !== "boolean" ||
     !Number.isInteger(lobbyVersion)
   )
-    return res
-      .status(400)
-      .json({
-        error: "Room, player, readiness and lobby version are required",
-      });
+    return res.status(400).json({
+      error: "Room, player, readiness and lobby version are required",
+    });
   if (!(await authorize(req, res, { role: "PLAYER", roomId, id: playerId })))
     return;
-  const rejectStarting = () => res.status(409).json({
-    code: "ROUND_STARTING", error: "The round is already starting.",
-  });
+  const rejectStarting = () =>
+    res.status(409).json({
+      code: "ROUND_STARTING",
+      error: "The round is already starting.",
+    });
   const release = await acquireRoomMutation(roomId);
   if (!release) {
     const snapshot = await getRoomById(roomId);

@@ -13,19 +13,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!roomId) return res.status(400).json({ error: "roomId is required" });
 
   const release = await acquireRoomMutation(roomId);
-  if (!release) return res.status(409).json({ error: "Room update in progress" });
+  if (!release)
+    return res.status(409).json({ error: "Room update in progress" });
   const flush = deferJsonResponse(res);
   try {
-  const room = await getRoomById(roomId);
-  if (!room) return res.status(404).json({ error: "Room not found" });
+    const room = await getRoomById(roomId);
+    if (!room) return res.status(404).json({ error: "Room not found" });
 
-  if (!await authorize(req, res, { role: "HOST", roomId: room.id, id: room.hostId })) return;
+    if (
+      !(await authorize(req, res, {
+        role: "HOST",
+        roomId: room.id,
+        id: room.hostId,
+      }))
+    )
+      return;
 
-  const updated = { ...room, status: "DONE" as const, closed: true };
-  await saveRoom(updated);
+    const updated = { ...room, status: "DONE" as const, closed: true };
+    await saveRoom(updated);
 
-  await expireRoom(roomId, 60);
+    await expireRoom(roomId, 60);
 
-  return res.status(200).json({ ok: true });
-  } finally { try { await release(); } finally { flush(); } }
+    return res.status(200).json({ ok: true });
+  } finally {
+    try {
+      await release();
+    } finally {
+      flush();
+    }
+  }
 }

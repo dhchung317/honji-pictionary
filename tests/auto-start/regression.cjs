@@ -168,7 +168,9 @@ function fixture() {
     get generated() {
       return generated;
     },
-    setGenerate(fn) { generate = fn; },
+    setGenerate(fn) {
+      generate = fn;
+    },
     deny() {
       allowed = false;
     },
@@ -299,11 +301,24 @@ test("host can still manually start with unready players but never an empty rost
 
 test("start commitment is visible during generation and rejects last-second unready", async () => {
   const f = fixture();
-  await f.ready("a"); await f.ready("b"); f.tick(5000);
+  await f.ready("a");
+  await f.ready("b");
+  f.tick(5000);
   let finish, entered;
-  const generating = new Promise(resolve => { entered = resolve; });
-  f.setGenerate(() => { entered(); return new Promise(resolve => { finish = resolve; }); });
-  const start = f.call("api/start-round.ts", { roomId: "ABCD", autoStart: true, lobbyVersion: 0 });
+  const generating = new Promise((resolve) => {
+    entered = resolve;
+  });
+  f.setGenerate(() => {
+    entered();
+    return new Promise((resolve) => {
+      finish = resolve;
+    });
+  });
+  const start = f.call("api/start-round.ts", {
+    roomId: "ABCD",
+    autoStart: true,
+    lobbyVersion: 0,
+  });
   await generating;
   assert.equal(f.room.status, "STARTING");
   assert.equal(f.round, null);
@@ -317,9 +332,16 @@ test("start commitment is visible during generation and rejects last-second unre
 });
 test("generation failure reopens a fresh lobby with no automatic retry loop", async () => {
   const f = fixture();
-  await f.ready("a"); await f.ready("b"); f.tick(5000);
-  f.setGenerate(async () => { throw new Error("AI unavailable"); });
-  assert.equal((await f.call("api/start-round.ts", {roomId: "ABCD"})).code, 500);
+  await f.ready("a");
+  await f.ready("b");
+  f.tick(5000);
+  f.setGenerate(async () => {
+    throw new Error("AI unavailable");
+  });
+  assert.equal(
+    (await f.call("api/start-round.ts", { roomId: "ABCD" })).code,
+    500,
+  );
   assert.equal(f.room.status, "LOBBY");
   assert.equal(f.room.lobbyVersion, 1);
   assert.equal(f.room.autoStartAt, null);

@@ -6,7 +6,11 @@ import { GameErrorPage } from "../components/GameError";
 import { GameLoading } from "../components/GameLoading/GameLoading";
 import { useAsync } from "../hooks/useAsync";
 import { useCountdown } from "../hooks/useCountdown";
-import { getPlayersByRoom, setPlayerReady, RoundStartingError } from "../lib/playersApi";
+import {
+  getPlayersByRoom,
+  setPlayerReady,
+  RoundStartingError,
+} from "../lib/playersApi";
 import { getRoom } from "../lib/roomsApi";
 import { upload } from "@vercel/blob/client";
 import { useAsyncAction } from "../hooks/useAsyncAction";
@@ -121,17 +125,11 @@ function PlayerLobby() {
     error: readyError,
   } = useAsyncAction(async () => {
     if (!roomId || !room) return;
-    if (
-      room.status !== "LOBBY" ||
-      startingVersion === (room.lobbyVersion ?? 0)
-    ) return;
+    if (room.status !== "LOBBY" || startingVersion === (room.lobbyVersion ?? 0))
+      return;
     let reply;
     try {
-      reply = await setPlayerReady(
-        roomId,
-        !isReady,
-        room.lobbyVersion ?? 0,
-      );
+      reply = await setPlayerReady(roomId, !isReady, room.lobbyVersion ?? 0);
     } catch (error) {
       if (error instanceof RoundStartingError) {
         setStartingVersion(room.lobbyVersion ?? 0);
@@ -147,8 +145,11 @@ function PlayerLobby() {
 
   useEffect(() => {
     if (
-      !roomId || !roomStatus || room?.closed ||
-      roomStatus === "LOBBY" || roomStatus === "STARTING"
+      !roomId ||
+      !roomStatus ||
+      room?.closed ||
+      roomStatus === "LOBBY" ||
+      roomStatus === "STARTING"
     )
       return;
 

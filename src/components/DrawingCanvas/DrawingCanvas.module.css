@@ -1,2 +1,14 @@
-.container { width: 100%; max-width: 600px; }
-.canvas { display: block; width: 100%; height: auto; border: 3px solid var(--ink); border-radius: 0.65rem; box-shadow: 4px 4px var(--ink); touch-action: none; background: white; }
+.container {
+  width: 100%;
+  max-width: 600px;
+}
+.canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 3px solid var(--ink);
+  border-radius: 0.65rem;
+  box-shadow: 4px 4px var(--ink);
+  touch-action: none;
+  background: white;
+}

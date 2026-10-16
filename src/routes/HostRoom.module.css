@@ -367,41 +367,171 @@
   }
 }
 
-.stage { padding: clamp(0.5rem, 2dvh, 1.5rem); gap: clamp(0.4rem, 1.5dvh, 1rem); }
-.logoSpace { width: min(30rem, 36vw, 32dvh); }
-.lobbyCenter { padding: 0.5rem 1rem; background: var(--paper); border: 3px solid var(--ink); border-radius: 1rem; box-shadow: 5px 5px var(--ink); }
-.stageTitle { font-size: clamp(1.2rem, 3dvh, 2rem); font-weight: 900; }
-.lobbyActions { gap: clamp(0.3rem, 1dvh, 0.75rem); }
-.playerCount { font-size: 0.95rem; opacity: 1; font-weight: 850; padding: 0.15rem 0.65rem; background: #00c879; border: 2px solid var(--ink); transform: rotate(-2deg); }
-.startButton { background: #ff4b51; }
-.lobbyPlayer { width: min(6rem, 10vw, 15dvh); }
-.roundContent { padding: 0.5rem; gap: 0.5rem; }
-.promptLabel { background: #00c879; padding: 0.1rem 0.6rem; border: 2px solid var(--ink); font-weight: 850; opacity: 1; }
-.prompt { padding: 0.5rem 1rem; background: var(--paper); border: 3px solid var(--ink); border-radius: 0.75rem; box-shadow: 4px 4px var(--ink); font-size: clamp(1rem, 3dvh, 2rem); }
-.roundPlayers { min-height: 0; gap: clamp(0.4rem, 2dvh, 1.5rem); }
-.roundPlayer { padding: 0.4rem; border: 2px solid var(--ink); border-radius: 0.75rem; background: var(--paper); width: min(8rem, 14vw, 23dvh); box-shadow: 3px 3px var(--ink); }
-.roundPlayer .playerName { font-size: 0.85rem; }
-.playerStatus { font-size: 0.7rem; }
+.stage {
+  padding: clamp(0.5rem, 2dvh, 1.5rem);
+  gap: clamp(0.4rem, 1.5dvh, 1rem);
+}
+.logoSpace {
+  width: min(30rem, 36vw, 32dvh);
+}
+.lobbyCenter {
+  padding: 0.5rem 1rem;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 1rem;
+  box-shadow: 5px 5px var(--ink);
+}
+.stageTitle {
+  font-size: clamp(1.2rem, 3dvh, 2rem);
+  font-weight: 900;
+}
+.lobbyActions {
+  gap: clamp(0.3rem, 1dvh, 0.75rem);
+}
+.playerCount {
+  font-size: 0.95rem;
+  opacity: 1;
+  font-weight: 850;
+  padding: 0.15rem 0.65rem;
+  background: #00c879;
+  border: 2px solid var(--ink);
+  transform: rotate(-2deg);
+}
+.startButton {
+  background: #ff4b51;
+}
+.lobbyPlayer {
+  width: min(6rem, 10vw, 15dvh);
+}
+.roundContent {
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+.promptLabel {
+  background: #00c879;
+  padding: 0.1rem 0.6rem;
+  border: 2px solid var(--ink);
+  font-weight: 850;
+  opacity: 1;
+}
+.prompt {
+  padding: 0.5rem 1rem;
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 0.75rem;
+  box-shadow: 4px 4px var(--ink);
+  font-size: clamp(1rem, 3dvh, 2rem);
+}
+.roundPlayers {
+  min-height: 0;
+  gap: clamp(0.4rem, 2dvh, 1.5rem);
+}
+.roundPlayer {
+  padding: 0.4rem;
+  border: 2px solid var(--ink);
+  border-radius: 0.75rem;
+  background: var(--paper);
+  width: min(8rem, 14vw, 23dvh);
+  box-shadow: 3px 3px var(--ink);
+}
+.roundPlayer .playerName {
+  font-size: 0.85rem;
+}
+.playerStatus {
+  font-size: 0.7rem;
+}
 @media (max-width: 48rem), (max-height: 500px) {
-  .roundPlayers { flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); align-content: center; align-items: center; max-width: 40rem; gap: 0.4rem; }
-  .roundPlayer { width: 100%; flex-direction: row; gap: 0.4rem; padding: 0.25rem; }
-  .roundAvatar { width: min(2.5rem, 6dvh); flex: 0 0 min(2.5rem, 6dvh); }
-  .roundPlayerDetails { align-items: flex-start; flex: 1; }
-  .roundPlayer .playerName { margin: 0; max-width: 100%; font-size: 0.75rem; }
-  .logoSpace { height: auto; width: min(12rem, 22dvh); }
+  .roundPlayers {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    align-content: center;
+    align-items: center;
+    max-width: 40rem;
+    gap: 0.4rem;
+  }
+  .roundPlayer {
+    width: 100%;
+    flex-direction: row;
+    gap: 0.4rem;
+    padding: 0.25rem;
+  }
+  .roundAvatar {
+    width: min(2.5rem, 6dvh);
+    flex: 0 0 min(2.5rem, 6dvh);
+  }
+  .roundPlayerDetails {
+    align-items: flex-start;
+    flex: 1;
+  }
+  .roundPlayer .playerName {
+    margin: 0;
+    max-width: 100%;
+    font-size: 0.75rem;
+  }
+  .logoSpace {
+    height: auto;
+    width: min(12rem, 22dvh);
+  }
 }
 @media (max-height: 500px) and (min-width: 550px) {
-  .lobbyPlayers { display: none; }
-  .stage:has(.lobbyActions) { flex-direction: row; gap: 2rem; }
-  .roundPlayers { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .lobbyPlayers {
+    display: none;
+  }
+  .stage:has(.lobbyActions) {
+    flex-direction: row;
+    gap: 2rem;
+  }
+  .roundPlayers {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
 /* Keep the shared round deadline visible above the drawing prompt. */
-.roundHeading { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.5rem; flex-shrink: 0; }
-.roundHeading .promptLabel { margin: 0; }
-.timer { display: flex; align-items: center; gap: 0.5rem; padding: 0.15rem 0.65rem; border: 2px solid var(--ink); border-radius: 0.4rem; background: #ff4b51; color: var(--ink); font-family: var(--font-room-code); font-size: clamp(1rem, 2.5dvh, 1.4rem); font-weight: 850; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.timerLabel { font-family: Inter, system-ui, sans-serif; font-size: 0.7rem; font-weight: 800; }
-.roundContent > .prompt { flex-shrink: 0; }
+.roundHeading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.roundHeading .promptLabel {
+  margin: 0;
+}
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.15rem 0.65rem;
+  border: 2px solid var(--ink);
+  border-radius: 0.4rem;
+  background: #ff4b51;
+  color: var(--ink);
+  font-family: var(--font-room-code);
+  font-size: clamp(1rem, 2.5dvh, 1.4rem);
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.timerLabel {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+.roundContent > .prompt {
+  flex-shrink: 0;
+}
 
-.readyCount { font-weight: 850; font-size: 0.85rem; }
-.readyStatus { font-size: 0.7rem; font-weight: 800; background: var(--paper); border-radius: 0.3rem; padding: 0.1rem 0.3rem; }
+.readyCount {
+  font-weight: 850;
+  font-size: 0.85rem;
+}
+.readyStatus {
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: var(--paper);
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.3rem;
+}
