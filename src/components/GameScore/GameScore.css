@@ -7,18 +7,73 @@
   flex-shrink: 0;
   filter: drop-shadow(2px 2px 0 #161616);
 }
-.game-score--gold { --medal-fill: #ffdb27; --medal-inner: #fff3ad; }
-.game-score--silver { --medal-fill: #bccbd7; --medal-inner: #edf4fa; }
-.game-score--bronze { --medal-fill: #cd8751; --medal-inner: #f4c89f; }
-.game-score__art { display: block; width: 100%; height: auto; overflow: visible; }
-.game-score__face { fill: var(--medal-fill); stroke: #161616; stroke-width: 2.5; stroke-linejoin: round; }
-.game-score__ring { fill: var(--medal-inner); stroke: #161616; stroke-width: 1.5; }
-.game-score__ribbon { fill: #ff4b51; stroke: #161616; stroke-width: 2.5; stroke-linejoin: round; }
-.game-score__shine { fill: none; stroke: #fffdf4; stroke-width: 3; stroke-linecap: round; }
-.game-score__number { position: absolute; left: 50%; top: 36.29%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 62%; }
-.game-score--burst .game-score__number { top: 50%; }
-.game-score__number img { height: var(--score-digit-height); width: auto; min-width: 0; object-fit: contain; filter: none; }
+.game-score--gold {
+  --medal-fill: #ffdb27;
+  --medal-inner: #fff3ad;
+}
+.game-score--silver {
+  --medal-fill: #bccbd7;
+  --medal-inner: #edf4fa;
+}
+.game-score--bronze {
+  --medal-fill: #cd8751;
+  --medal-inner: #f4c89f;
+}
+.game-score__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.game-score__face {
+  fill: var(--medal-fill);
+  stroke: #161616;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.game-score__ring {
+  fill: var(--medal-inner);
+  stroke: #161616;
+  stroke-width: 1.5;
+}
+.game-score__ribbon {
+  fill: #ff4b51;
+  stroke: #161616;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.game-score__shine {
+  fill: none;
+  stroke: #fffdf4;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.game-score__number {
+  position: absolute;
+  left: 50%;
+  top: 36.29%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 62%;
+}
+.game-score--burst .game-score__number {
+  top: 50%;
+}
+.game-score__number img {
+  height: var(--score-digit-height);
+  width: auto;
+  min-width: 0;
+  object-fit: contain;
+  filter: none;
+}
 
 /* Numeral thresholds are independent of the rank-based medal colors. */
-.game-score__number--silver img { filter: grayscale(1) brightness(1.15); }
-.game-score__number--bronze img { filter: sepia(2) saturate(2.75) hue-rotate(-45deg) brightness(0.68) contrast(1.85); }
+.game-score__number--silver img {
+  filter: grayscale(1) brightness(1.15);
+}
+.game-score__number--bronze img {
+  filter: sepia(2) saturate(2.75) hue-rotate(-45deg) brightness(0.68)
+    contrast(1.85);
+}

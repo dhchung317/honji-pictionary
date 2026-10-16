@@ -17,6 +17,7 @@ Room saves preserve the remaining expiry in one Lua operation. A room with no ex
 ## Test
 
 Using DEVELOPMENT Redis:
+
 1. Create a room; inspect PTTL for `room:CODE`: it should be positive and around one hour.
 2. Set that key's TTL to 120 seconds, then start/advance the room. Its remaining TTL should continue decreasing, not reset to one hour or become permanent (-1).
 3. Remove a room's expiry, then trigger a normal save: it should receive the one-hour fallback.

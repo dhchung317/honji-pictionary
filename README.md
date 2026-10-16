@@ -45,28 +45,28 @@ The home page’s **Instructions** tab keeps the rules close at hand.
 
 ## What’s inside
 
-| Feature | The experience |
-| :--- | :--- |
-| **Room-code multiplayer** | Join the same game from separate devices, without creating an account. |
-| **Drawn avatars** | Introduce yourself with a sketch before the round begins. |
-| **Fresh prompts** | AI creates a shared drawing challenge using the room’s prompt history. |
-| **Timed drawing** | A browser canvas with undo, clear, and automatic submission at the deadline. |
-| **AI judging** | Scores from 0–100, ranked submissions, and short, playful reactions. |
-| **A shared podium** | Gold, silver, and bronze medals on the host’s results screen. |
-| **Mobile-ready results** | Full-width cards and a scrolling results view for phones. |
-| **Comic-book personality** | Bold outlines, bright colors, expressive artwork, and plenty of bad art. |
+| Feature                    | The experience                                                               |
+| :------------------------- | :--------------------------------------------------------------------------- |
+| **Room-code multiplayer**  | Join the same game from separate devices, without creating an account.       |
+| **Drawn avatars**          | Introduce yourself with a sketch before the round begins.                    |
+| **Fresh prompts**          | AI creates a shared drawing challenge using the room’s prompt history.       |
+| **Timed drawing**          | A browser canvas with undo, clear, and automatic submission at the deadline. |
+| **AI judging**             | Scores from 0–100, ranked submissions, and short, playful reactions.         |
+| **A shared podium**        | Gold, silver, and bronze medals on the host’s results screen.                |
+| **Mobile-ready results**   | Full-width cards and a scrolling results view for phones.                    |
+| **Comic-book personality** | Bold outlines, bright colors, expressive artwork, and plenty of bad art.     |
 
 ## Built with
 
-| Layer | Tools |
-| :--- | :--- |
-| Interface | React · TypeScript · Vite · CSS Modules |
-| Navigation | React Router |
-| Drawing | HTML Canvas · Pointer Events |
-| API & hosting | Vercel Functions · Vercel |
-| Game state | Upstash Redis |
-| Image uploads | Vercel Blob |
-| Prompts & judging | OpenAI API · Zod structured outputs |
+| Layer             | Tools                                   |
+| :---------------- | :-------------------------------------- |
+| Interface         | React · TypeScript · Vite · CSS Modules |
+| Navigation        | React Router                            |
+| Drawing           | HTML Canvas · Pointer Events            |
+| API & hosting     | Vercel Functions · Vercel               |
+| Game state        | Upstash Redis                           |
+| Image uploads     | Vercel Blob                             |
+| Prompts & judging | OpenAI API · Zod structured outputs     |
 
 The browser polls room state to follow the game from lobby to drawing, judging, and results. Redis holds room, player, round, submission, and score records; Blob stores the uploaded artwork.
 
@@ -122,14 +122,14 @@ To test with a phone, open Vite’s network address on a device connected to the
 
 ### Useful commands
 
-| Command | Purpose |
-| :--- | :--- |
-| `npm run ui` | Start the Vite development server. |
-| `npm run api` | Run the API through Vercel’s local development server. |
-| `npm run build` | Type-check and produce the production build. |
-| `npm run preview` | Preview the built interface locally. |
-| `npm run lint` | Run ESLint. |
-| `node --test tests/*/*.cjs` | Run the regression tests. |
+| Command                     | Purpose                                                |
+| :-------------------------- | :----------------------------------------------------- |
+| `npm run ui`                | Start the Vite development server.                     |
+| `npm run api`               | Run the API through Vercel’s local development server. |
+| `npm run build`             | Type-check and produce the production build.           |
+| `npm run preview`           | Preview the built interface locally.                   |
+| `npm run lint`              | Run ESLint.                                            |
+| `node --test tests/*/*.cjs` | Run the regression tests.                              |
 
 ## Project map
 

@@ -40,8 +40,8 @@ export function PlayerAvatarView({
             {isStarting
               ? "Starting round…"
               : room.autoStartAt
-              ? `Everyone’s ready! Starting in ${Math.max(1, startSeconds ?? 5)}…`
-              : "The round starts five seconds after everyone is ready."}
+                ? `Everyone’s ready! Starting in ${Math.max(1, startSeconds ?? 5)}…`
+                : "The round starts five seconds after everyone is ready."}
           </p>
           <h2>Draw your avatar</h2>
 
@@ -90,7 +90,9 @@ export function PlayerAvatarView({
                 ? "Starting…"
                 : readyBusy
                   ? "Updating…"
-                  : isReady ? "Unready" : "Ready"}
+                  : isReady
+                    ? "Unready"
+                    : "Ready"}
             </button>
           </div>
         </div>

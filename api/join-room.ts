@@ -24,29 +24,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!(await allowRequest(req, res, "join", 24, 60, roomId))) return;
 
   const release = await acquireRoomMutation(roomId);
-  if (!release) return res.status(409).json({ error: "Room update in progress. Try again." });
+  if (!release)
+    return res
+      .status(409)
+      .json({ error: "Room update in progress. Try again." });
   const flush = deferJsonResponse(res);
   try {
-  const room = await getRoomById(roomId);
-  if (!room || room.closed) return res.status(404).json({ error: "Room not found" });
-  if (room.status !== "LOBBY")
-    return res.status(400).json({ error: "Game started, cannot join" });
+    const room = await getRoomById(roomId);
+    if (!room || room.closed)
+      return res.status(404).json({ error: "Room not found" });
+    if (room.status !== "LOBBY")
+      return res.status(400).json({ error: "Game started, cannot join" });
 
-  try {
-    const player = await upsertPlayer(roomId, name);
-    await syncLobbyCountdown(room);
-    const sessionToken = await issueSession({
-      role: "PLAYER",
-      roomId,
-      id: player.id,
-    });
-    res.status(200).json({ ...player, sessionToken });
-  } catch (error) {
-    if (error instanceof Error && error.message === "ROOM_FULL")
-      return res
-        .status(409)
-        .json({ error: "Room is full (10 players maximum)" });
-    res.status(503).json({ error: "Unable to join room" });
+    try {
+      const player = await upsertPlayer(roomId, name);
+      await syncLobbyCountdown(room);
+      const sessionToken = await issueSession({
+        role: "PLAYER",
+        roomId,
+        id: player.id,
+      });
+      res.status(200).json({ ...player, sessionToken });
+    } catch (error) {
+      if (error instanceof Error && error.message === "ROOM_FULL")
+        return res
+          .status(409)
+          .json({ error: "Room is full (10 players maximum)" });
+      res.status(503).json({ error: "Unable to join room" });
+    }
+  } finally {
+    try {
+      await release();
+    } finally {
+      flush();
+    }
   }
-  } finally { try { await release(); } finally { flush(); } }
 }

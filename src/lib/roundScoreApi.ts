@@ -5,7 +5,7 @@ export async function getRoundScore(
   roundId: string | null,
 ): Promise<RoundScore> {
   const res = await fetch(
-    `/api/get-round-score?roomId=${encodeURIComponent(roomId)}&roundId=${encodeURIComponent(roundId ?? '')}`,
+    `/api/get-round-score?roomId=${encodeURIComponent(roomId)}&roundId=${encodeURIComponent(roundId ?? "")}`,
   );
 
   if (!res.ok) {

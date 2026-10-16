@@ -8,9 +8,13 @@ export function GameHeader() {
   if (!roomId) return null;
   return (
     <header className={styles.header}>
-      <Link to="/" className={styles.brand} aria-label="Honji home"><img src="/honji-wordmark.svg" alt="Honji" width="1040" height="425" /></Link>
-      <div className={styles.room} aria-label={`Room ${roomId}`}><span className={styles.label}>Room</span><strong className={styles.code}>{roomId}</strong></div>
-
+      <Link to="/" className={styles.brand} aria-label="Honji home">
+        <img src="/honji-wordmark.svg" alt="Honji" width="1040" height="425" />
+      </Link>
+      <div className={styles.room} aria-label={`Room ${roomId}`}>
+        <span className={styles.label}>Room</span>
+        <strong className={styles.code}>{roomId}</strong>
+      </div>
     </header>
   );
 }

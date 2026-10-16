@@ -5,9 +5,15 @@ interface GameLoadingProps {
   inline?: boolean;
 }
 
-export function GameLoading({ message = "Loading...", inline = false }: GameLoadingProps) {
+export function GameLoading({
+  message = "Loading...",
+  inline = false,
+}: GameLoadingProps) {
   return (
-    <div className={`${styles.page} ${inline ? styles.inline : ""}`} role="status">
+    <div
+      className={`${styles.page} ${inline ? styles.inline : ""}`}
+      role="status"
+    >
       <div className={styles.content}>
         <div className={styles.spinner} />
         <p className={styles.message}>{message}</p>

@@ -25,24 +25,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const room = await getRoomById(roomId);
   if (!room) return res.status(404).json({ error: "Room not found" });
 
-  if(!room.currentRoundId) return res.status(404).json({ error: "Round id not found" });
+  if (!room.currentRoundId)
+    return res.status(404).json({ error: "Round id not found" });
   const round = await getRound(room.id, room.currentRoundId);
-  if(!round) return res.status(404).json({ error: "Round not found" });
-
+  if (!round) return res.status(404).json({ error: "Round not found" });
 
   if (!round.frozenPlayerIds.includes(playerId))
     return res
       .status(400)
       .json({ error: "Cannot accept submission players outside round" });
 
-  if (!await authorize(req, res, { role: "PLAYER", roomId, id: playerId })) return;
-  if (!await allowRequest(req, res, "submit", 6, 60, `${roomId}:${playerId}`)) return;
+  if (!(await authorize(req, res, { role: "PLAYER", roomId, id: playerId })))
+    return;
+  if (!(await allowRequest(req, res, "submit", 6, 60, `${roomId}:${playerId}`)))
+    return;
   const prefix = `room/${roomId}/round/${round.id}/players/${playerId}`;
-  if (!validImageUrl(imageUrl, prefix + "-")) return res.status(400).json({ error: "Invalid drawing image" });
+  if (!validImageUrl(imageUrl, prefix + "-"))
+    return res.status(400).json({ error: "Invalid drawing image" });
   try {
     const blob = await head(imageUrl);
-    if (blob.size > 2 * 1024 * 1024 || !["image/png", "image/jpeg", "image/webp"].includes(blob.contentType)) throw new Error("Invalid image");
-  } catch { return res.status(400).json({ error: "Drawing image could not be verified" }); }
+    if (
+      blob.size > 2 * 1024 * 1024 ||
+      !["image/png", "image/jpeg", "image/webp"].includes(blob.contentType)
+    )
+      throw new Error("Invalid image");
+  } catch {
+    return res
+      .status(400)
+      .json({ error: "Drawing image could not be verified" });
+  }
 
   const now = Date.now();
   const endAt = round.roundEndAt;

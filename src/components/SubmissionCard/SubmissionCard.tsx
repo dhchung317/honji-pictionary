@@ -33,7 +33,10 @@ export function SubmissionCard({
   const scoreHeight = variant === "host" || isWinner ? 20 : 16;
 
   return (
-    <article className={className} style={{ "--image-ratio": imageRatio } as CSSProperties}>
+    <article
+      className={className}
+      style={{ "--image-ratio": imageRatio } as CSSProperties}
+    >
       <div className={styles.submissionHeader}>
         <span>{submission.playerName}</span>
 
@@ -42,24 +45,28 @@ export function SubmissionCard({
 
       <div className={styles.imageContainer}>
         <div className={styles.imageFrame} style={{ aspectRatio: imageRatio }}>
-        <img
-          className={styles.submissionImage}
-          style={{ width: "100%", height: "auto", aspectRatio: imageRatio }}
-          src={submission.imageUrl}
-          alt={`Submission from ${submission.playerName}`}
-          onLoad={event => {
-            const image = event.currentTarget;
-            if (image.naturalWidth && image.naturalHeight) {
-              setImageRatio(image.naturalWidth / image.naturalHeight);
-            }
-          }}
-        />
+          <img
+            className={styles.submissionImage}
+            style={{ width: "100%", height: "auto", aspectRatio: imageRatio }}
+            src={submission.imageUrl}
+            alt={`Submission from ${submission.playerName}`}
+            onLoad={(event) => {
+              const image = event.currentTarget;
+              if (image.naturalWidth && image.naturalHeight) {
+                setImageRatio(image.naturalWidth / image.naturalHeight);
+              }
+            }}
+          />
 
-        {result && (
-          <div className={styles.scoreBadge}>
-            <GameScore score={result.score} rank={result.rank} height={scoreHeight} />
-          </div>
-        )}
+          {result && (
+            <div className={styles.scoreBadge}>
+              <GameScore
+                score={result.score}
+                rank={result.rank}
+                height={scoreHeight}
+              />
+            </div>
+          )}
         </div>
       </div>
 

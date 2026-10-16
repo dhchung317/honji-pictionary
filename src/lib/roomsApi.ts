@@ -35,11 +35,21 @@ export async function getRoom(roomId: string): Promise<RoomState> {
   return res.json();
 }
 
-export async function startRound(roomId: string, automatic?: { lobbyVersion: number }) {
+export async function startRound(
+  roomId: string,
+  automatic?: { lobbyVersion: number },
+) {
   const res = await fetch(`/api/start-round`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "HOST") },
-    body: JSON.stringify({ roomId, autoStart: Boolean(automatic), lobbyVersion: automatic?.lobbyVersion }),
+    headers: {
+      "Content-Type": "application/json",
+      ...sessionHeaders(roomId, "HOST"),
+    },
+    body: JSON.stringify({
+      roomId,
+      autoStart: Boolean(automatic),
+      lobbyVersion: automatic?.lobbyVersion,
+    }),
   });
   if (!res.ok) {
     const body = await res.json().catch(() => null);
@@ -51,7 +61,10 @@ export async function startRound(roomId: string, automatic?: { lobbyVersion: num
 export async function nextRound(roomId: string) {
   const res = await fetch("/api/next-round", {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "HOST") },
+    headers: {
+      "Content-Type": "application/json",
+      ...sessionHeaders(roomId, "HOST"),
+    },
     body: JSON.stringify({ roomId }),
   });
   if (!res.ok) throw new Error("Host action failed");
@@ -60,7 +73,10 @@ export async function nextRound(roomId: string) {
 export async function quit(roomId: string) {
   const res = await fetch("/api/quit-room", {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "HOST") },
+    headers: {
+      "Content-Type": "application/json",
+      ...sessionHeaders(roomId, "HOST"),
+    },
     body: JSON.stringify({ roomId }),
   });
   if (!res.ok) throw new Error("Host action failed");

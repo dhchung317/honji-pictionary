@@ -9,7 +9,10 @@ export async function createSubmission(input: {
 }): Promise<Submission> {
   const res = await fetch("/api/submit-drawing", {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...sessionHeaders(input.roomId, "PLAYER") },
+    headers: {
+      "Content-Type": "application/json",
+      ...sessionHeaders(input.roomId, "PLAYER"),
+    },
     body: JSON.stringify(input),
   });
   if (!res.ok) throw new Error("Failed to submit drawing");

@@ -18,30 +18,33 @@ const PromptResultSchema = z.object({
 export async function genPrompt(params: { history: string[] }) {
   const style = getRandomPromptStyle();
 
-  const resp = await openai.responses.parse({
-    model: "gpt-4o-mini",
+  const resp = await openai.responses.parse(
+    {
+      model: "gpt-4o-mini",
 
-    instructions: PROMPT_INSTRUCTIONS,
+      instructions: PROMPT_INSTRUCTIONS,
 
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: buildPromptInput({
-              style,
-              history: params.history,
-            }),
-          },
-        ],
+      input: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_text",
+              text: buildPromptInput({
+                style,
+                history: params.history,
+              }),
+            },
+          ],
+        },
+      ],
+
+      text: {
+        format: zodTextFormat(PromptResultSchema, "prompt_result"),
       },
-    ],
-
-    text: {
-      format: zodTextFormat(PromptResultSchema, "prompt_result"),
     },
-  }, { timeout: 45_000, maxRetries: 0 });
+    { timeout: 45_000, maxRetries: 0 },
+  );
 
   const parsed = resp.output_parsed;
 

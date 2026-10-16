@@ -1,8 +1,4 @@
-export type RoundStatus =
-  | "DRAWING"
-  | "SCORING"
-  | "SCORING_FAILED"
-  | "DONE";
+export type RoundStatus = "DRAWING" | "SCORING" | "SCORING_FAILED" | "DONE";
 
 export interface Round {
   id: string;
