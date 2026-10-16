@@ -196,7 +196,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     release = await acquireRoomMutation(roomId);
     if (!release) {
-      return res.status(200).json({ room: snapshot, round: null });
+      const round = snapshot.currentRoundId
+        ? await getRound(snapshot.id, snapshot.currentRoundId)
+        : null;
+      return res.status(200).json({ room: snapshot, round });
     }
 
     const room = await getRoomById(roomId);

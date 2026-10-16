@@ -73,3 +73,29 @@ test("one submitted player advances to scoring before the deadline and unlocks b
  const res=response();const send=res.json;res.json=function(body){assert.equal(released,true);return send.call(this,body);};
  await handler({method:"GET",query:{roomId:"ABCD"}},res);assert.equal(res.body.round.status,"SCORING");assert.equal(res.body.room.status,"SCORING");
 });
+
+test("busy active-room polling preserves round details without mutating the room", async () => {
+  const room = { id: "ABCD", status: "DRAWING", currentRoundId: "round1" };
+  const round = {
+    id: "round1",
+    status: "DRAWING",
+    prompt: "cat",
+    frozenPlayerIds: ["p"],
+  };
+  const handler = load("api/get-room.ts", {
+    "./_mutationLock.js": { acquireRoomMutation: async () => null },
+    "./redis.js": { redis: {} },
+    "./_roomStore.js": { getRoomById: async () => room },
+    "./_roundStore.js": { getRound: async () => round },
+    "./_submissionStore.js": {},
+    "./_aiScoreRound.js": {},
+    "./_roundScoreStore.js": {},
+    "./shared.js": {},
+  }).default;
+  const res = response();
+  await handler({ method: "GET", query: { roomId: "ABCD" } }, res);
+  assert.equal(res.code, 200);
+  assert.equal(res.body.round.id, "round1");
+  assert.equal(res.body.round.prompt, "cat");
+  assert.equal(res.body.room.status, "DRAWING");
+});
