@@ -35,13 +35,16 @@ export async function getRoom(roomId: string): Promise<RoomState> {
   return res.json();
 }
 
-export async function startRound(roomId: string) {
+export async function startRound(roomId: string, automatic?: { lobbyVersion: number }) {
   const res = await fetch(`/api/start-round`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "HOST") },
-    body: JSON.stringify({ roomId }),
+    body: JSON.stringify({ roomId, autoStart: Boolean(automatic), lobbyVersion: automatic?.lobbyVersion }),
   });
-  if (!res.ok) throw new Error(res.statusText);
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.error || res.statusText);
+  }
   return res.json();
 }
 

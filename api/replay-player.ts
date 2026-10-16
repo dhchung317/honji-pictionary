@@ -4,6 +4,7 @@ import { acquireRoomMutation } from "./_mutationLock.js";
 import { deferJsonResponse } from "./_deferredResponse.js";
 import { getRoomById } from "./_roomStore.js";
 import { getPlayer, rejoinPlayer, savePlayer } from "./_playerStore.js";
+import { syncLobbyCountdown } from "./_lobbyReady.js";
 import { getRound } from "./_roundStore.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -24,8 +25,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!pending && !lobby) return res.status(409).json({ error: "The next round has already started or this replay is out of date." });
     const round = await getRound(roomId, roundId);
     if (round?.status !== "DONE" || !round.frozenPlayerIds.includes(playerId)) return res.status(403).json({ error: "You did not participate in this round." });
-    const updated = { ...player, replayRoundId: roundId };
-    if (lobby) await rejoinPlayer(updated);
+    const updated = { ...player, replayRoundId: roundId, ready: player.replayRoundId === roundId ? player.ready : false };
+    if (lobby) { await rejoinPlayer(updated); await syncLobbyCountdown(room); }
     else await savePlayer(updated);
     return res.status(200).json({ waitingForHost: pending });
   } catch (error) {

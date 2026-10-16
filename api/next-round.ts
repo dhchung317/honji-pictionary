@@ -32,13 +32,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const players = await listPlayers(roomId);
   for (const player of players) {
     if (player.replayRoundId !== room.currentRoundId) await removePlayerFromRoster(roomId, player.id);
-    else await savePlayer(player);
+    else await savePlayer({ ...player, ready: false });
   }
 
   const updated: Room = {
     ...room,
     status: "LOBBY",
     replayFromRoundId: room.currentRoundId,
+    lobbyVersion: (room.lobbyVersion ?? 0) + 1,
+    autoStartAt: null,
   };
 
   await saveRoom(updated);

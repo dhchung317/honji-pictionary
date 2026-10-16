@@ -10,7 +10,7 @@ function load(file, mocks = {}) {
   const source = readFileSync(path.join(root, file), "utf8");
   const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
   const module = { exports: {} };
-  const sandbox = { module, exports: module.exports, require: id => id in mocks ? mocks[id] : require(id), crypto: crypto.webcrypto, Date, Error, console: { ...console, error() {} }, setTimeout, clearTimeout, URL };
+  const sandbox = { module, exports: module.exports, require: id => id in mocks ? mocks[id] : id === "./_lobbyReady.js" ? { syncLobbyCountdown: async room => room } : require(id), crypto: crypto.webcrypto, Date, Error, console: { ...console, error() {} }, setTimeout, clearTimeout, URL };
   vm.runInNewContext(code, sandbox, { filename: file });
   return module.exports;
 }

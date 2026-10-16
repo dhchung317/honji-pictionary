@@ -10,5 +10,7 @@ export interface Room {
   promptHistory: string[]; // optional but recommended
   replayFromRoundId?: string;
   closed?: boolean;
+  lobbyVersion?: number;
+  autoStartAt?: string | null;
   theme: string | null; // optional: "animals", "food", etc.
 }

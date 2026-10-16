@@ -36,9 +36,10 @@ Honji turns a shared screen and a handful of phones into a drawing competition. 
 
 1. **Create a room.** Open [honji.xyz](https://honji.xyz/) and choose **Host a new game**. Share the four-letter room code. The host doesn’t need a player name.
 2. **Bring your friends.** Up to 10 players enter a name and the room code, then draw and submit their avatar in the lobby.
-3. **Start the round.** When everyone has joined, the host chooses **Start Round**. Everyone receives the same AI-generated prompt.
+3. **Start the round.** Players choose **I’m ready** in the avatar lobby. When everyone is ready, the round starts after a five-second countdown; choosing unready cancels it. The host can also start manually. Everyone receives the same AI-generated prompt.
 4. **Beat the clock.** Players have three minutes to draw. Submit early or let the game submit automatically when the countdown reaches zero.
 5. **Meet the winner.** AI judges the drawings and assigns rankings, scores, and feedback. The host screen features the top three; each player can browse the full results on their device.
+6. **Go again—or call it a night.** Players choose **Play again** or **Leave room**. The host chooses **Play another round** to reopen the avatar lobby, or **Back to home** to close the room. Players who skip replay are excluded from the next round. Joining is available only while the lobby is open.
 
 The home page’s **Instructions** tab keeps the rules close at hand.
 

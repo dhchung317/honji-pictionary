@@ -66,3 +66,10 @@ export async function leaveRoom(roomId: string) {
   await playerAction(roomId, "leave-room");
   for (const key of ["playerId", "playerName", "playerSession", "submittedRound", "replayRound"]) sessionStorage.removeItem(`${key}:${roomId}`);
 }
+
+export async function setPlayerReady(roomId: string, ready: boolean, lobbyVersion: number) {
+  const res = await fetch("/api/set-ready", { method: "POST", headers: { "Content-Type": "application/json", ...sessionHeaders(roomId, "PLAYER") }, body: JSON.stringify({ roomId, playerId: sessionStorage.getItem(`playerId:${roomId}`), ready, lobbyVersion }) });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error || "Unable to change readiness.");
+  return body as { ready: boolean; autoStartAt: string | null };
+}

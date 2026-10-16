@@ -1,3 +1,4 @@
+import { syncLobbyCountdown } from "./_lobbyReady.js";
 import { deferJsonResponse } from "./_deferredResponse.js";
 import { authorize } from "./_session.js";
 import { allowRequest } from "./_limits.js";
@@ -55,6 +56,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 
     const entrants = await listPlayers(roomId);
+    if (req.body?.autoStart === true) {
+      const current = await syncLobbyCountdown(room);
+      if ((room.lobbyVersion ?? 0) !== req.body.lobbyVersion || !current.autoStartAt || Date.parse(current.autoStartAt) > Date.now() || entrants.length === 0 || !entrants.every(player => player.ready === true)) {
+        return res.status(409).json({ error: "Automatic start was cancelled or is not due yet." });
+      }
+    }
     if (entrants.length === 0) return res.status(409).json({ error: "Wait for at least one player to join." });
     const { prompt } = await genPrompt({ history: room.promptHistory });
 
@@ -81,6 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const updated: Room = {
       ...room,
       currentRoundId: round.id,
+      autoStartAt: null,
       status: "DRAWING",
       promptHistory: [...room.promptHistory, prompt],
     };

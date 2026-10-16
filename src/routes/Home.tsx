@@ -73,7 +73,7 @@ function Home() {
         <ol className={styles.playSteps}>
           <li><strong>Host a game.</strong><p>Choose “Host a new game” and share the four-letter room code. The host doesn’t need a player name.</p></li>
           <li><strong>Join and make your mark.</strong><p>Players open this site, enter a name and the room code, then draw and submit an avatar in the lobby.</p></li>
-          <li><strong>Get everyone ready.</strong><p>Once players have joined, the host chooses “Start Round.” Everyone gets the same drawing prompt.</p></li>
+          <li><strong>Get everyone ready.</strong><p>Players choose “I’m ready” in the avatar lobby. Once everyone is ready, a five-second countdown starts. Choose unready to cancel it; the host can also start a round manually. Everyone gets the same drawing prompt.</p></li>
           <li><strong>Draw against the clock.</strong><p>You have three minutes to bring the prompt to life. Submit when you’re ready; your drawing is submitted automatically when time runs out.</p></li>
           <li><strong>See who takes the crown.</strong><p>AI scores the drawings and picks a winner. Check the rankings and feedback on your phone, and enjoy the top drawings together on the host screen.</p></li>
         </ol>

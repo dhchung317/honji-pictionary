@@ -14,6 +14,8 @@ export async function createRoom(hostId: string): Promise<Room> {
     drawingDurationMs: 180_000,
     promptHistory: [],
     theme: null,
+    lobbyVersion: 0,
+    autoStartAt: null,
   };
 
   // Upstash will JSON-serialize this object
