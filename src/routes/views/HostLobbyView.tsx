@@ -66,13 +66,13 @@ export function HostLobbyView({
             {autoStartError} Use Start Round to retry.
           </p>
         )}
-        <div style={{ fontSize: "1.25rem" }}>
+        <div className={styles.joinInstructions}>
           <p className={styles.stageMessage}>
-            Enter <strong style={{ fontSize: "1.5rem" }}>{room.id}</strong>
+            Enter{" "}
+            <strong className={styles.joinRoomCode}>{room.id}</strong>
           </p>
           <p className={styles.stageMessage}>
-            at <strong style={{ fontSize: "1.25rem" }}>{baseUrl}</strong> to
-            play.
+            at <strong className={styles.joinUrl}>{baseUrl}</strong> to play.
           </p>
         </div>
         <button

@@ -32,6 +32,7 @@
 }
 .waiting {
   display: inline-block;
+  color: var(--color-action-text);
   background: var(--color-green);
   border: 2px solid var(--color-border);
   padding: 0.15rem 0.6rem;
@@ -42,7 +43,11 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: min(100%, 32rem, max(0px, calc(var(--game-content-height) - 13rem)));
+  width: min(
+    100%,
+    32rem,
+    max(0px, calc(var(--game-content-height) - var(--lobby-chrome-height)))
+  );
 }
 .actionsBox {
   display: flex;
@@ -65,6 +70,14 @@
 }
 .clearButton {
   background: var(--color-panel);
+  color: var(--color-text);
+}
+.readyButton {
+  background: var(--color-green);
+  font-size: 0.85rem;
+}
+.readyButton[aria-pressed="true"] {
+  background: var(--color-ready-selected);
 }
 .error {
   color: var(--color-danger);
@@ -82,41 +95,16 @@
   .avatarHeading {
     grid-column: 1;
   }
+  .avatarSection .readyButton {
+    grid-column: 1;
+  }
   .canvasContainer {
     grid-column: 2;
-    grid-row: 1 / 4;
+    grid-row: 1 / 5;
     width: min(45vw, calc(var(--game-content-height) - 2rem));
   }
   .actions,
   .error {
     grid-column: 1;
   }
-}
-
-.readyButton {
-  background: var(--color-green);
-  font-size: 0.85rem;
-}
-.readyButton[aria-pressed="true"] {
-  background: var(--color-ready-selected);
-}
-/* Reserve room for readiness without hiding the avatar controls. */
-.canvasContainer {
-  width: min(100%, 32rem, max(0px, calc(var(--game-content-height) - 17rem)));
-}
-@media (max-height: 500px) and (min-width: 550px) {
-  .avatarSection .readyButton {
-    grid-column: 1;
-  }
-  .avatarSection .canvasContainer {
-    width: min(45vw, calc(var(--game-content-height) - 2rem));
-    grid-row: 1 / 5;
-  }
-}
-
-.waiting {
-  color: var(--color-action-text);
-}
-.clearButton {
-  color: var(--color-text);
 }

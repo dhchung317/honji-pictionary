@@ -44,26 +44,6 @@
   font-size: 1.3rem;
   letter-spacing: 0.12em;
 }
-.actions {
-  justify-self: end;
-}
-.actions button {
-  padding: 0.25rem 0.65rem;
-  font-size: 0.8rem;
-  background: var(--color-red);
-}
-.error {
-  position: absolute;
-  top: 100%;
-  right: 0.5rem;
-  max-width: min(24rem, 90vw);
-  padding: 0.5rem;
-  background: var(--color-panel);
-  border: 2px solid var(--color-danger-border);
-  color: var(--color-danger);
-  font-size: 0.85rem;
-}
-
 .themeControl {
   grid-column: 3;
   justify-self: end;

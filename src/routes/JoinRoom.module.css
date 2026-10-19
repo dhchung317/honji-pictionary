@@ -47,7 +47,11 @@
 .canvasContainer {
   display: flex;
   justify-content: center;
-  width: min(100%, 32rem, max(0px, calc(var(--game-content-height) - 13rem)));
+  width: min(
+    100%,
+    32rem,
+    max(0px, calc(var(--game-content-height) - var(--drawing-chrome-height)))
+  );
 }
 .actions {
   display: flex;

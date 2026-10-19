@@ -1,5 +1,3 @@
-/* ---------- Page ---------- */
-
 .page {
   width: 100%;
   height: 100%;
@@ -10,111 +8,76 @@
   width: 100%;
   height: 100%;
   min-height: 0;
-
   display: flex;
   flex-direction: column;
 }
-
-/* ---------- Header ---------- */
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-xl);
-
-  padding: var(--space-lg) var(--space-xl);
-}
-
-.title {
-  margin: 0;
-}
-
-/* ---------- Game stage ---------- */
 
 .stage {
   position: relative;
-
   flex: 1;
-  flex-direction: column;
-  min-height: 0;
-  width: 100%;
-
-  overflow: hidden;
-
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  padding: clamp(0.5rem, 2dvh, 1.5rem);
+  gap: clamp(0.4rem, 1.5dvh, 1rem);
 }
-
-/* ---------- Shared phase content ---------- */
 
 .stageTitle {
   margin: 0 0 var(--space-sm);
+  font-size: clamp(1.2rem, 3dvh, 2rem);
+  font-weight: 900;
 }
 
 .stageMessage {
   max-width: 32rem;
   margin: 0;
-
   opacity: 0.75;
 }
 
-.playerCount {
+.joinInstructions {
   font-size: 1.25rem;
-  margin: 0;
+}
 
-  opacity: 0.7;
+.joinInstructions strong {
+  font-weight: inherit;
+}
+
+.joinRoomCode {
+  font-size: 1.5rem;
+}
+
+.joinUrl {
+  font-size: 1.25rem;
+}
+
+.playerCount {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 850;
+  color: var(--color-action-text);
+  padding: 0.15rem 0.65rem;
+  background: var(--color-green);
+  border: 2px solid var(--color-border);
+  transform: rotate(-2deg);
 }
 
 .startButton {
   min-width: 12rem;
   padding: 0.8rem 1.5rem;
-
-  border-color: var(--color-primary);
+  background: var(--color-red);
 }
 
 .error {
   margin: 0;
-
   color: var(--color-danger);
 }
 
-/* ---------- Lobby ---------- */
-
 /*
-  The player field fills the entire stage.
-
-  Players are assigned to these predefined slots based
-  on their position in the players array / join order.
-*/
-.lobbyPlayers {
-  position: absolute;
-  inset: 0;
-
-  display: grid;
-
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-
-  padding: var(--space-lg) var(--space-xl);
-
-  pointer-events: none;
-}
-
-.lobbyPlayer {
-  min-width: 0;
-  width: 6rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  place-self: center;
-}
-
-/*
-  Center column / center row is intentionally left open
-  for the Honji logo or another central graphic.
+  Players are assigned to these slots based on join order.
 
       P1          P2
 
@@ -122,101 +85,98 @@
 
       P5          P6
 */
+.lobbyPlayers {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: var(--space-lg) var(--space-xl);
+  pointer-events: none;
+}
+
+.lobbyPlayer {
+  min-width: 0;
+  width: min(6rem, 10vw, 15dvh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  place-self: center;
+}
 
 .playerSlot1 {
   grid-column: 2;
   grid-row: 1;
 }
-
 .playerSlot2 {
   grid-column: 4;
   grid-row: 1;
 }
-
 .playerSlot3 {
   grid-column: 1;
   grid-row: 2;
 }
-
 .playerSlot4 {
   grid-column: 5;
   grid-row: 2;
 }
-
 .playerSlot5 {
   grid-column: 2;
   grid-row: 3;
 }
-
 .playerSlot6 {
   grid-column: 4;
   grid-row: 3;
 }
-
 .playerSlot7 {
   grid-column: 1;
   grid-row: 1;
 }
-
 .playerSlot8 {
   grid-column: 5;
   grid-row: 1;
 }
-
 .playerSlot9 {
   grid-column: 1;
   grid-row: 3;
 }
-
 .playerSlot10 {
   grid-column: 5;
   grid-row: 3;
 }
 
-/* ---------- Lobby center ---------- */
-
 .lobbyCenter {
   z-index: 1;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-
   pointer-events: none;
+  padding: 0.5rem 1rem;
+  background: var(--color-panel);
+  border: 3px solid var(--color-border);
+  border-radius: 1rem;
+  box-shadow: 5px 5px var(--color-shadow);
 }
 
 .logoSpace {
-  width: 30rem;
+  width: min(30rem, 36vw, 32dvh);
 }
 
-/* ---------- Lobby controls ---------- */
-
 .lobbyActions {
-  /* position: absolute;
-  bottom: var(--space-xl);
-  left: 50%; */
-
   z-index: 2;
-
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
-
-  /* transform: translateX(-50%); */
-
+  gap: clamp(0.3rem, 1dvh, 0.75rem);
   text-align: center;
 }
-
-/* ---------- Player avatars ---------- */
 
 .playerName {
   max-width: 10rem;
   margin-top: var(--space-sm);
-
   overflow: hidden;
-
   font-size: 1.1rem;
   font-weight: 600;
   text-align: center;
@@ -224,263 +184,17 @@
   white-space: nowrap;
 }
 
-/* ---------- Drawing / round phase ---------- */
-
 .roundContent {
   width: 100%;
   height: 100%;
-
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-lg);
-  padding: var(--space-xl);
-
+  gap: 0.5rem;
+  padding: 0.5rem;
   text-align: center;
 }
 
-.promptLabel {
-  margin: 0 0 var(--space-xs);
-
-  font-size: 0.9rem;
-
-  opacity: 0.65;
-}
-
-.prompt {
-  max-width: 40rem;
-  margin: 0;
-
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.roundPlayers {
-  width: 100%;
-
-  flex: 1;
-
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-
-  gap: var(--space-xl);
-}
-
-.roundPlayer {
-  display: flex;
-  width: 8rem;
-  flex-direction: column;
-  align-items: center;
-}
-
-.roundAvatar {
-  width: 100%;
-}
-
-.roundPlayerDetails {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 0;
-}
-
-.playerStatus {
-  margin-top: var(--space-xs);
-
-  font-size: 0.8rem;
-
-  opacity: 0.65;
-}
-
-/* ---------- Mobile host layout ---------- */
-
-@media (max-width: 48rem) {
-  .header {
-    padding: var(--space-md);
-  }
-
-  .title {
-    font-size: 1.5rem;
-  }
-
-  .lobbyPlayers {
-    display: none;
-  }
-
-  .logoSpace {
-    width: 10rem;
-    height: 7rem;
-  }
-
-  .roundContent {
-    padding: var(--space-md);
-  }
-
-  .prompt {
-    font-size: 1.5rem;
-    overflow-wrap: anywhere;
-  }
-
-  .roundPlayers {
-    flex: none;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
-    max-width: 32rem;
-    gap: var(--space-md);
-  }
-
-  .roundPlayer {
-    width: 100%;
-    min-width: 0;
-    flex-direction: row;
-    gap: var(--space-sm);
-    text-align: left;
-  }
-
-  .roundAvatar {
-    width: 2.5rem;
-    flex: 0 0 2.5rem;
-  }
-
-  .roundPlayerDetails {
-    flex: 1;
-    min-width: 0;
-    align-items: flex-start;
-  }
-
-  .roundPlayer .playerName {
-    max-width: 100%;
-    margin-top: 0;
-    font-size: 1rem;
-    text-align: left;
-  }
-}
-
-.stage {
-  padding: clamp(0.5rem, 2dvh, 1.5rem);
-  gap: clamp(0.4rem, 1.5dvh, 1rem);
-}
-.logoSpace {
-  width: min(30rem, 36vw, 32dvh);
-}
-.lobbyCenter {
-  padding: 0.5rem 1rem;
-  background: var(--color-panel);
-  border: 3px solid var(--color-border);
-  border-radius: 1rem;
-  box-shadow: 5px 5px var(--color-shadow);
-}
-.stageTitle {
-  font-size: clamp(1.2rem, 3dvh, 2rem);
-  font-weight: 900;
-}
-.lobbyActions {
-  gap: clamp(0.3rem, 1dvh, 0.75rem);
-}
-.playerCount {
-  font-size: 0.95rem;
-  opacity: 1;
-  font-weight: 850;
-  padding: 0.15rem 0.65rem;
-  background: var(--color-green);
-  border: 2px solid var(--color-border);
-  transform: rotate(-2deg);
-}
-.startButton {
-  background: var(--color-red);
-}
-.lobbyPlayer {
-  width: min(6rem, 10vw, 15dvh);
-}
-.roundContent {
-  padding: 0.5rem;
-  gap: 0.5rem;
-}
-.promptLabel {
-  background: var(--color-green);
-  padding: 0.1rem 0.6rem;
-  border: 2px solid var(--color-border);
-  font-weight: 850;
-  opacity: 1;
-}
-.prompt {
-  padding: 0.5rem 1rem;
-  background: var(--color-panel);
-  border: 3px solid var(--color-border);
-  border-radius: 0.75rem;
-  box-shadow: 4px 4px var(--color-shadow);
-  font-size: clamp(1rem, 3dvh, 2rem);
-}
-.roundPlayers {
-  min-height: 0;
-  gap: clamp(0.4rem, 2dvh, 1.5rem);
-}
-.roundPlayer {
-  padding: 0.4rem;
-  border: 2px solid var(--color-border);
-  border-radius: 0.75rem;
-  background: var(--color-panel);
-  width: min(8rem, 14vw, 23dvh);
-  box-shadow: 3px 3px var(--color-shadow);
-}
-.roundPlayer .playerName {
-  font-size: 0.85rem;
-}
-.playerStatus {
-  font-size: 0.7rem;
-}
-@media (max-width: 48rem), (max-height: 500px) {
-  .roundPlayers {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: minmax(0, 1fr);
-    align-content: center;
-    align-items: center;
-    max-width: 40rem;
-    gap: 0.4rem;
-  }
-  .roundPlayer {
-    width: 100%;
-    flex-direction: row;
-    gap: 0.4rem;
-    padding: 0.25rem;
-  }
-  .roundAvatar {
-    width: min(2.5rem, 6dvh);
-    flex: 0 0 min(2.5rem, 6dvh);
-  }
-  .roundPlayerDetails {
-    align-items: flex-start;
-    flex: 1;
-  }
-  .roundPlayer .playerName {
-    margin: 0;
-    max-width: 100%;
-    font-size: 0.75rem;
-  }
-  .logoSpace {
-    height: auto;
-    width: min(12rem, 22dvh);
-  }
-}
-@media (max-height: 500px) and (min-width: 550px) {
-  .lobbyPlayers {
-    display: none;
-  }
-  .stage:has(.lobbyActions) {
-    flex-direction: row;
-    gap: 2rem;
-  }
-  .roundPlayers {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
-/* Keep the shared round deadline visible above the drawing prompt. */
 .roundHeading {
   display: flex;
   align-items: center;
@@ -489,9 +203,21 @@
   gap: 0.5rem;
   flex-shrink: 0;
 }
+
 .roundHeading .promptLabel {
   margin: 0;
 }
+
+.promptLabel {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.9rem;
+  font-weight: 850;
+  color: var(--color-action-text);
+  padding: 0.1rem 0.6rem;
+  background: var(--color-green);
+  border: 2px solid var(--color-border);
+}
+
 .timer {
   display: flex;
   align-items: center;
@@ -507,19 +233,79 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
 .timerLabel {
   font-family: Inter, system-ui, sans-serif;
   font-size: 0.7rem;
   font-weight: 800;
 }
+
 .roundContent > .prompt {
   flex-shrink: 0;
+}
+
+.prompt {
+  max-width: 40rem;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font-size: clamp(1rem, 3dvh, 2rem);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  background: var(--color-panel);
+  border: 3px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: 4px 4px var(--color-shadow);
+}
+
+.roundPlayers {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.4rem, 2dvh, 1.5rem);
+}
+
+.roundPlayer {
+  display: flex;
+  width: min(8rem, 14vw, 23dvh);
+  flex-direction: column;
+  align-items: center;
+  padding: 0.4rem;
+  border: 2px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-panel);
+  box-shadow: 3px 3px var(--color-shadow);
+}
+
+.roundAvatar {
+  width: 100%;
+}
+
+.roundPlayerDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.roundPlayer .playerName {
+  font-size: 0.85rem;
+}
+
+.playerStatus {
+  margin-top: var(--space-xs);
+  font-size: 0.7rem;
+  opacity: 0.65;
 }
 
 .readyCount {
   font-weight: 850;
   font-size: 0.85rem;
 }
+
 .readyStatus {
   font-size: 0.7rem;
   font-weight: 800;
@@ -528,7 +314,65 @@
   padding: 0.1rem 0.3rem;
 }
 
-.playerCount,
-.promptLabel {
-  color: var(--color-action-text);
+@media (max-width: 48rem) {
+  .lobbyPlayers {
+    display: none;
+  }
+}
+
+@media (max-width: 48rem), (max-height: 500px) {
+  .roundPlayers {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    align-content: center;
+    align-items: center;
+    max-width: 40rem;
+    gap: 0.4rem;
+  }
+
+  .roundPlayer {
+    width: 100%;
+    flex-direction: row;
+    gap: 0.4rem;
+    padding: 0.25rem;
+  }
+
+  .roundAvatar {
+    width: min(2.5rem, 6dvh);
+    flex: 0 0 min(2.5rem, 6dvh);
+  }
+
+  .roundPlayerDetails {
+    align-items: flex-start;
+    flex: 1;
+  }
+
+  .roundPlayer .playerName {
+    margin: 0;
+    max-width: 100%;
+    font-size: 0.75rem;
+    text-align: left;
+  }
+
+  .logoSpace {
+    height: auto;
+    width: min(12rem, 22dvh);
+  }
+}
+
+@media (max-height: 500px) and (min-width: 550px) {
+  .lobbyPlayers {
+    display: none;
+  }
+
+  .stage:has(.lobbyActions) {
+    flex-direction: row;
+    gap: 2rem;
+  }
+
+  .roundPlayers {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
