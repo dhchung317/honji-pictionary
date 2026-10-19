@@ -43,7 +43,7 @@
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   padding: 1rem;
-  border: 2px solid var(--color-border);
+  border: var(--chrome-border);
   border-radius: 0.8rem;
   background: var(--color-results-well);
 }

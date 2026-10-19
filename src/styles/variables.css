@@ -59,6 +59,29 @@
   --drawing-chrome-height: 13rem;
   --lobby-chrome-height: 17rem;
 
+  /* Comic chrome: ink borders and hard offset shadows */
+  --chrome-border-width: 2px;
+  --chrome-border-width-thick: 3px;
+  --chrome-border: var(--chrome-border-width) solid var(--color-border);
+  --chrome-border-thick: var(--chrome-border-width-thick) solid var(--color-border);
+
+  --chrome-radius-stamp: 3px;
+  --chrome-radius-button: 0.6rem;
+  --chrome-radius-canvas: 0.65rem;
+  --chrome-radius-card: 0.9rem;
+  --chrome-radius-panel: 1rem;
+  --chrome-radius-hero: 1.4rem;
+
+  --shadow-hard-xs: 2px 2px var(--color-shadow);
+  --shadow-hard-xs-offset: 2px 2px 0 var(--color-shadow);
+  --shadow-hard-sm: 3px 3px 0 var(--color-shadow);
+  --shadow-hard-md: 4px 4px var(--color-shadow);
+  --shadow-hard-md-offset: 4px 4px 0 var(--color-shadow);
+  --shadow-hard-lg: 5px 5px var(--color-shadow);
+  --shadow-hard-lg-offset: 5px 5px 0 var(--color-shadow);
+  --shadow-hard-xl: 6px 6px 0 var(--color-shadow);
+  --shadow-hard-hero: 9px 9px 0 var(--color-shadow);
+
   --font-room-code: "Atkinson Hyperlegible Mono", monospace;
 
   --spark-clip: polygon(

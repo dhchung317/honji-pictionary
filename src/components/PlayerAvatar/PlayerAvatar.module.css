@@ -9,9 +9,9 @@
   overflow: hidden;
 
   border-radius: 50%;
-  border: 2px solid var(--color-border);
+  border: var(--chrome-border);
   background: var(--color-panel);
-  box-shadow: 3px 3px var(--color-shadow);
+  box-shadow: var(--shadow-hard-sm);
 }
 
 .image {

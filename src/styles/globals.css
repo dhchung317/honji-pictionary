@@ -52,14 +52,14 @@ select {
 
 button {
   padding: 0.6em 1.2em;
-  border: 2px solid var(--color-border);
-  border-radius: 0.6rem;
+  border: var(--chrome-border);
+  border-radius: var(--chrome-radius-button);
   font-size: 1em;
   font-weight: 800;
   font-family: inherit;
   background: var(--color-blue);
   color: var(--color-action-text);
-  box-shadow: 3px 3px 0 var(--color-shadow);
+  box-shadow: var(--shadow-hard-sm);
   cursor: pointer;
 }
 
@@ -130,9 +130,9 @@ button:disabled {
   max-width: 34rem;
   padding: 1rem;
   background: var(--color-panel);
-  border: 2px solid var(--color-border);
-  border-radius: 0.75rem;
-  box-shadow: 4px 4px var(--color-shadow);
+  border: var(--chrome-border);
+  border-radius: var(--chrome-radius-button);
+  box-shadow: var(--shadow-hard-md);
 }
 @media (max-width: 40rem) {
   .app-root {
