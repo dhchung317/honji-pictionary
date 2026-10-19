@@ -1,5 +1,6 @@
 @import "./variables.css";
 @import "./reset.css";
+@import "./chrome.css";
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

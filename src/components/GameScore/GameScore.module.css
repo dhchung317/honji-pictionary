@@ -1,4 +1,4 @@
-.game-score {
+.root {
   --medal-fill: var(--color-blue);
   --medal-inner: var(--color-medal-blue-inner);
   position: relative;
@@ -7,48 +7,57 @@
   flex-shrink: 0;
   filter: drop-shadow(2px 2px 0 var(--color-artwork-ink));
 }
-.game-score--gold {
+
+.gold {
   --medal-fill: var(--color-yellow);
   --medal-inner: var(--color-medal-gold-inner);
 }
-.game-score--silver {
+
+.silver {
   --medal-fill: var(--color-medal-silver);
   --medal-inner: var(--color-medal-silver-inner);
 }
-.game-score--bronze {
+
+.bronze {
   --medal-fill: var(--color-medal-bronze);
   --medal-inner: var(--color-medal-bronze-inner);
 }
-.game-score__art {
+
+.art {
   display: block;
   width: 100%;
   height: auto;
   overflow: visible;
 }
-.game-score__face {
+
+.face {
   fill: var(--medal-fill);
   stroke: var(--color-artwork-ink);
   stroke-width: 2.5;
   stroke-linejoin: round;
 }
-.game-score__ring {
+
+.ring {
   fill: var(--medal-inner);
   stroke: var(--color-artwork-ink);
   stroke-width: 1.5;
 }
-.game-score__ribbon {
+
+.ribbon {
   fill: var(--color-red);
   stroke: var(--color-artwork-ink);
   stroke-width: 2.5;
   stroke-linejoin: round;
 }
-.game-score__shine {
+
+.shine {
   fill: none;
   stroke: var(--color-medal-shine);
   stroke-width: 3;
   stroke-linecap: round;
 }
-.game-score__number {
+
+.number {
   position: absolute;
   left: 50%;
   top: 36.29%;
@@ -58,10 +67,12 @@
   justify-content: center;
   width: 62%;
 }
-.game-score--burst .game-score__number {
+
+.numberBurst {
   top: 50%;
 }
-.game-score__number img {
+
+.number img {
   height: var(--score-digit-height);
   width: auto;
   min-width: 0;
@@ -70,10 +81,11 @@
 }
 
 /* Numeral thresholds are independent of the rank-based medal colors. */
-.game-score__number--silver img {
+.numberSilver img {
   filter: grayscale(1) brightness(1.15);
 }
-.game-score__number--bronze img {
+
+.numberBronze img {
   filter: sepia(2) saturate(2.75) hue-rotate(-45deg) brightness(0.68)
     contrast(1.85);
 }

@@ -16,7 +16,7 @@ import { upload } from "@vercel/blob/client";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { updatePlayerAvatar } from "../lib/playersApi";
 
-import styles from "./PlayerLobby.module.css";
+import shellStyles from "../styles/drawingShell.module.css";
 import { PlayerAvatarView } from "./views/PlayerAvatarView";
 import { PhaseMessageView } from "./views/PhaseMessageView";
 
@@ -188,7 +188,7 @@ function PlayerLobby() {
   }
 
   return (
-    <main className={styles.page}>
+    <main className={shellStyles.page}>
       {roomError && (
         <p role="status">
           Connection interrupted. Reconnecting… Your drawing is still here.

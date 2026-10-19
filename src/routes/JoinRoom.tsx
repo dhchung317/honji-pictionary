@@ -11,6 +11,7 @@ import { useCountdown } from "../hooks/useCountdown";
 import { useAsync } from "../hooks/useAsync";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 
+import shellStyles from "../styles/drawingShell.module.css";
 import styles from "./JoinRoom.module.css";
 import { PlayerDrawingView } from "./views/PlayerDrawingView";
 import { PhaseMessageView } from "./views/PhaseMessageView";
@@ -266,7 +267,7 @@ function JoinRoom() {
   }
 
   return (
-    <main className={styles.page}>
+    <main className={shellStyles.page}>
       {roomError && (
         <p role="status">
           Connection interrupted. Reconnecting… Your drawing is still here.
