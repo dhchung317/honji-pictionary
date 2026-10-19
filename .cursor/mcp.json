@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "dependency-assistant": {
+      "command": "node",
+      "args": ["/Users/hyunki/Documents/ChatGPT/mcp research/dist/index.js"],
+      "env": {
+        "REPO_PATH": "/Users/hyunki/Desktop/honji-pictionary"
+      }
+    }
+  }
+}
