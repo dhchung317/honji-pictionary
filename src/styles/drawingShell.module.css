@@ -1,0 +1,21 @@
+/* Shared layout for player drawing and avatar lobby screens. */
+.page {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.5rem, 2dvh, 1.5rem);
+}
+
+.canvasWidth {
+  width: min(
+    100%,
+    32rem,
+    max(
+      0px,
+      calc(var(--game-content-height) - var(--shell-chrome-height, var(--drawing-chrome-height)))
+    )
+  );
+}
