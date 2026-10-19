@@ -38,9 +38,9 @@
   flex-shrink: 0;
   width: min(100%, 36rem);
   background: var(--color-panel);
-  border: 3px solid var(--color-border);
-  border-radius: 1.4rem;
-  box-shadow: 9px 9px 0 var(--color-shadow);
+  border: var(--chrome-border-thick);
+  border-radius: var(--chrome-radius-hero);
+  box-shadow: var(--shadow-hard-hero);
   padding: 2rem 2.25rem 0;
 }
 
@@ -56,8 +56,8 @@
   z-index: 2;
   display: inline-block;
   padding: 0.3rem 0.8rem;
-  border: 2px solid var(--color-border);
-  border-radius: 3px;
+  border: var(--chrome-border);
+  border-radius: var(--chrome-radius-stamp);
   background: var(--color-green);
   color: var(--color-action-text);
   font-size: 0.7rem;
@@ -104,10 +104,11 @@
   line-height: 1.55;
 }
 
+/* Home entry buttons add press motion on top of the global comic button. */
 .entry button {
-  border: 2px solid var(--color-border);
-  border-radius: 0.6rem;
-  box-shadow: 4px 4px 0 var(--color-shadow);
+  border: var(--chrome-border);
+  border-radius: var(--chrome-radius-button);
+  box-shadow: var(--shadow-hard-md-offset);
   font-weight: 850;
   color: var(--color-action-text);
   display: flex;
@@ -121,7 +122,7 @@
 
 .entry button:hover:not(:disabled) {
   transform: translate(-1px, -1px);
-  box-shadow: 5px 5px 0 var(--color-shadow);
+  box-shadow: var(--shadow-hard-lg-offset);
 }
 
 .entry button:active:not(:disabled) {
@@ -204,7 +205,7 @@
   min-width: 0;
   height: 3rem;
   padding: 0.7rem 0.8rem;
-  border: 2px solid var(--color-border);
+  border: var(--chrome-border);
   border-radius: 0.5rem;
   background: var(--color-input);
   color: var(--color-text);
@@ -251,7 +252,7 @@
   gap: 0.6rem 1.25rem;
   margin: 1.75rem -2.25rem 0;
   padding: 1rem;
-  border-top: 2px solid var(--color-border);
+  border-top: var(--chrome-border);
   border-radius: 0 0 1.2rem 1.2rem;
   background: var(--color-panel-muted);
   color: var(--color-text-muted);
@@ -304,9 +305,9 @@
   right: calc(50% - 28rem);
   top: 12%;
   transform: rotate(40deg);
-  border: 3px solid var(--color-border);
+  border: var(--chrome-border-thick);
   background: var(--color-spark-red);
-  box-shadow: 5px 5px 0 var(--color-shadow);
+  box-shadow: var(--shadow-hard-lg-offset);
 }
 
 .themeControl {
@@ -330,7 +331,7 @@
   background: var(--color-blue);
   font-size: 0.7rem;
   font-weight: 850;
-  box-shadow: 2px 2px 0 var(--color-shadow);
+  box-shadow: var(--shadow-hard-xs-offset);
 }
 
 .instructionsTab span {
@@ -350,11 +351,11 @@
   padding: clamp(1rem, 3vw, 2rem);
   overflow-y: auto;
   overscroll-behavior: contain;
-  border: 3px solid var(--color-border);
-  border-radius: 1rem;
+  border: var(--chrome-border-thick);
+  border-radius: var(--chrome-radius-panel);
   background: var(--color-panel);
   color: var(--color-text);
-  box-shadow: 6px 6px 0 var(--color-shadow);
+  box-shadow: var(--shadow-hard-xl);
 }
 
 .instructionsModal::backdrop {
@@ -385,7 +386,7 @@
   background: var(--color-red);
   font-size: 1.5rem;
   line-height: 1;
-  box-shadow: 2px 2px var(--color-shadow);
+  box-shadow: var(--shadow-hard-xs);
 }
 
 .instructionsIntro {
@@ -396,8 +397,8 @@
 
 .screenTip {
   padding: 0.85rem 1rem;
-  border: 2px solid var(--color-border);
-  border-radius: 0.6rem;
+  border: var(--chrome-border);
+  border-radius: var(--chrome-radius-button);
   background: var(--color-highlight-panel);
 }
 
@@ -456,7 +457,7 @@
 
   .card {
     padding: 1.5rem 1.25rem 0;
-    box-shadow: 5px 5px 0 var(--color-shadow);
+    box-shadow: var(--shadow-hard-lg-offset);
   }
 
   .gameFacts {

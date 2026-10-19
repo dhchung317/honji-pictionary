@@ -4,12 +4,12 @@
   font-weight: 850;
   color: var(--color-action-text);
   background: var(--color-red);
-  border: 2px solid var(--color-border);
+  border: var(--chrome-border);
   font-variant-numeric: tabular-nums;
 }
 
 .chromeStamp {
-  border: 2px solid var(--color-border);
+  border: var(--chrome-border);
   font-weight: 850;
   color: var(--color-action-text);
 }
@@ -20,4 +20,18 @@
 
 .chromeStampRed {
   background: var(--color-red);
+}
+
+.chromePanel {
+  background: var(--color-panel);
+  border: var(--chrome-border-thick);
+  border-radius: var(--chrome-radius-panel);
+  box-shadow: var(--shadow-hard-lg);
+}
+
+.chromeArtworkSurface {
+  border: var(--chrome-border-thick);
+  border-radius: var(--chrome-radius-canvas);
+  box-shadow: var(--shadow-hard-md-offset);
+  background: var(--color-artwork-paper);
 }

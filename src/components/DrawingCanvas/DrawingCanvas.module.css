@@ -3,12 +3,9 @@
   max-width: 600px;
 }
 .canvas {
+  composes: chromeArtworkSurface from global;
   display: block;
   width: 100%;
   height: auto;
-  border: 3px solid var(--color-border);
-  border-radius: 0.65rem;
-  box-shadow: 4px 4px var(--color-shadow);
   touch-action: none;
-  background: var(--color-artwork-paper);
 }

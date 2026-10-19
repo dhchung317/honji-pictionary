@@ -7,11 +7,11 @@
   width: 3.75rem;
   height: 2rem;
   padding: 0.25rem;
-  border: 2px solid var(--color-border);
+  border: var(--chrome-border);
   border-radius: 2rem;
   background: var(--color-panel);
   color: var(--color-text);
-  box-shadow: 2px 2px 0 var(--color-shadow);
+  box-shadow: var(--shadow-hard-xs-offset);
 }
 .toggle svg {
   position: relative;

@@ -13,16 +13,13 @@
   height: auto;
 }
 .content {
+  composes: chromePanel from global;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
   max-width: 34rem;
   padding: 1.25rem;
-  background: var(--color-panel);
-  border: 3px solid var(--color-border);
-  border-radius: 1rem;
-  box-shadow: 5px 5px var(--color-shadow);
 }
 .spinner {
   width: 2.5rem;
