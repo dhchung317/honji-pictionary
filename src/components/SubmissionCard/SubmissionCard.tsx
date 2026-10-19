@@ -44,10 +44,9 @@ export function SubmissionCard({
       </div>
 
       <div className={styles.imageContainer}>
-        <div className={styles.imageFrame} style={{ aspectRatio: imageRatio }}>
+        <div className={styles.imageFrame}>
           <img
             className={styles.submissionImage}
-            style={{ width: "100%", height: "auto", aspectRatio: imageRatio }}
             src={submission.imageUrl}
             alt={`Submission from ${submission.playerName}`}
             onLoad={(event) => {
